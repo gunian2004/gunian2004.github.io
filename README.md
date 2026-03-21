@@ -71,12 +71,12 @@
 ## 💼 Professional Experience
 
 ### AI Product Development Engineer
-**Guangzhou Zhiyong Kaiwu AI Technology Co., Ltd.** | *June 2025 - Present*
+**Guangzhou Zhiyong Kaiwu AI Technology Co., Ltd.** | *June 2025 - March 2026*
 
 - 🤝 Collaborated with former Microsoft Chief Technology Experts to develop **Agent Foundry** (Agent Building Platform)
 - 📦 Delivered AI solutions across software, manufacturing, and materials industries
 - 🔧 Built custom AI agents deployed on Web, Android, and iOS platforms
-- 💰 **Achieved millions in revenue** through product delivery and iteration
+- 💰 **Achieved over a million deliveries** through product delivery and iteration
 - 🧪 Full-cycle testing: Unit → Integration → System → Confirmation
 
 ---
