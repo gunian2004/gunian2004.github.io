@@ -23,7 +23,8 @@
 ### 📋 Personal Profile
 
 **Name**: gunian
-**Graduation Year**: 2024
+**EnName**: Cedric
+**Graduation Year**: 2026
 **University**: Guangzhou Commerce University
 **Major**: Software Engineering
 **Location**: Guangzhou, China
