@@ -1,0 +1,287 @@
+.ai-title {
+    font-size: 3rem;
+    font-weight: 700;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+    text-align: center;
+    animation: aiTitleGlow 3s ease-in-out infinite;
+}
+
+.ai-subtitle {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+@keyframes aiTitleGlow {
+    0%, 100% { filter: drop-shadow(0 0 10px rgba(0, 212, 255, 0.5)); }
+    50% { filter: drop-shadow(0 0 20px rgba(255, 0, 170, 0.5)); }
+}
+
+.back-home-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 9998;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.15), rgba(255, 0, 170, 0.15));
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 25px;
+    color: var(--text-main);
+    text-decoration: none;
+    font-size: 0.85rem;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.back-home-btn:hover {
+    transform: translateY(-3px);
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.3), rgba(255, 0, 170, 0.3));
+    border-color: var(--primary);
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+}
+
+.sections-wrapper {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.ai-section {
+    margin-bottom: 20px;
+    background: var(--bg-card);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    overflow: hidden;
+    backdrop-filter: blur(20px);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    opacity: 0;
+    transform: translateY(30px);
+    animation: sectionFadeIn 0.6s ease-out forwards;
+}
+
+.ai-section:nth-child(1) { animation-delay: 0.1s; }
+.ai-section:nth-child(2) { animation-delay: 0.2s; }
+.ai-section:nth-child(3) { animation-delay: 0.3s; }
+.ai-section:nth-child(4) { animation-delay: 0.4s; }
+.ai-section:nth-child(5) { animation-delay: 0.5s; }
+
+@keyframes sectionFadeIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.ai-section:hover {
+    border-color: rgba(0, 212, 255, 0.3);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
+}
+
+.ai-section.active {
+    border-color: var(--primary);
+    box-shadow: 0 0 30px rgba(0, 212, 255, 0.3), 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.ai-section.active .section-arrow {
+    transform: rotate(180deg);
+    color: var(--primary);
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.section-header:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.section-icon {
+    width: 55px;
+    height: 55px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+}
+
+.ai-section:hover .section-icon,
+.ai-section.active .section-icon {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+}
+
+.section-info {
+    flex: 1;
+}
+
+.section-info .section-title {
+    font-size: 1.25rem;
+    color: var(--text-main);
+    margin-bottom: 6px;
+    background: none;
+    -webkit-text-fill-color: unset;
+}
+
+.section-info .section-desc {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.section-arrow {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    transition: all 0.3s ease;
+    opacity: 0.7;
+}
+
+.section-arrow:hover {
+    opacity: 1;
+}
+
+.section-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ai-section.active .section-content {
+    max-height: 800px;
+}
+
+.content-inner {
+    padding: 0 25px 25px 25px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding-top: 20px;
+}
+
+.content-inner h3 {
+    color: var(--primary);
+    font-size: 1rem;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.content-inner h3::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: var(--secondary);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--secondary);
+}
+
+.content-list {
+    list-style: none;
+    margin-bottom: 20px;
+}
+
+.content-list li {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    padding: 10px 15px;
+    margin-bottom: 8px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    border-left: 3px solid var(--primary);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.content-list li::before {
+    content: '▸';
+    color: var(--secondary);
+    margin-right: 10px;
+}
+
+.content-list li:hover {
+    background: rgba(0, 212, 255, 0.1);
+    transform: translateX(5px);
+    border-left-color: var(--secondary);
+}
+
+.content-list li strong {
+    color: var(--primary);
+}
+
+.code-block {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(0, 212, 255, 0.2);
+    border-radius: 12px;
+    padding: 15px;
+    margin-top: 10px;
+    overflow-x: auto;
+}
+
+.code-block pre {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    font-family: 'Consolas', 'Monaco', monospace;
+}
+
+.code-block::before {
+    content: '📝 示例';
+    display: block;
+    color: var(--primary);
+    font-size: 0.8rem;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 600px) {
+    .ai-title {
+        font-size: 2rem;
+    }
+    
+    .section-header {
+        padding: 18px;
+        gap: 12px;
+    }
+    
+    .section-icon {
+        width: 45px;
+        height: 45px;
+        font-size: 1.3rem;
+    }
+    
+    .section-info .section-title {
+        font-size: 1.1rem;
+    }
+    
+    .section-info .section-desc {
+        font-size: 0.8rem;
+    }
+    
+    .content-inner {
+        padding: 0 18px 18px 18px;
+    }
+    
+    .back-home-btn {
+        padding: 8px 14px;
+        font-size: 0.8rem;
+    }
+}
