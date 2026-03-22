@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI模式 | 陈柏贤</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/AI.css">
+</head>
+<body>
+    <div class="loading-screen" id="loading">
+        <div class="loader"></div>
+    </div>
+
+    <canvas id="canvas-bg"></canvas>
+
+    <a href="index.html" class="back-home-btn" title="返回首页">
+        <span class="back-btn-icon">🏠</span>
+        <span class="back-btn-text">返回首页</span>
+    </a>
+
+    <div class="container">
+        <section class="hero">
+            <h1 class="ai-title">AI 模式</h1>
+            <p class="ai-subtitle">探索AI工具与智能开发的世界</p>
+        </section>
+
+        <div class="sections-wrapper">
+            <section class="ai-section" data-section="prompts">
+                <div class="section-header">
+                    <div class="section-icon">💡</div>
+                    <div class="section-info">
+                        <h2 class="section-title">提示词板块</h2>
+                        <p class="section-desc">分享高效的AI提示词模板与写作技巧，让AI输出更精准</p>
+                    </div>
+                    <div class="section-arrow">▼</div>
+                </div>
+                <div class="section-content">
+                    <div class="content-inner">
+                        <h3>提示词技巧</h3>
+                        <ul class="content-list">
+                            <li>角色扮演：明确AI扮演的角色身份</li>
+                            <li>结构化输出：使用Markdown格式要求输出</li>
+                            <li>few-shot学习：提供示例引导AI理解</li>
+                            <li>链式思考：分步引导AI推理过程</li>
+                        </ul>
+                        <h3>实用模板</h3>
+                        <div class="code-block">
+                            <pre>角色：你是一位资深技术作家
+任务：撰写一篇技术教程
+要求：
+1. 语言通俗易懂
+2. 包含代码示例
+3. 分步骤讲解</pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="ai-section" data-section="design">
+                <div class="section-header">
+                    <div class="section-icon">🎨</div>
+                    <div class="section-info">
+                        <h2 class="section-title">软件设计板块</h2>
+                        <p class="section-desc">软件架构设计、UI/UX设计原则与最佳实践</p>
+                    </div>
+                    <div class="section-arrow">▼</div>
+                </div>
+                <div class="section-content">
+                    <div class="content-inner">
+                        <h3>设计原则</h3>
+                        <ul class="content-list">
+                            <li>SOLID原则：单一职责、开闭、里氏替换、接口隔离、依赖倒置</li>
+                            <li>KISS原则：保持简单和直接</li>
+                            <li>DRY原则：不要重复自己</li>
+                            <li>YAGNI原则：你不会需要它</li>
+                        </ul>
+                        <h3>架构模式</h3>
+                        <ul class="content-list">
+                            <li>微服务架构</li>
+                            <li>前后端分离</li>
+                            <li>Serverless架构</li>
+                            <li>事件驱动架构</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="ai-section" data-section="agent">
+                <div class="section-header">
+                    <div class="section-icon">🤖</div>
+                    <div class="section-info">
+                        <h2 class="section-title">智能体开发板块</h2>
+                        <p class="section-desc">基于Coze、Dify等平台的智能体开发与应用</p>
+                    </div>
+                    <div class="section-arrow">▼</div>
+                </div>
+                <div class="section-content">
+                    <div class="content-inner">
+                        <h3>智能体平台</h3>
+                        <ul class="content-list">
+                            <li><strong>Coze</strong>：字节跳动推出的AI Bot开发平台</li>
+                            <li><strong>Dify</strong>：开源的大语言模型应用开发平台</li>
+                            <li><strong>Agent Foundry</strong>：公司内部的智能体搭建平台</li>
+                            <li><strong>LangChain</strong>：构建AI应用的开发框架</li>
+                        </ul>
+                        <h3>开发技巧</h3>
+                        <ul class="content-list">
+                            <li>合理设计工作流节点</li>
+                            <li>配置有效的变量与记忆</li>
+                            <li>设置触发条件和插件集成</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="ai-section" data-section="automation">
+                <div class="section-header">
+                    <div class="section-icon">⚡</div>
+                    <div class="section-info">
+                        <h2 class="section-title">自动化工作流板块</h2>
+                        <p class="section-desc">使用n8n等工具构建自动化工作流，提升效率</p>
+                    </div>
+                    <div class="section-arrow">▼</div>
+                </div>
+                <div class="section-content">
+                    <div class="content-inner">
+                        <h3>n8n 工作流</h3>
+                        <ul class="content-list">
+                            <li><strong>数据同步</strong>：多平台数据自动同步与处理</li>
+                            <li><strong>定时任务</strong>：自动化报告生成与发送</li>
+                            <li><strong>Webhook集成</strong>：第三方服务API对接</li>
+                            <li><strong>AI工作流</strong>：结合LLM的智能自动化</li>
+                        </ul>
+                        <h3>应用场景</h3>
+                        <ul class="content-list">
+                            <li>社交媒体自动发布与互动</li>
+                            <li>客户信息自动录入CRM</li>
+                            <li>订单处理与通知自动化</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="ai-section" data-section="product">
+                <div class="section-header">
+                    <div class="section-icon">📊</div>
+                    <div class="section-info">
+                        <h2 class="section-title">产品分析板块</h2>
+                        <p class="section-desc">产品需求分析、竞品研究与用户体验优化</p>
+                    </div>
+                    <div class="section-arrow">▼</div>
+                </div>
+                <div class="section-content">
+                    <div class="content-inner">
+                        <h3>分析方法</h3>
+                        <ul class="content-list">
+                            <li><strong>SWOT分析</strong>：优势、劣势、机会、威胁</li>
+                            <li><strong>用户画像</strong>：目标用户特征与需求分析</li>
+                            <li><strong>需求池管理</strong>：优先级排序与迭代规划</li>
+                            <li><strong>A/B测试</strong>：数据驱动的决策优化</li>
+                        </ul>
+                        <h3>分析工具</h3>
+                        <ul class="content-list">
+                            <li>Figma：UI设计与原型制作</li>
+                            <li>Axure：复杂原型设计</li>
+                            <li>Notion：产品文档管理</li>
+                            <li>Mixpanel：用户行为分析</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <footer>
+            <p>© 2026 gunian 用 ❤️ 打造 AI 模式</p>
+        </footer>
+    </div>
+
+    <script src="script/main.js"></script>
+    <script src="script/AI.js"></script>
+</body>
+</html>
