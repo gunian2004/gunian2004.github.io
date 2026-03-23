@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>陈柏贤 | 软件工程师</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/transition.css">
     <link rel="stylesheet" href="css/stars.css">
 </head>
 <body>
@@ -12,7 +13,7 @@
         <div class="loader"></div>
     </div>
 
-    <a href="AI.html" class="ai-mode-btn" title="AI模式">
+    <a href="AI.html" class="ai-mode-btn" title="AI模式" onclick="TransitionManager.toAI(event); return false;">
         <span class="ai-btn-icon">🤖</span>
         <span class="ai-btn-text">AI模式</span>
     </a>
@@ -342,5 +343,6 @@
 
     <script src="script/main.js"></script>
     <script src="script/stars.js"></script>
+    <script src="script/transition.js"></script>
 </body>
 </html>

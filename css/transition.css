@@ -1,0 +1,292 @@
+.page-transition-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 99999;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    overflow: hidden;
+}
+
+.page-transition-overlay.active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: all;
+}
+
+.portal-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 0;
+    height: 0;
+}
+
+.portal-circle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: radial-gradient(circle, 
+        rgba(0, 212, 255, 0.9) 0%, 
+        rgba(255, 0, 170, 0.7) 40%, 
+        rgba(123, 44, 191, 0.5) 70%,
+        transparent 100%);
+    opacity: 0;
+    box-shadow: 
+        0 0 60px rgba(0, 212, 255, 0.8),
+        0 0 120px rgba(255, 0, 170, 0.5),
+        0 0 180px rgba(123, 44, 191, 0.3);
+}
+
+.portal-circle.expand {
+    animation: portalExpand 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.portal-circle.contract {
+    animation: portalContract 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes portalExpand {
+    0% {
+        width: 0;
+        height: 0;
+        opacity: 1;
+    }
+    30% {
+        opacity: 1;
+    }
+    100% {
+        width: 300vmax;
+        height: 300vmax;
+        opacity: 1;
+    }
+}
+
+@keyframes portalContract {
+    0% {
+        width: 300vmax;
+        height: 300vmax;
+        opacity: 1;
+    }
+    70% {
+        opacity: 1;
+    }
+    100% {
+        width: 0;
+        height: 0;
+        opacity: 1;
+    }
+}
+
+.portal-ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    border: 3px solid transparent;
+    opacity: 0;
+}
+
+.portal-ring.expand {
+    animation: ringExpand 0.8s ease-out forwards;
+}
+
+@keyframes ringExpand {
+    0% {
+        width: 0;
+        height: 0;
+        border-color: rgba(0, 212, 255, 0.8);
+        opacity: 1;
+    }
+    100% {
+        width: 250vmax;
+        height: 250vmax;
+        border-color: rgba(255, 0, 170, 0);
+        opacity: 0;
+    }
+}
+
+.particle-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 0;
+    height: 0;
+}
+
+.particle {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    opacity: 0;
+}
+
+.particle.spiral-in {
+    animation: particleSpiralIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.particle.spiral-out {
+    animation: particleSpiralOut 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes particleSpiralIn {
+    0% {
+        transform: translate(0, 0) rotate(0deg) scale(1);
+        opacity: 0;
+    }
+    20% {
+        opacity: 1;
+    }
+    100% {
+        transform: translate(var(--tx), var(--ty)) rotate(720deg) scale(0.3);
+        opacity: 0;
+    }
+}
+
+@keyframes particleSpiralOut {
+    0% {
+        transform: translate(var(--tx), var(--ty)) rotate(0deg) scale(0.3);
+        opacity: 0;
+    }
+    20% {
+        opacity: 1;
+    }
+    100% {
+        transform: translate(0, 0) rotate(720deg) scale(1);
+        opacity: 0;
+    }
+}
+
+.energy-burst {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    opacity: 0;
+}
+
+.energy-burst.active {
+    animation: energyBurst 0.6s ease-out forwards;
+}
+
+@keyframes energyBurst {
+    0% {
+        width: 20px;
+        height: 20px;
+        opacity: 1;
+        box-shadow: 
+            0 0 20px rgba(0, 212, 255, 1),
+            0 0 40px rgba(255, 0, 170, 0.8);
+    }
+    100% {
+        width: 200vmax;
+        height: 200vmax;
+        opacity: 0;
+        box-shadow: 
+            0 0 60px rgba(0, 212, 255, 0),
+            0 0 80px rgba(255, 0, 170, 0);
+    }
+}
+
+.center-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle, 
+        rgba(255, 255, 255, 1) 0%, 
+        rgba(0, 212, 255, 0.8) 30%,
+        transparent 70%);
+    opacity: 0;
+}
+
+.center-glow.active {
+    animation: centerGlow 0.6s ease-out forwards;
+}
+
+@keyframes centerGlow {
+    0% {
+        width: 0;
+        height: 0;
+        opacity: 1;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        width: 100vmax;
+        height: 100vmax;
+        opacity: 0;
+    }
+}
+
+.flash-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: white;
+    opacity: 0;
+    z-index: 100000;
+    pointer-events: none;
+}
+
+.flash-overlay.active {
+    animation: flashEffect 0.3s ease-out forwards;
+}
+
+@keyframes flashEffect {
+    0% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 0.9;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+.btn-click-effect {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: radial-gradient(circle, 
+        rgba(0, 212, 255, 1) 0%, 
+        rgba(255, 0, 170, 0.8) 50%,
+        transparent 70%);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 99998;
+    animation: btnClickPulse 0.6s ease-out forwards;
+}
+
+@keyframes btnClickPulse {
+    0% {
+        width: 10px;
+        height: 10px;
+        opacity: 1;
+    }
+    100% {
+        width: 150px;
+        height: 150px;
+        opacity: 0;
+    }
+}
