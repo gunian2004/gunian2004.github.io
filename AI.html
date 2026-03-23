@@ -6,6 +6,7 @@
     <title>AI模式 | 陈柏贤</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/AI.css">
+    <link rel="stylesheet" href="css/transition.css">
     <link rel="stylesheet" href="css/stars.css">
 </head>
 <body>
@@ -16,7 +17,7 @@
     <canvas id="canvas-bg"></canvas>
     <canvas id="stars-canvas"></canvas>
 
-    <a href="index.html" class="back-home-btn" title="看看我">
+    <a href="index.html" class="back-home-btn" title="看看我" onclick="TransitionManager.toIndex(event); return false;">
         <span class="back-btn-icon">🏠</span>
         <span class="back-btn-text">返回</span>
     </a>
@@ -199,5 +200,6 @@
     <script src="script/main.js"></script>
     <script src="script/stars.js"></script>
     <script src="script/AI.js"></script>
+    <script src="script/transition.js"></script>
 </body>
 </html>
