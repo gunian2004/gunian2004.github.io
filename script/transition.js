@@ -48,8 +48,11 @@
         document.body.appendChild(overlay);
     }
 
-    function createParticles(isEntering) {
+    function createParticles(isEntering, colorStyle) {
         particleContainer.innerHTML = '';
+        
+        const hueRange = colorStyle === 'gentle' ? 40 : 100;
+        const hueStart = colorStyle === 'gentle' ? 200 : 180;
         
         for (let i = 0; i < PARTICLE_COUNT; i++) {
             const particle = document.createElement('div');
@@ -63,9 +66,9 @@
             particle.style.setProperty('--tx', `${tx}px`);
             particle.style.setProperty('--ty', `${ty}px`);
             
-            const hue = 180 + (i / PARTICLE_COUNT) * 100;
-            particle.style.background = `hsl(${hue}, 100%, 60%)`;
-            particle.style.boxShadow = `0 0 10px hsl(${hue}, 100%, 60%)`;
+            const hue = hueStart + (i / PARTICLE_COUNT) * hueRange;
+            particle.style.background = `hsl(${hue}, 80%, 65%)`;
+            particle.style.boxShadow = `0 0 10px hsl(${hue}, 80%, 65%)`;
             
             const delay = Math.random() * 0.2;
             particle.style.animationDelay = `${delay}s`;
@@ -82,12 +85,18 @@
         container.style.top = y + 'px';
     }
 
-    function playEnterAnimation(targetUrl, startX, startY, callback) {
+    function playEnterAnimation(targetUrl, startX, startY, colorStyle) {
+        if (colorStyle === 'gentle') {
+            overlay.classList.add('gentle');
+        } else {
+            overlay.classList.remove('gentle');
+        }
+        
         overlay.classList.add('active');
         
         setPortalPosition(startX, startY);
         
-        createParticles(true);
+        createParticles(true, colorStyle);
         
         portalCircle.classList.add('expand');
         portalRing.classList.add('expand');
@@ -101,15 +110,20 @@
         }, TRANSITION_DURATION * 0.7);
         
         setTimeout(() => {
-            if (callback) callback();
             window.location.href = targetUrl;
         }, TRANSITION_DURATION * 0.85);
     }
 
-    function playExitAnimation(targetUrl, callback) {
+    function playExitAnimation(targetUrl, colorStyle) {
+        if (colorStyle === 'gentle') {
+            overlay.classList.add('gentle');
+        } else {
+            overlay.classList.remove('gentle');
+        }
+        
         overlay.classList.add('active');
         
-        createParticles(false);
+        createParticles(false, colorStyle);
         
         centerGlow.classList.add('active');
         
@@ -126,7 +140,6 @@
         }, TRANSITION_DURATION * 0.7);
         
         setTimeout(() => {
-            if (callback) callback();
             window.location.href = targetUrl;
         }, TRANSITION_DURATION * 0.85);
     }
@@ -157,7 +170,21 @@
             const centerX = rect.left + rect.width / 2;
             const centerY = rect.top + rect.height / 2;
             
-            playEnterAnimation('AI.html', centerX, centerY);
+            playEnterAnimation('AI.html', centerX, centerY, 'vibrant');
+        },
+        
+        toDemo: function(event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            
+            const btn = event.currentTarget;
+            const rect = btn.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            playEnterAnimation('demo.html', centerX, centerY, 'gentle');
         },
         
         toIndex: function(event) {
@@ -171,7 +198,7 @@
             const centerX = rect.left + rect.width / 2;
             const centerY = rect.top + rect.height / 2;
             
-            playEnterAnimation('index.html', centerX, centerY);
+            playEnterAnimation('index.html', centerX, centerY, 'gentle');
         },
         
         isTransitioning: false

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>项目演示 | 陈柏贤</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/transition.css">
+    <link rel="stylesheet" href="css/stars.css">
+</head>
+<body>
+    <div class="loading-screen" id="loading">
+        <div class="loader"></div>
+    </div>
+
+    <a href="index.html" class="demo-btn" title="返回首页" onclick="TransitionManager.toIndex(event); return false;">
+        <span class="demo-btn-icon">🏠</span>
+        <span class="demo-btn-text">返回首页</span>
+    </a>
+
+    <canvas id="canvas-bg"></canvas>
+    <canvas id="stars-canvas"></canvas>
+    <div class="cursor" id="cursor"></div>
+    <div class="cursor-dot" id="cursor-dot"></div>
+
+    <div class="container">
+        <section class="hero">
+            <h1 class="name">项目演示</h1>
+            <p class="title">自动化系统实战演示</p>
+            <p class="tagline">点击卡片查看项目实际运行效果</p>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title"><span class="section-title-icon">🎬</span>演示项目</h2>
+            <div class="demo-projects-grid">
+                <div class="demo-project-card" data-video="自动化获取会话信息.mp4">
+                    <div class="demo-project-header">
+                        <span class="demo-project-icon">💬</span>
+                        <h3 class="demo-project-title">抖音客服系统自动化</h3>
+                        <span class="demo-project-tag">点击播放</span>
+                    </div>
+                    <p class="demo-project-desc">自动化获取抖音客服会话信息，实现智能化消息处理与回复。</p>
+                    <div class="demo-project-features">
+                        <span>自动获取会话</span>
+                        <span>智能消息处理</span>
+                        <span>自动化流程</span>
+                    </div>
+                    <div class="demo-play-overlay">
+                        <span class="demo-play-icon">▶</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title"><span class="section-title-icon">📋</span>更多项目</h2>
+            <div class="demo-projects-grid">
+                <div class="demo-project-card disabled">
+                    <div class="demo-project-header">
+                        <span class="demo-project-icon">🎬</span>
+                        <h3 class="demo-project-title">AI视频生成工具</h3>
+                        <span class="demo-project-tag">即将上线</span>
+                    </div>
+                    <p class="demo-project-desc">面向公司内部的AI视频生成工具演示。</p>
+                    <div class="demo-project-features">
+                        <span>批处理调度</span>
+                        <span>多AI厂商接入</span>
+                        <span>自动化生成</span>
+                    </div>
+                </div>
+
+                <div class="demo-project-card disabled">
+                    <div class="demo-project-header">
+                        <span class="demo-project-icon">📱</span>
+                        <h3 class="demo-project-title">闺蜜机智能应用</h3>
+                        <span class="demo-project-tag">即将上线</span>
+                    </div>
+                    <p class="demo-project-desc">为用户打造的专属AI智能体演示。</p>
+                    <div class="demo-project-features">
+                        <span>多端部署</span>
+                        <span>智能对话</span>
+                        <span>个性化定制</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <p>© 2026 gunian 用 ❤️ 精心打造</p>
+        </footer>
+    </div>
+
+    <div class="video-modal" id="videoModal">
+        <div class="video-modal-content">
+            <button class="video-exit-btn" id="videoExitBtn">
+                <span class="video-exit-icon">✕</span>
+                <span class="video-exit-text">按 ESC 或点击此处退出</span>
+            </button>
+            <video id="videoPlayer" controls>
+                <source src="" type="video/mp4">
+                您的浏览器不支持视频播放。
+            </video>
+        </div>
+    </div>
+
+    <script src="script/transition.js"></script>
+    <script src="script/main.js"></script>
+    <script src="script/stars.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const demoCards = document.querySelectorAll('.demo-project-card:not(.disabled)');
+            const videoModal = document.getElementById('videoModal');
+            const videoPlayer = document.getElementById('videoPlayer');
+            const videoModalClose = document.getElementById('videoExitBtn');
+
+            demoCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const videoSrc = this.getAttribute('data-video');
+                    if (videoSrc) {
+                        videoPlayer.src = videoSrc;
+                        videoModal.classList.add('active');
+                        videoPlayer.play();
+                    }
+                });
+            });
+
+            function closeVideoModal() {
+                videoModal.classList.remove('active');
+                videoPlayer.pause();
+                videoPlayer.currentTime = 0;
+            }
+
+            videoModalClose.addEventListener('click', closeVideoModal);
+
+            videoModal.addEventListener('click', function(e) {
+                if (e.target === videoModal) {
+                    closeVideoModal();
+                }
+            });
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && videoModal.classList.contains('active')) {
+                    closeVideoModal();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
