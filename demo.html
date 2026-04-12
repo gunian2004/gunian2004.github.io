@@ -55,7 +55,7 @@
         <section class="section">
             <h2 class="section-title"><span class="section-title-icon">📋</span>更多项目</h2>
             <div class="demo-projects-grid">
-                <div class="demo-project-card" data-video="demo_video/AI视频生成.mp4">
+                <div class="demo-project-card" data-video="demo_video/生成视频AI.mov">
                     <div class="demo-project-header">
                         <span class="demo-project-icon">🎬</span>
                         <h3 class="demo-project-title">AI视频生成系统</h3>
@@ -101,6 +101,7 @@
             </button>
             <video id="videoPlayer" controls>
                 <source src="" type="video/mp4">
+                <source src="" type="video/quicktime">
                 您的浏览器不支持视频播放。
             </video>
         </div>
@@ -120,7 +121,11 @@
                 card.addEventListener('click', function() {
                     const videoSrc = this.getAttribute('data-video');
                     if (videoSrc) {
-                        videoPlayer.src = videoSrc;
+                        const sources = videoPlayer.querySelectorAll('source');
+                        sources.forEach(source => {
+                            source.src = videoSrc;
+                        });
+                        videoPlayer.load();
                         videoModal.classList.add('active');
                         videoPlayer.play();
                     }
