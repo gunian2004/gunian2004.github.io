@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小工具</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--bg-card);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            margin-bottom: 2rem;
+        }
+
+        .back-btn:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        /* ========== 卡片系统 ========== */
+        .tools-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .tool-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .tool-card:hover {
+            border-color: rgba(255,255,255,0.2);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .tool-card.expanded {
+            border-color: var(--primary);
+        }
+
+        /* 卡片头部 - 可点击 */
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s;
+        }
+
+        .card-header:hover {
+            background: rgba(255,255,255,0.02);
+        }
+
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .card-icon {
+            font-size: 1.25rem;
+        }
+
+        .card-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .badge-idle {
+            background: rgba(148, 163, 184, 0.2);
+            color: var(--text-secondary);
+        }
+
+        .badge-recording {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+            animation: pulse 1.5s infinite;
+        }
+
+        .badge-playing {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+            animation: pulse 1.5s infinite;
+        }
+
+        .badge-collapsed {
+            background: rgba(99, 102, 241, 0.15);
+            color: var(--primary);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .card-toggle {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.05);
+            transition: all 0.3s;
+            font-size: 0.8rem;
+        }
+
+        .tool-card.expanded .card-toggle {
+            transform: rotate(180deg);
+            background: var(--primary);
+            color: white;
+        }
+
+        /* 卡片内容区 - 可折叠 */
+        .card-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.4s ease;
+        }
+
+        .tool-card.expanded .card-content {
+            max-height: 2000px;
+            padding: 0 1.5rem 1.5rem;
+        }
+
+        .card-content-inner {
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding-top: 1.25rem;
+        }
+
+        /* ========== 通用控件样式 ========== */
+        .controls {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #5558e3;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover:not(:disabled) {
+            background: #0ea472;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            background: #dc2626;
+            transform: translateY(-2px);
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: #1e293b;
+        }
+
+        .btn-warning:hover:not(:disabled) {
+            background: #d97706;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .speed-control input {
+            width: 100px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .info-item {
+            background: rgba(0,0,0,0.2);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .info-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .info-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            width: 0%;
+            transition: width 0.1s;
+        }
+
+        /* ========== 事件列表 ========== */
+        .event-list-wrapper {
+            position: relative;
+        }
+
+        .event-list {
+            max-height: 200px;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 1rem;
+            transition: max-height 0.3s ease;
+        }
+
+        .event-list-wrapper.expanded .event-list {
+            max-height: 500px;
+        }
+
+        .event-list-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+            background: rgba(255,255,255,0.05);
+            border: none;
+            border-radius: 6px;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .event-list-toggle:hover {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-primary);
+        }
+
+        .event-list-toggle .arrow {
+            transition: transform 0.3s;
+        }
+
+        .event-list-wrapper.expanded .event-list-toggle .arrow {
+            transform: rotate(180deg);
+        }
+
+        .event-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .event-list::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+            border-radius: 3px;
+        }
+
+        .event-list::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.2);
+            border-radius: 3px;
+        }
+
+        .event-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            transition: background 0.2s;
+        }
+
+        .event-item:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .event-item.playing {
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--text-primary);
+        }
+
+        .event-icon {
+            font-size: 1rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .event-type {
+            font-weight: 500;
+            min-width: 70px;
+        }
+
+        .event-target {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .event-time {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+
+        .event-list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .event-count {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        /* ========== 测试区域 ========== */
+        .demo-area {
+            margin-top: 1rem;
+            padding: 2rem;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .demo-area h3 {
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .demo-btn-sample {
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 0.5rem;
+        }
+
+        .demo-btn-sample:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .demo-input-sample {
+            padding: 0.75rem 1rem;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            margin: 0.5rem;
+            width: 200px;
+        }
+
+        .demo-input-sample:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .section-desc {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-btn">← 返回首页</a>
+
+    <div class="container">
+        <h1>🛠️ 小工具</h1>
+        <p class="subtitle">实用工具集，点击卡片标题展开操作</p>
+
+        <div class="tools-grid">
+            <!-- 卡片1: 操作录制与回放 -->
+            <div class="tool-card" id="cardRecorder">
+                <div class="card-header" onclick="toggleCard('cardRecorder')">
+                    <div class="card-title">
+                        <span class="card-icon">📍</span>
+                        <span>操作录制与回放</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <span class="card-badge badge-idle" id="statusBadge">空闲中</span>
+                        <span class="card-toggle">▼</span>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="card-content-inner">
+                        <!-- 录制控制 -->
+                        <div class="controls" style="margin-bottom: 1rem;">
+                            <button class="btn btn-danger" id="btnRecord">
+                                <span>⏺</span> 开始录制
+                            </button>
+                            <button class="btn btn-secondary" id="btnStop" disabled>
+                                <span>⏹</span> 停止录制
+                            </button>
+                            <button class="btn btn-success" id="btnPlay" disabled>
+                                <span>▶</span> 回放
+                            </button>
+                            <button class="btn btn-warning" id="btnPause" disabled>
+                                <span>⏸</span> 暂停
+                            </button>
+                            <button class="btn btn-secondary" id="btnClear" disabled>
+                                <span>🗑️</span> 清空
+                            </button>
+                            <button class="btn btn-secondary" id="btnExport" disabled>
+                                <span>💾</span> 导出
+                            </button>
+                            <button class="btn btn-secondary" id="btnImport">
+                                <span>📂</span> 导入
+                            </button>
+                        </div>
+                        <input type="file" id="fileImport" accept=".json" style="display:none">
+
+                        <!-- 回放设置 -->
+                        <div class="speed-control">
+                            <span>回放速度:</span>
+                            <input type="range" id="speedRange" min="0.25" max="3" step="0.25" value="1">
+                            <span id="speedValue">1x</span>
+                        </div>
+
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <div class="info-value" id="eventCount">0</div>
+                                <div class="info-label">录制事件数</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-value" id="totalTime">0.0s</div>
+                                <div class="info-label">总时长</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-value" id="currentIndex">-</div>
+                                <div class="info-label">当前播放</div>
+                            </div>
+                        </div>
+
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+
+                        <!-- 事件列表 -->
+                        <div style="margin-top: 1.5rem;">
+                            <div class="event-list-header">
+                                <span class="card-title" style="font-size: 1rem;">
+                                    <span class="card-icon">📋</span>
+                                    <span>事件列表</span>
+                                </span>
+                                <span class="event-count" id="eventCountText">暂无录制</span>
+                            </div>
+                            <div class="event-list-wrapper" id="eventListWrapper">
+                                <div class="event-list" id="eventList">
+                                    <div class="empty-state">
+                                        <div class="empty-state-icon">📝</div>
+                                        <p>点击"开始录制"后，你在此页面的所有操作都会被记录</p>
+                                    </div>
+                                </div>
+                                <button class="event-list-toggle" id="eventListToggle" onclick="toggleEventList()">
+                                    <span class="arrow">▼</span>
+                                    <span id="toggleText">展开查看更多</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 测试区域 -->
+                        <div style="margin-top: 1.5rem;">
+                            <div class="event-list-header">
+                                <span class="card-title" style="font-size: 1rem;">
+                                    <span class="card-icon">🧪</span>
+                                    <span>测试区域</span>
+                                </span>
+                            </div>
+                            <p class="section-desc">在下方区域进行操作测试，录制后点击回放查看效果</p>
+                            <div class="demo-area">
+                                <h3>操作演示区（在此区域内录制操作）</h3>
+                                <button class="demo-btn-sample" id="demoBtn1">按钮 1</button>
+                                <button class="demo-btn-sample" id="demoBtn2">按钮 2</button>
+                                <button class="demo-btn-sample" id="demoBtn3">按钮 3</button>
+                                <br>
+                                <input type="text" class="demo-input-sample" id="demoInput1" placeholder="输入框 1">
+                                <input type="text" class="demo-input-sample" id="demoInput2" placeholder="输入框 2">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 卡片2: 占位 - 后续可添加更多工具 -->
+            <!-- 
+            <div class="tool-card" id="cardNewTool">
+                <div class="card-header" onclick="toggleCard('cardNewTool')">
+                    <div class="card-title">
+                        <span class="card-icon">🔧</span>
+                        <span>新工具名称</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <span class="card-badge badge-collapsed">点击展开</span>
+                        <span class="card-toggle">▼</span>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="card-content-inner">
+                        工具内容...
+                    </div>
+                </div>
+            </div>
+            -->
+
+        </div>
+    </div>
+
+    <script>
+        // ========== 卡片折叠功能 ==========
+        function toggleCard(cardId) {
+            const card = document.getElementById(cardId);
+            const wasExpanded = card.classList.contains('expanded');
+            
+            // 切换展开状态
+            card.classList.toggle('expanded');
+            
+            // 更新 badge 显示
+            const badge = card.querySelector('.card-badge');
+            if (cardId === 'cardRecorder') {
+                // 录制卡片特殊处理
+                updateRecorderBadge();
+            } else {
+                if (wasExpanded) {
+                    badge.textContent = '点击展开';
+                    badge.className = 'card-badge badge-collapsed';
+                } else {
+                    badge.textContent = '';
+                    badge.className = 'card-badge';
+                }
+            }
+        }
+
+        function updateRecorderBadge() {
+            const badge = document.getElementById('statusBadge');
+            if (state.isPlaying) {
+                badge.textContent = state.isPaused ? '已暂停' : '回放中...';
+                badge.className = `card-badge badge-playing`;
+            } else if (state.isRecording) {
+                badge.textContent = '录制中...';
+                badge.className = 'card-badge badge-recording';
+            } else {
+                badge.textContent = '空闲中';
+                badge.className = 'card-badge badge-idle';
+            }
+        }
+
+        // ========== 事件列表展开/收起 ==========
+        function toggleEventList() {
+            const wrapper = elements.eventListWrapper;
+            const toggleText = elements.toggleText;
+            const isExpanded = wrapper.classList.toggle('expanded');
+
+            if (isExpanded) {
+                toggleText.textContent = '收起';
+            } else {
+                toggleText.textContent = '展开查看更多';
+            }
+        }
+
+        // ========== 状态管理 ==========
+        const state = {
+            isRecording: false,
+            isPlaying: false,
+            isPaused: false,
+            events: [],
+            startTime: null,
+            playbackIndex: 0,
+            playbackSpeed: 1,
+            recordedData: null
+        };
+
+        // ========== DOM 元素 ==========
+        const elements = {
+            btnRecord: document.getElementById('btnRecord'),
+            btnStop: document.getElementById('btnStop'),
+            btnPlay: document.getElementById('btnPlay'),
+            btnPause: document.getElementById('btnPause'),
+            btnClear: document.getElementById('btnClear'),
+            btnExport: document.getElementById('btnExport'),
+            btnImport: document.getElementById('btnImport'),
+            fileImport: document.getElementById('fileImport'),
+            statusBadge: document.getElementById('statusBadge'),
+            eventList: document.getElementById('eventList'),
+            eventListWrapper: document.getElementById('eventListWrapper'),
+            eventListToggle: document.getElementById('eventListToggle'),
+            toggleText: document.getElementById('toggleText'),
+            eventCount: document.getElementById('eventCount'),
+            eventCountText: document.getElementById('eventCountText'),
+            totalTime: document.getElementById('totalTime'),
+            currentIndex: document.getElementById('currentIndex'),
+            speedRange: document.getElementById('speedRange'),
+            speedValue: document.getElementById('speedValue'),
+            progressFill: document.getElementById('progressFill')
+        };
+
+        // ========== 事件类型映射 ==========
+        const eventIcons = {
+            'click': '🖱️',
+            'dblclick': '🖱️×2',
+            'mousedown': '⬇️',
+            'mouseup': '⬆️',
+            'mousemove': '✋',
+            'keydown': '⌨️',
+            'keyup': '⌨️↗',
+            'input': '✏️',
+            'change': '🔄',
+            'scroll': '📜',
+            'focus': '🔍',
+            'blur': '👁️'
+        };
+
+        const eventNames = {
+            'click': '点击',
+            'dblclick': '双击',
+            'mousedown': '按下',
+            'mouseup': '松开',
+            'mousemove': '移动',
+            'keydown': '按下键',
+            'keyup': '松开键',
+            'input': '输入',
+            'change': '变更',
+            'scroll': '滚动',
+            'focus': '聚焦',
+            'blur': '失焦'
+        };
+
+        // ========== 核心功能 ==========
+
+        // 录制事件
+        function recordEvent(e) {
+            if (!state.isRecording) return;
+
+            const eventData = {
+                type: e.type,
+                x: e.clientX,
+                y: e.clientY,
+                targetXPath: getElementXPath(e.target),
+                targetTag: e.target.tagName,
+                targetId: e.target.id || null,
+                targetClass: e.target.className || null,
+                targetText: e.target.innerText?.substring(0, 30) || null,
+                key: e.key || null,
+                keyCode: e.keyCode || null,
+                value: e.target.value || null,
+                time: Date.now() - state.startTime,
+                timestamp: new Date().toLocaleTimeString()
+            };
+
+            state.events.push(eventData);
+            renderEventList();
+            updateStats();
+        }
+
+        // 获取元素 XPath
+        function getElementXPath(element) {
+            if (element.id) return `#${element.id}`;
+            if (element.className && typeof element.className === 'string') {
+                const classes = element.className.split(' ').filter(c => c && !c.includes('demo-'));
+                if (classes.length > 0) return `.${classes[0]}`;
+            }
+            const path = [];
+            while (element && element.nodeType === Node.ELEMENT_NODE) {
+                let index = 1;
+                let sibling = element.previousSibling;
+                while (sibling) {
+                    if (sibling.nodeType === Node.ELEMENT_NODE && sibling.tagName === element.tagName) {
+                        index++;
+                    }
+                    sibling = sibling.previousSibling;
+                }
+                path.unshift(`${element.tagName.toLowerCase()}[${index}]`);
+                element = element.parentNode;
+            }
+            return path.join(' > ');
+        }
+
+        // 通过选择器查找元素
+        function findElement(eventData) {
+            if (eventData.targetXPath) {
+                try {
+                    const result = document.evaluate(
+                        eventData.targetXPath,
+                        document,
+                        null,
+                        XPathResult.FIRST_ORDERED_NODE_TYPE,
+                        null
+                    );
+                    if (result.singleNodeValue) return result.singleNodeValue;
+                } catch (e) {}
+            }
+
+            if (eventData.targetId) {
+                const el = document.getElementById(eventData.targetId);
+                if (el) return el;
+            }
+
+            if (eventData.targetClass) {
+                const classes = eventData.targetClass.split(' ').filter(c => c && !c.includes('demo-'));
+                if (classes.length > 0) {
+                    const els = document.getElementsByClassName(classes[0]);
+                    if (els.length > 0) return els[0];
+                }
+            }
+
+            if (eventData.x && eventData.y) {
+                return document.elementFromPoint(eventData.x, eventData.y);
+            }
+
+            return null;
+        }
+
+        // 回放单个事件
+        async function playbackEvent(eventData) {
+            return new Promise((resolve) => {
+                const element = findElement(eventData);
+                if (!element) {
+                    console.warn('无法找到元素:', eventData);
+                    resolve();
+                    return;
+                }
+
+                highlightEvent(state.playbackIndex);
+
+                switch (eventData.type) {
+                    case 'click':
+                    case 'dblclick':
+                        element.click();
+                        break;
+
+                    case 'mousedown':
+                        element.dispatchEvent(new MouseEvent('mousedown', {
+                            bubbles: true,
+                            clientX: eventData.x,
+                            clientY: eventData.y
+                        }));
+                        break;
+
+                    case 'mouseup':
+                        element.dispatchEvent(new MouseEvent('mouseup', {
+                            bubbles: true,
+                            clientX: eventData.x,
+                            clientY: eventData.y
+                        }));
+                        break;
+
+                    case 'keydown':
+                    case 'keyup':
+                        if (eventData.key) {
+                            const keyboardEvent = new KeyboardEvent(eventData.type, {
+                                key: eventData.key,
+                                code: eventData.keyCode,
+                                bubbles: true
+                            });
+                            element.dispatchEvent(keyboardEvent);
+                        }
+                        break;
+
+                    case 'input':
+                    case 'change':
+                        if (eventData.value !== null && element.value !== undefined) {
+                            element.value = eventData.value;
+                            element.dispatchEvent(new Event('input', { bubbles: true }));
+                            element.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
+                        break;
+
+                    case 'focus':
+                        element.focus();
+                        break;
+
+                    case 'blur':
+                        element.blur();
+                        break;
+
+                    default:
+                        console.log('未处理的事件类型:', eventData.type);
+                }
+
+                const baseDelay = 50;
+                const nextEvent = state.events[state.playbackIndex + 1];
+                let delay = nextEvent ? (nextEvent.time - eventData.time) / state.playbackSpeed : baseDelay;
+                delay = Math.max(delay, baseDelay);
+                delay = Math.min(delay, 3000);
+
+                setTimeout(resolve, delay);
+            });
+        }
+
+        // 回放所有事件
+        async function playAllEvents() {
+            if (state.events.length === 0) return;
+
+            state.isPlaying = true;
+            state.isPaused = false;
+            updateUI();
+            elements.progressFill.style.width = '0%';
+
+            for (let i = state.playbackIndex; i < state.events.length; i++) {
+                if (!state.isPlaying || state.isPaused) break;
+
+                state.playbackIndex = i;
+                elements.currentIndex.textContent = `${i + 1}/${state.events.length}`;
+                elements.progressFill.style.width = `${((i + 1) / state.events.length) * 100}%`;
+
+                await playbackEvent(state.events[i]);
+            }
+
+            state.isPlaying = false;
+            state.isPaused = false;
+            updateUI();
+        }
+
+        // 停止回放
+        function stopPlayback() {
+            state.isPlaying = false;
+            state.isPaused = false;
+            state.playbackIndex = 0;
+            elements.progressFill.style.width = '0%';
+            elements.currentIndex.textContent = '-';
+            clearHighlights();
+            updateUI();
+        }
+
+        // 高亮事件
+        function highlightEvent(index) {
+            clearHighlights();
+            const items = elements.eventList.querySelectorAll('.event-item');
+            if (items[index]) {
+                items[index].classList.add('playing');
+                items[index].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+
+        // 清除高亮
+        function clearHighlights() {
+            elements.eventList.querySelectorAll('.event-item').forEach(item => {
+                item.classList.remove('playing');
+            });
+        }
+
+        // ========== UI 渲染 ==========
+
+        function renderEventList() {
+            if (state.events.length === 0) {
+                elements.eventList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📝</div>
+                        <p>点击"开始录制"后，你在此页面的所有操作都会被记录</p>
+                    </div>
+                `;
+                return;
+            }
+
+            elements.eventList.innerHTML = state.events.map((evt, idx) => `
+                <div class="event-item" data-index="${idx}">
+                    <span class="event-icon">${eventIcons[evt.type] || '📌'}</span>
+                    <span class="event-type">${eventNames[evt.type] || evt.type}</span>
+                    <span class="event-target" title="${evt.targetXPath || evt.targetTag}">
+                        ${evt.targetId ? `#${evt.targetId}` : evt.targetText || evt.targetTag}
+                        ${evt.key ? `[${evt.key}]` : ''}
+                        ${evt.value !== null && evt.value !== undefined ? `"${evt.value}"` : ''}
+                    </span>
+                    <span class="event-time">${evt.timestamp}</span>
+                </div>
+            `).join('');
+        }
+
+        function updateStats() {
+            elements.eventCount.textContent = state.events.length;
+            elements.eventCountText.textContent = state.events.length > 0
+                ? `共 ${state.events.length} 个事件`
+                : '暂无录制';
+
+            if (state.events.length > 0) {
+                const lastEvent = state.events[state.events.length - 1];
+                const firstEvent = state.events[0];
+                const duration = (lastEvent.time - firstEvent.time) / 1000;
+                elements.totalTime.textContent = `${duration.toFixed(1)}s`;
+            } else {
+                elements.totalTime.textContent = '0.0s';
+            }
+        }
+
+        function updateUI() {
+            elements.btnRecord.disabled = state.isRecording || state.isPlaying;
+            elements.btnStop.disabled = !state.isRecording;
+            elements.btnPlay.disabled = state.events.length === 0 || state.isRecording || state.isPlaying;
+            elements.btnPause.disabled = !state.isPlaying;
+            elements.btnClear.disabled = state.events.length === 0 || state.isRecording || state.isPlaying;
+            elements.btnExport.disabled = state.events.length === 0;
+
+            updateRecorderBadge();
+        }
+
+        // ========== 事件监听 ==========
+
+        elements.btnRecord.addEventListener('click', () => {
+            state.isRecording = true;
+            state.events = [];
+            state.startTime = Date.now();
+            renderEventList();
+            updateStats();
+            updateUI();
+        });
+
+        elements.btnStop.addEventListener('click', () => {
+            state.isRecording = false;
+            updateUI();
+        });
+
+        elements.btnPlay.addEventListener('click', () => {
+            if (state.isPaused) {
+                state.isPaused = false;
+                playAllEvents();
+            } else {
+                state.playbackIndex = 0;
+                playAllEvents();
+            }
+        });
+
+        elements.btnPause.addEventListener('click', () => {
+            state.isPaused = true;
+            updateUI();
+        });
+
+        elements.btnClear.addEventListener('click', () => {
+            if (confirm('确定要清空所有录制内容吗？')) {
+                state.events = [];
+                state.playbackIndex = 0;
+                renderEventList();
+                updateStats();
+                stopPlayback();
+            }
+        });
+
+        elements.btnExport.addEventListener('click', () => {
+            if (state.events.length === 0) return;
+
+            const data = {
+                version: '1.0',
+                exportTime: new Date().toISOString(),
+                eventCount: state.events.length,
+                events: state.events
+            };
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `recording-${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        elements.btnImport.addEventListener('click', () => {
+            elements.fileImport.click();
+        });
+
+        elements.fileImport.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const data = JSON.parse(event.target.result);
+                    if (data.events && Array.isArray(data.events)) {
+                        state.events = data.events;
+                        state.recordedData = data;
+                        renderEventList();
+                        updateStats();
+                        updateUI();
+                        alert(`成功导入 ${data.events.length} 个事件！`);
+                    } else {
+                        alert('文件格式不正确');
+                    }
+                } catch (err) {
+                    alert('解析文件失败: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+            e.target.value = '';
+        });
+
+        elements.speedRange.addEventListener('input', (e) => {
+            state.playbackSpeed = parseFloat(e.target.value);
+            elements.speedValue.textContent = `${state.playbackSpeed}x`;
+        });
+
+        // 全局事件监听 - 录制
+        document.addEventListener('click', recordEvent, true);
+        document.addEventListener('keydown', recordEvent, true);
+        document.addEventListener('keyup', recordEvent, true);
+        document.addEventListener('input', recordEvent, true);
+        document.addEventListener('change', recordEvent, true);
+        document.addEventListener('focus', recordEvent, true);
+        document.addEventListener('blur', recordEvent, true);
+
+        // 阻止测试区域按钮的默认行为
+        document.querySelectorAll('.demo-btn-sample').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                if (!state.isRecording) return;
+                e.stopPropagation();
+            });
+        });
+
+        // 初始化
+        updateUI();
+    </script>
+</body>
+</html>

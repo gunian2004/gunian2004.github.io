@@ -192,15 +192,29 @@
                 event.preventDefault();
                 event.stopPropagation();
             }
-            
+
             const btn = event.currentTarget;
             const rect = btn.getBoundingClientRect();
             const centerX = rect.left + rect.width / 2;
             const centerY = rect.top + rect.height / 2;
-            
+
             playEnterAnimation('index.html', centerX, centerY, 'gentle');
         },
-        
+
+        toTool: function(event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+
+            const btn = event.currentTarget;
+            const rect = btn.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            playEnterAnimation('tool.html', centerX, centerY, 'vibrant');
+        },
+
         isTransitioning: false
     };
 
