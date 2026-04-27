@@ -24,3 +24,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 800);
     }
 });
+
+function toggleCard(card) {
+    card.classList.toggle('expanded');
+    const toggleText = card.querySelector('.card-toggle');
+    if (card.classList.contains('expanded')) {
+        toggleText.textContent = '▲ 收起';
+    } else {
+        toggleText.textContent = '...（点击展开）';
+    }
+}

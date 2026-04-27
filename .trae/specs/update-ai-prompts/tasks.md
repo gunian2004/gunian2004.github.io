@@ -1,0 +1,11 @@
+# Tasks
+- [x] Task 1: 清除提示词板块现有内容并添加新的卡片结构
+  - [x] SubTask 1.1: 在AI.html中替换提示词板块的section-content内容
+  - [x] SubTask 1.2: 添加三条提示词卡片，每条包含完整内容和展开/收起功能
+- [x] Task 2: 实现卡片折叠功能
+  - [x] SubTask 2.1: 添加CSS样式实现默认只显示2行
+  - [x] SubTask 2.2: 添加JavaScript实现点击展开/收起功能
+- [x] Task 3: 验证功能正常
+  - [x] SubTask 3.1: 检查卡片默认只显示2行
+  - [x] SubTask 3.2: 检查点击展开功能正常
+  - [x] SubTask 3.3: 检查收起功能正常
