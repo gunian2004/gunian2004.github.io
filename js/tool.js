@@ -1465,3 +1465,207 @@ function erClearAll() {
 // 初始化
 erUpdateRelationSelects();
 erRenderRelationList();
+
+// ========== 在线翻译功能 ==========
+const translateLangNames = {
+    'auto': '自动检测',
+    'zh': '中文',
+    'en': '英语',
+    'ja': '日语',
+    'ko': '韩语',
+    'fr': '法语',
+    'de': '德语',
+    'es': '西班牙语',
+    'pt': '葡萄牙语',
+    'ru': '俄语',
+    'ar': '阿拉伯语',
+    'th': '泰语',
+    'vi': '越南语'
+};
+
+const translateAPIs = [
+    'https://libretranslate.com/translate',
+    'https://translate.astian.org/translate',
+    'https://libretranslate.pussthecat.org/translate'
+];
+
+let translateCurrentApiIndex = 0;
+let translateResult = '';
+
+// 更新语言标签显示
+function updateTranslateLabels() {
+    const sourceLang = document.getElementById('translateSourceLang').value;
+    const targetLang = document.getElementById('translateTargetLang').value;
+    const sourceLabel = translateLangNames[sourceLang] || sourceLang;
+    const targetLabel = translateLangNames[targetLang] || targetLang;
+    document.getElementById('translateSourceLabel').textContent = sourceLabel;
+    document.getElementById('translateTargetLabel').textContent = targetLabel;
+}
+
+// 交换语言
+function translateSwapLang() {
+    const sourceSelect = document.getElementById('translateSourceLang');
+    const targetSelect = document.getElementById('translateTargetLang');
+    const sourceVal = sourceSelect.value;
+    const targetVal = targetSelect.value;
+
+    if (sourceVal === 'auto') {
+        sourceSelect.value = targetVal;
+        targetSelect.value = 'auto';
+    } else {
+        sourceSelect.value = targetVal;
+        targetSelect.value = sourceVal;
+    }
+    updateTranslateLabels();
+}
+
+// 字符计数
+const translateInputEl = document.getElementById('translateInput');
+if (translateInputEl) {
+    translateInputEl.addEventListener('input', function() {
+        const count = this.value.length;
+        const countEl = document.getElementById('translateCharsCount');
+        if (countEl) countEl.textContent = count + ' 字符';
+    });
+}
+
+// 翻译文本
+async function translateText() {
+    const input = document.getElementById('translateInput').value.trim();
+    const output = document.getElementById('translateOutput');
+    const btn = document.getElementById('translateBtn');
+    const status = document.getElementById('translateStatus');
+    const copyBtn = document.getElementById('translateCopyBtn');
+
+    if (!input) {
+        output.textContent = '⚠️ 请输入要翻译的文本';
+        output.classList.remove('has-result');
+        copyBtn.disabled = true;
+        return;
+    }
+
+    const sourceLang = document.getElementById('translateSourceLang').value;
+    const targetLang = document.getElementById('translateTargetLang').value;
+
+    if (sourceLang !== 'auto' && sourceLang === targetLang) {
+        output.textContent = '⚠️ 源语言和目标语言不能相同';
+        output.classList.remove('has-result');
+        copyBtn.disabled = true;
+        return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = '⏳ 翻译中...';
+    output.textContent = '⏳ 正在翻译，请稍候...';
+    output.classList.remove('has-result');
+    copyBtn.disabled = true;
+    status.textContent = '';
+    status.style.color = 'var(--text-secondary)';
+
+    let lastError = null;
+    for (let i = 0; i < translateAPIs.length; i++) {
+        const apiUrl = translateAPIs[(translateCurrentApiIndex + i) % translateAPIs.length];
+        try {
+            status.textContent = `正在调用 ${new URL(apiUrl).hostname}...`;
+
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 8000);
+
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    q: input,
+                    source: sourceLang,
+                    target: targetLang,
+                    format: 'text'
+                }),
+                signal: controller.signal
+            });
+            clearTimeout(timeout);
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(`HTTP ${response.status}: ${errText}`);
+            }
+
+            const data = await response.json();
+
+            if (data && data.translatedText) {
+                translateResult = data.translatedText;
+                output.textContent = translateResult;
+                output.classList.add('has-result');
+                copyBtn.disabled = false;
+                status.textContent = `✅ 翻译完成 (${new URL(apiUrl).hostname})`;
+                status.style.color = 'var(--success)';
+                translateCurrentApiIndex = (translateCurrentApiIndex + i) % translateAPIs.length;
+                btn.disabled = false;
+                btn.textContent = '🌐 翻译';
+                return;
+            } else {
+                throw new Error('返回数据格式错误');
+            }
+        } catch (err) {
+            lastError = err;
+            console.warn(`API ${apiUrl} 调用失败:`, err.message);
+        }
+    }
+
+    output.textContent = `⚠️ 翻译失败: ${lastError?.message || '所有翻译服务暂不可用'}\n\n建议：\n1. 检查网络连接\n2. 稍后重试\n3. 尝试更换翻译内容`;
+    output.classList.remove('has-result');
+    copyBtn.disabled = true;
+    status.textContent = '❌ 所有翻译服务暂不可用';
+    status.style.color = 'var(--danger)';
+    btn.disabled = false;
+    btn.textContent = '🌐 翻译';
+}
+
+// 复制翻译结果
+function translateCopy() {
+    if (!translateResult) return;
+    navigator.clipboard.writeText(translateResult).then(() => {
+        const status = document.getElementById('translateStatus');
+        status.textContent = '✅ 已复制到剪贴板！';
+        status.style.color = 'var(--success)';
+        setTimeout(() => { status.textContent = ''; }, 2000);
+    }).catch(() => {
+        alert('复制失败，请手动选择文字复制');
+    });
+}
+
+// 清空输入
+function translateClearInput() {
+    const input = document.getElementById('translateInput');
+    const output = document.getElementById('translateOutput');
+    const copyBtn = document.getElementById('translateCopyBtn');
+    const status = document.getElementById('translateStatus');
+    const countEl = document.getElementById('translateCharsCount');
+
+    input.value = '';
+    output.textContent = '翻译结果将显示在这里...';
+    output.classList.remove('has-result');
+    copyBtn.disabled = true;
+    status.textContent = '';
+    if (countEl) countEl.textContent = '0 字符';
+    translateResult = '';
+}
+
+// 监听语言选择变化
+const sourceLangEl = document.getElementById('translateSourceLang');
+const targetLangEl = document.getElementById('translateTargetLang');
+if (sourceLangEl) sourceLangEl.addEventListener('change', updateTranslateLabels);
+if (targetLangEl) targetLangEl.addEventListener('change', updateTranslateLabels);
+
+// 初始化语言标签
+updateTranslateLabels();
+
+// Ctrl+Enter 快捷键翻译
+const translateInput = document.getElementById('translateInput');
+if (translateInput) {
+    translateInput.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+            e.preventDefault();
+            translateText();
+        }
+    });
+}
