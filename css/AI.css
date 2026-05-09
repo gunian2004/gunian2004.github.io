@@ -414,3 +414,36 @@
 .prompt-card.expanded .card-toggle {
     color: var(--secondary);
 }
+
+/* 规则卡片头部样式 */
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.card-index {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    flex-shrink: 0;
+}
+
+.card-title {
+    color: var(--text-main);
+    font-size: 0.95rem;
+    font-weight: 600;
+    flex: 1;
+}
+
+.card-source {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    flex-shrink: 0;
+    opacity: 0.7;
+}

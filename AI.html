@@ -82,6 +82,122 @@
                 </div>
             </section>
 
+            <section class="ai-section" data-section="rules">
+                <div class="section-header">
+                    <div class="section-icon">📋</div>
+                    <div class="section-info">
+                        <h2 class="section-title">代理规则板块</h2>
+                        <p class="section-desc">AI 代理的工作准则与行为规范，确保任务执行规范高效</p>
+                    </div>
+                    <div class="section-arrow">▼</div>
+                </div>
+                <div class="section-content">
+                    <div class="content-inner">
+                        <div class="prompt-cards">
+                            <div class="prompt-card" onclick="toggleCard(this)">
+                                <div class="card-header">
+                                    <span class="card-index">规则 1</span>
+                                    <span class="card-title">任务规划先行</span>
+                                    <span class="card-source">来源：老板 · 2026-05-06</span>
+                                </div>
+                                <div class="card-content">
+                                    <p class="card-text">每次接到任务，先做规划：拆分子任务、排优先级。</p>
+                                </div>
+                                <div class="card-toggle">...（点击展开）</div>
+                            </div>
+                            <div class="prompt-card" onclick="toggleCard(this)">
+                                <div class="card-header">
+                                    <span class="card-index">规则 2</span>
+                                    <span class="card-title">阶段性汇报总结</span>
+                                    <span class="card-source">来源：老板 · 2026-05-06</span>
+                                </div>
+                                <div class="card-content">
+                                    <p class="card-text">每完成一个阶段，汇报做了什么、完成情况、如何测试验证。</p>
+                                </div>
+                                <div class="card-toggle">...（点击展开）</div>
+                            </div>
+                            <div class="prompt-card" onclick="toggleCard(this)">
+                                <div class="card-header">
+                                    <span class="card-index">规则 3</span>
+                                    <span class="card-title">自主选方案 + 汇报等决策</span>
+                                    <span class="card-source">来源：老板 · 2026-05-06</span>
+                                </div>
+                                <div class="card-content">
+                                    <p class="card-text">技术方案自己选最优的，完成后汇报、测试说明、然后等老板决策下一步。</p>
+                                </div>
+                                <div class="card-toggle">...（点击展开）</div>
+                            </div>
+                            <div class="prompt-card" onclick="toggleCard(this)">
+                                <div class="card-header">
+                                    <span class="card-index">规则 4</span>
+                                    <span class="card-title">实际操作需授权</span>
+                                    <span class="card-source">来源：老板 · 2026-05-06</span>
+                                </div>
+                                <div class="card-content">
+                                    <p class="card-text">动手改东西之前先问老板，老板同意后才能操作。</p>
+                                </div>
+                                <div class="card-toggle">...（点击展开）</div>
+                            </div>
+                            <div class="prompt-card" onclick="toggleCard(this)">
+                                <div class="card-header">
+                                    <span class="card-index">规则 5</span>
+                                    <span class="card-title">路径明确才执行</span>
+                                    <span class="card-source">来源：老板 · 2026-05-06</span>
+                                </div>
+                                <div class="card-content">
+                                    <p class="card-text">如果文件路径老板没说，必须主动询问或提出建议路径，老板同意后才能执行。</p>
+                                </div>
+                                <div class="card-toggle">...（点击展开）</div>
+                            </div>
+                            <div class="prompt-card" onclick="toggleCard(this)">
+                                <div class="card-header">
+                                    <span class="card-index">规则 6</span>
+                                    <span class="card-title">主动追问细节</span>
+                                    <span class="card-source">来源：老板 · 2026-05-06</span>
+                                </div>
+                                <div class="card-content">
+                                    <p class="card-text">老板描述偏抽象，需要主动多问细节。</p>
+                                </div>
+                                <div class="card-toggle">...（点击展开）</div>
+                            </div>
+                            <div class="prompt-card" onclick="toggleCard(this)">
+                                <div class="card-header">
+                                    <span class="card-index">规则 7</span>
+                                    <span class="card-title">文件分类存放</span>
+                                    <span class="card-source">来源：老板 · 2026-05-06</span>
+                                </div>
+                                <div class="card-content">
+                                    <p class="card-text">每次创建的文件（脚本、md、报告等）要按用途分类存放，不要直接塞到主体文件夹下。相同类型的文件放在同一类文件夹下，不同脚本用不同子文件夹区分。整个 openclaw 文件夹下的文件和文件夹都要有规则地排列。</p>
+                                </div>
+                                <div class="card-toggle">...（点击展开）</div>
+                            </div>
+                            <div class="prompt-card" onclick="toggleCard(this)">
+                                <div class="card-header">
+                                    <span class="card-index">规则 8</span>
+                                    <span class="card-title">每日记忆同步</span>
+                                    <span class="card-source">来源：老板 · 2026-05-06</span>
+                                </div>
+                                <div class="card-content">
+                                    <p class="card-text">每次接到新任务，先创建或打开 memory/YYYY-MM-DD.md（今日日期）记录任务详情；每完成一个子任务/阶段后，同步更新进度到该文件。任务结束后做最终总结。保证每天的工作都有完整的追溯记录。</p>
+                                </div>
+                                <div class="card-toggle">...（点击展开）</div>
+                            </div>
+                            <div class="prompt-card" onclick="toggleCard(this)">
+                                <div class="card-header">
+                                    <span class="card-index">规则 9</span>
+                                    <span class="card-title">遇问题先请示</span>
+                                    <span class="card-source">来源：老板 · 2026-05-06</span>
+                                </div>
+                                <div class="card-content">
+                                    <p class="card-text">遇到需要决策、不确定、遇到阻碍、需要权限的情况，必须先向老板汇报说明情况，等老板给指示后再继续。不得擅自决定操作方向或自行绕过障碍。</p>
+                                </div>
+                                <div class="card-toggle">...（点击展开）</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <section class="ai-section" data-section="design">
                 <div class="section-header">
                     <div class="section-icon">🎨</div>
