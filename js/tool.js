@@ -1484,9 +1484,7 @@ const translateLangNames = {
 };
 
 const translateAPIs = [
-    'https://libretranslate.com/translate',
-    'https://translate.astian.org/translate',
-    'https://libretranslate.pussthecat.org/translate'
+    'https://api.mymemory.translated.net/get'
 ];
 
 let translateCurrentApiIndex = 0;
@@ -1562,24 +1560,32 @@ async function translateText() {
     status.textContent = '';
     status.style.color = 'var(--text-secondary)';
 
+    // MyMemory API: langpair 格式 "source|target"
+    const langpair = (sourceLang === 'auto' ? 'auto' : sourceLang) + '|' + targetLang;
+
+    // MyMemory 免费额度：5000 字符/次，100次/天/IP
+    const MAX_CHARS = 5000;
+    const truncatedInput = input.length > MAX_CHARS ? input.substring(0, MAX_CHARS) : input;
+    if (input.length > MAX_CHARS) {
+        status.textContent = `⚠️ 文本已截断至 ${MAX_CHARS} 字符（API限制）`;
+        status.style.color = 'var(--text-secondary)';
+    }
+
     let lastError = null;
     for (let i = 0; i < translateAPIs.length; i++) {
-        const apiUrl = translateAPIs[(translateCurrentApiIndex + i) % translateAPIs.length];
+        const baseUrl = translateAPIs[(translateCurrentApiIndex + i) % translateAPIs.length];
         try {
-            status.textContent = `正在调用 ${new URL(apiUrl).hostname}...`;
+            status.textContent = '正在翻译...';
+
+            const url = new URL(baseUrl);
+            url.searchParams.set('q', truncatedInput);
+            url.searchParams.set('langpair', langpair);
 
             const controller = new AbortController();
-            const timeout = setTimeout(() => controller.abort(), 8000);
+            const timeout = setTimeout(() => controller.abort(), 10000);
 
-            const response = await fetch(apiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    q: input,
-                    source: sourceLang,
-                    target: targetLang,
-                    format: 'text'
-                }),
+            const response = await fetch(url.toString(), {
+                method: 'GET',
                 signal: controller.signal
             });
             clearTimeout(timeout);
@@ -1591,12 +1597,13 @@ async function translateText() {
 
             const data = await response.json();
 
-            if (data && data.translatedText) {
-                translateResult = data.translatedText;
+            // MyMemory 响应格式: { responseData: { translatedText: "..." }, responseStatus: 200 }
+            if (data && data.responseData && data.responseData.translatedText) {
+                translateResult = data.responseData.translatedText;
                 output.textContent = translateResult;
                 output.classList.add('has-result');
                 copyBtn.disabled = false;
-                status.textContent = `✅ 翻译完成 (${new URL(apiUrl).hostname})`;
+                status.textContent = '✅ 翻译完成 (MyMemory)';
                 status.style.color = 'var(--success)';
                 translateCurrentApiIndex = (translateCurrentApiIndex + i) % translateAPIs.length;
                 btn.disabled = false;
@@ -1607,14 +1614,14 @@ async function translateText() {
             }
         } catch (err) {
             lastError = err;
-            console.warn(`API ${apiUrl} 调用失败:`, err.message);
+            console.warn('API 调用失败:', err.message);
         }
     }
 
-    output.textContent = `⚠️ 翻译失败: ${lastError?.message || '所有翻译服务暂不可用'}\n\n建议：\n1. 检查网络连接\n2. 稍后重试\n3. 尝试更换翻译内容`;
+    output.textContent = `⚠️ 翻译失败: ${lastError?.message || '翻译服务暂不可用'}\n\nMyMemory 免费额度：100次/天/IP\n如额度用完，请明日再试。`;
     output.classList.remove('has-result');
     copyBtn.disabled = true;
-    status.textContent = '❌ 所有翻译服务暂不可用';
+    status.textContent = '❌ 翻译失败';
     status.style.color = 'var(--danger)';
     btn.disabled = false;
     btn.textContent = '🌐 翻译';
