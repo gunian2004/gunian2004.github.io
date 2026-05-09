@@ -164,25 +164,26 @@
 }
 
 .ai-section.active .section-content {
-    max-height: 5000px;
-    overflow-y: auto;
+    max-height: 550px !important;
+    overflow-y: auto !important;
 }
 
 .ai-section.active .section-content::-webkit-scrollbar {
-    width: 6px;
+    width: 6px !important;
 }
 
 .ai-section.active .section-content::-webkit-scrollbar-track {
-    background: transparent;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-radius: 3px;
 }
 
 .ai-section.active .section-content::-webkit-scrollbar-thumb {
-    background: rgba(0, 212, 255, 0.3);
+    background: rgba(0, 212, 255, 0.4) !important;
     border-radius: 3px;
 }
 
 .ai-section.active .section-content::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 212, 255, 0.5);
+    background: rgba(0, 212, 255, 0.7) !important;
 }
 
 .content-inner {
