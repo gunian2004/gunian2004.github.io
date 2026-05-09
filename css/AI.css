@@ -164,7 +164,25 @@
 }
 
 .ai-section.active .section-content {
-    max-height: 800px;
+    max-height: 5000px;
+    overflow-y: auto;
+}
+
+.ai-section.active .section-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.ai-section.active .section-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.ai-section.active .section-content::-webkit-scrollbar-thumb {
+    background: rgba(0, 212, 255, 0.3);
+    border-radius: 3px;
+}
+
+.ai-section.active .section-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 212, 255, 0.5);
 }
 
 .content-inner {
