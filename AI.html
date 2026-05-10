@@ -77,6 +77,12 @@
                                 </div>
                                 <div class="card-toggle">...（点击展开）</div>
                             </div>
+                            <div class="prompt-card" onclick="toggleCard(this)">
+                                <div class="card-content">
+                                    <p class="card-text">浏览器调试步骤及（针对9222端口的edge浏览器的配置，具体路径看个人电脑路径） <br>1，taskkill /F /IM msedge.exe<br>2，打开终端命令行，输入："C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" --remote-debugging-port=9222 --user-data-dir="C:\Users\{用户名}\AppData\Local\Microsoft\Edge\User Data" --no-first-run <br>3，打开新的终端命令行，输入（查看9222端口是否被监听到，有输出即是成功）：netstat -ano | findstr :9222 | findstr LISTENING <br>成功之后就可以让agent进行调试了</p>
+                                </div>
+                                <div class="card-toggle">...（点击展开）</div>
+                            </div>
                         </div>
                     </div>
                 </div>
