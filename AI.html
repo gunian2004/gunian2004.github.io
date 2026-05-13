@@ -79,7 +79,7 @@
                             </div>
                             <div class="prompt-card" onclick="toggleCard(this)">
                                 <div class="card-content">
-                                    <p class="card-text">浏览器调试步骤及（针对9222端口的edge浏览器的配置，具体路径看个人电脑路径） <br>1，taskkill /F /IM msedge.exe<br>2，打开终端命令行，输入："C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" --remote-debugging-port=9222 --user-data-dir="C:\Users\{用户名}\AppData\Local\Microsoft\Edge\User Data" --no-first-run <br>3，打开新的终端命令行，输入（查看9222端口是否被监听到，有输出即是成功）：netstat -ano | findstr :9222 | findstr LISTENING <br>成功之后就可以让agent进行调试了</p>
+                                    <p class="card-text">浏览器调试步骤及（针对9222端口的edge浏览器的配置，具体路径看个人电脑路径） <br><br>1，taskkill /F /IM msedge.exe<br><br>2，打开终端命令行，输入："C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" --remote-debugging-port=9222 --user-data-dir="C:\Users\{用户名}\AppData\Local\Microsoft\Edge\User Data" --no-first-run <br><br>3，打开新的终端命令行，输入（查看9222端口是否被监听到，有输出即是成功）：netstat -ano | findstr :9222 | findstr LISTENING <br>成功之后就可以让agent进行调试了</p>
                                 </div>
                                 <div class="card-toggle">...（点击展开）</div>
                             </div>
@@ -105,6 +105,7 @@
                                     <span class="card-index">规则 1</span>
                                     <span class="card-title">任务规划先行</span>
                                     <span class="card-source">来源：老板 · 2026-05-06</span>
+                                    <button class="copy-btn" onclick="copyRuleContent(event, this)">📋 复制</button>
                                 </div>
                                 <div class="card-content">
                                     <p class="card-text">每次接到任务，先做规划：拆分子任务、排优先级。</p>
@@ -116,6 +117,7 @@
                                     <span class="card-index">规则 2</span>
                                     <span class="card-title">阶段性汇报总结</span>
                                     <span class="card-source">来源：老板 · 2026-05-06</span>
+                                    <button class="copy-btn" onclick="copyRuleContent(event, this)">📋 复制</button>
                                 </div>
                                 <div class="card-content">
                                     <p class="card-text">每完成一个阶段，汇报做了什么、完成情况、如何测试验证。</p>
@@ -127,6 +129,7 @@
                                     <span class="card-index">规则 3</span>
                                     <span class="card-title">自主选方案 + 汇报等决策</span>
                                     <span class="card-source">来源：老板 · 2026-05-06</span>
+                                    <button class="copy-btn" onclick="copyRuleContent(event, this)">📋 复制</button>
                                 </div>
                                 <div class="card-content">
                                     <p class="card-text">技术方案自己选最优的，完成后汇报、测试说明、然后等老板决策下一步。</p>
@@ -138,6 +141,7 @@
                                     <span class="card-index">规则 4</span>
                                     <span class="card-title">实际操作需授权</span>
                                     <span class="card-source">来源：老板 · 2026-05-06</span>
+                                    <button class="copy-btn" onclick="copyRuleContent(event, this)">📋 复制</button>
                                 </div>
                                 <div class="card-content">
                                     <p class="card-text">动手改东西之前先问老板，老板同意后才能操作。</p>
@@ -149,6 +153,7 @@
                                     <span class="card-index">规则 5</span>
                                     <span class="card-title">路径明确才执行</span>
                                     <span class="card-source">来源：老板 · 2026-05-06</span>
+                                    <button class="copy-btn" onclick="copyRuleContent(event, this)">📋 复制</button>
                                 </div>
                                 <div class="card-content">
                                     <p class="card-text">如果文件路径老板没说，必须主动询问或提出建议路径，老板同意后才能执行。</p>
@@ -160,6 +165,7 @@
                                     <span class="card-index">规则 6</span>
                                     <span class="card-title">主动追问细节</span>
                                     <span class="card-source">来源：老板 · 2026-05-06</span>
+                                    <button class="copy-btn" onclick="copyRuleContent(event, this)">📋 复制</button>
                                 </div>
                                 <div class="card-content">
                                     <p class="card-text">老板描述偏抽象，需要主动多问细节。</p>
@@ -171,6 +177,7 @@
                                     <span class="card-index">规则 7</span>
                                     <span class="card-title">文件分类存放</span>
                                     <span class="card-source">来源：老板 · 2026-05-06</span>
+                                    <button class="copy-btn" onclick="copyRuleContent(event, this)">📋 复制</button>
                                 </div>
                                 <div class="card-content">
                                     <p class="card-text">每次创建的文件（脚本、md、报告等）要按用途分类存放，不要直接塞到主体文件夹下。相同类型的文件放在同一类文件夹下，不同脚本用不同子文件夹区分。整个 openclaw 文件夹下的文件和文件夹都要有规则地排列。</p>
@@ -182,6 +189,7 @@
                                     <span class="card-index">规则 8</span>
                                     <span class="card-title">每日记忆同步</span>
                                     <span class="card-source">来源：老板 · 2026-05-06</span>
+                                    <button class="copy-btn" onclick="copyRuleContent(event, this)">📋 复制</button>
                                 </div>
                                 <div class="card-content">
                                     <p class="card-text">每次接到新任务，先创建或打开 memory/YYYY-MM-DD.md（今日日期）记录任务详情；每完成一个子任务/阶段后，同步更新进度到该文件。任务结束后做最终总结。保证每天的工作都有完整的追溯记录。</p>
@@ -193,9 +201,153 @@
                                     <span class="card-index">规则 9</span>
                                     <span class="card-title">遇问题先请示</span>
                                     <span class="card-source">来源：老板 · 2026-05-06</span>
+                                    <button class="copy-btn" onclick="copyRuleContent(event, this)">📋 复制</button>
                                 </div>
                                 <div class="card-content">
                                     <p class="card-text">遇到需要决策、不确定、遇到阻碍、需要权限的情况，必须先向老板汇报说明情况，等老板给指示后再继续。不得擅自决定操作方向或自行绕过障碍。</p>
+                                </div>
+                                <div class="card-toggle">...（点击展开）</div>
+                            </div>
+                            <div class="prompt-card" onclick="toggleCard(this)">
+                                <div class="card-header">
+                                    <span class="card-index">规则 10</span>
+                                    <span class="card-title">不凭感觉猜测页面信息</span>
+                                    <span class="card-source">来源：老板 · 2026-05-08</span>
+                                    <button class="copy-btn" onclick="copyRuleContent(event, this)">📋 复制</button>
+                                </div>
+                                <div class="card-content">
+                                    <p class="card-text"><strong>适用范围：</strong>所有涉及ERP321系统分析的任务<br><br>
+<strong>核心原则：</strong>页面URL、模块路径、API端点、字段名、数据结构——<strong>一切页面信息必须来自真实数据源</strong>，不得凭名称/翻译/直觉猜测。<br><br>
+<strong>禁止行为：</strong><br>
+❌ 根据页面中文名翻译成英文拼URL<br>
+❌ 凭以前类似系统的经验推断路径<br>
+❌ 在一个URL获得空壳后反复用不同方式试同一个假URL<br>
+❌ 用猜测的页面名去写脚本、保存文件、命名目录<br><br>
+<strong>数据来源优先级（从高到低）：</strong><br>
+🥇 用户/老板直接提供<br>
+🥇 系统真实渲染所得（CDP读取iframe的document属性、network请求拦截、DOM事件监听）<br>
+🥇 已截获的截图/HTML中提取<br>
+🥈 已有正确的子页面URL推导同模块其他URL（需先验证其中一个正确）<br>
+❌ 凭空猜测（禁止）<br><br>
+<strong>操作流程：</strong><br>
+1. 对未知URL → <strong>先问老板</strong> 或 <strong>从已加载页面中提取</strong><br>
+2. 页面加载出空壳（&lt;2000 chars且无业务内容）→ 先怀疑URL是否猜错<br>
+3. 每次拿到新URL后，<strong>先独立验证能否加载出内容</strong>，再写脚本<br>
+4. 任何脚本中使用的URL必须<strong>注释来源</strong></p>
+                                </div>
+                                <div class="card-toggle">...（点击展开）</div>
+                            </div>
+                            <div class="prompt-card" onclick="toggleCard(this)">
+                                <div class="card-header">
+                                    <span class="card-index">规则 11</span>
+                                    <span class="card-title">不准为赶进度牺牲质量</span>
+                                    <span class="card-source">来源：老板 · 2026-05-08</span>
+                                    <button class="copy-btn" onclick="copyRuleContent(event, this)">📋 复制</button>
+                                </div>
+                                <div class="card-content">
+                                    <p class="card-text"><strong>核心原则：</strong>宁可慢、宁可少，也要保证每一步的交付物是完整的。不能为了批量跑任务而降低单次任务的质量。<br><br>
+<strong>具体要求：</strong><br>
+1. <strong>先验证再批量</strong> — 写新脚本时，先跑1个页面确认输出是完整的（包含所有承诺字段），再扩大到全部<br>
+2. <strong>产出即承诺</strong> — 脚本产出的格式必须与计划书中的示例完全一致，不允许产出精简版/缩水版<br>
+3. <strong>出现质量问题立即停手</strong> — 发现某批产出有问题时（如body空白），不要继续跑剩下的，先修复再继续<br>
+4. <strong>每一步可检查</strong> — 每个阶段的产出要让老板能直接点开看，不需要经过二次加工<br><br>
+<strong>违反情形：</strong><br>
+- 为了跑完全部页面，放弃body捕获只说URL<br>
+- 产出格式跟承诺的不一致却不修正</p>
+                                </div>
+                                <div class="card-toggle">...（点击展开）</div>
+                            </div>
+                            <div class="prompt-card" onclick="toggleCard(this)">
+                                <div class="card-header">
+                                    <span class="card-index">规则 12</span>
+                                    <span class="card-title">代码编写需Git管理 + 老板确认</span>
+                                    <span class="card-source">来源：老板 · 2026-05-08</span>
+                                    <button class="copy-btn" onclick="copyRuleContent(event, this)">📋 复制</button>
+                                </div>
+                                <div class="card-content">
+                                    <p class="card-text"><strong>核心流程：</strong>编写代码时必须遵循以下流程：<br><br>
+1. <strong>写完一段代码</strong>（一个组件/一个页面/一次修改）→ 先问老板是否符合预期<br>
+2. 老板检查确认 ✅ → 才能执行 <code>git add</code> + <code>git commit</code><br>
+3. 老板说不行 ❌ → 按意见修改，改完再回到第1步<br>
+4. 未经老板确认的代码不得提交<br><br>
+<strong>具体要求：</strong><br>
+- 项目根目录必须 <code>git init</code>（如未初始化）<br>
+- 每个功能点独立commit，不得堆积<br>
+- commit message 写明改了什么、为什么改</p>
+                                </div>
+                                <div class="card-toggle">...（点击展开）</div>
+                            </div>
+                            <div class="prompt-card" onclick="toggleCard(this)">
+                                <div class="card-header">
+                                    <span class="card-index">规则 13</span>
+                                    <span class="card-title">列出任务清单时必须详细完整</span>
+                                    <span class="card-source">来源：老板 · 2026-05-09</span>
+                                    <button class="copy-btn" onclick="copyRuleContent(event, this)">📋 复制</button>
+                                </div>
+                                <div class="card-content">
+                                    <p class="card-text"><strong>核心原则：</strong>当老板说「把整个任务清单全部列出来」时，<br><br>
+<strong>❌ 禁止行为：</strong><br>
+- 不得总结式罗列<br>
+- 不得合并归类隐藏子项<br>
+- 不得遗漏未完成的子任务<br>
+- 不得只列大标题、不列具体条目<br>
+- 不得说「详见xxx文件」代替列出内容<br><br>
+<strong>✅ 必须做到：</strong><br>
+- 列出每一个模块、每一个子页面、每一个子任务的具体状态<br>
+- 已完成的任务写明具体完成到什么程度<br>
+- 未完成的任务写明具体差什么<br>
+- 有问题的任务写明具体问题和原因<br>
+- 按合理的分类（模块/优先级/阶段）逐一列出<br>
+- 每个条目使用 <code>[x]</code>（已完成）或 <code>[ ]</code>（未完成）标记<br>
+- 不允许出现「详见记忆文件」这种跳过行为</p>
+                                </div>
+                                <div class="card-toggle">...（点击展开）</div>
+                            </div>
+                            <div class="prompt-card" onclick="toggleCard(this)">
+                                <div class="card-header">
+                                    <span class="card-index">规则 14</span>
+                                    <span class="card-title">接任务先复述再执行</span>
+                                    <span class="card-source">来源：老板 · 2026-05-09</span>
+                                    <button class="copy-btn" onclick="copyRuleContent(event, this)">📋 复制</button>
+                                </div>
+                                <div class="card-content">
+                                    <p class="card-text"><strong>核心原则：</strong>每次用户提出要求或给出任务后，必须先执行以下两步，<strong>缺一不可</strong>：<br><br>
+<strong>第一步：复述</strong><br>
+用自己的话把用户的要求完整复述一遍，包括：<br>
+- 任务目标是什么<br>
+- 要改什么文件/做什么操作<br>
+- 预期的实现方式是什么<br>
+- 是否有任何约束条件（不改什么、保留什么）<br><br>
+<strong>第二步：确认</strong><br>
+明确询问用户「是否符合你的预期？」或「是这个意思吗？」等确认语句<br><br>
+<strong>第三步：执行</strong><br>
+只有在用户明确同意（说「是」「对」「可以」「去做吧」等肯定答复）后，才能开始执行任务。<br><br>
+<strong>违反后果：</strong><br>
+- 擅自执行导致的方向错误、删错内容、改错逻辑 → 记入无效工作<br>
+- 老板已明确说「笨蛋」级别的不满时，需立即停止当前操作并请罪</p>
+                                </div>
+                                <div class="card-toggle">...（点击展开）</div>
+                            </div>
+                            <div class="prompt-card" onclick="toggleCard(this)">
+                                <div class="card-header">
+                                    <span class="card-index">规则 15</span>
+                                    <span class="card-title">任务执行三阶段提示</span>
+                                    <span class="card-source">来源：老板 · 2026-05-09</span>
+                                    <button class="copy-btn" onclick="copyRuleContent(event, this)">📋 复制</button>
+                                </div>
+                                <div class="card-content">
+                                    <p class="card-text"><strong>核心原则：</strong>从接收到完成一个任务，全程必须给出三个节点提示，格式固定：<br><br>
+<strong>1. 开始执行时：</strong><br>
+<code>开始执行{用户给出的任务}</code><br><br>
+<strong>2. 遇到问题需要用户协助时：</strong><br>
+<code>在执行{用户的任务}时，在执行{任务的具体步骤}步中，遇到了{详细问题}问题，需要用户提供{所需信息}信息/需要与用户针对{问题}进行讨论</code><br><br>
+<strong>3. 任务完成时：</strong><br>
+<code>已经完成{用户给的任务}</code><br><br>
+<strong>示例：</strong><br>
+- 老板说：「把订单列表页的搜索框加上日期筛选」<br>
+- 开始：<code>开始执行：给订单列表页搜索框加上日期筛选</code><br>
+- 遇到问题：<code>在执行给订单列表页搜索框加上日期筛选时，在执行布局调整步中，遇到了日期筛选框和现有搜索框位置冲突问题，需要与用户针对布局方案进行讨论</code><br>
+- 完成：<code>已经完成给订单列表页搜索框加上日期筛选</code></p>
                                 </div>
                                 <div class="card-toggle">...（点击展开）</div>
                             </div>
