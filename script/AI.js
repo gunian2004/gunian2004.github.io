@@ -25,6 +25,26 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+function copyPromptContent(event, button) {
+    event.stopPropagation();
+    
+    const card = button.closest('.prompt-card');
+    const cardText = card.querySelector('.card-text').innerText;
+    
+    navigator.clipboard.writeText(cardText).then(() => {
+        const originalText = button.textContent;
+        button.textContent = '✓ 已复制';
+        button.classList.add('copied');
+        setTimeout(() => {
+            button.textContent = originalText;
+            button.classList.remove('copied');
+        }, 2000);
+    }).catch(err => {
+        console.error('复制失败: ', err);
+        alert('复制失败，请手动复制');
+    });
+}
+
 function toggleCard(card) {
     card.classList.toggle('expanded');
     const toggleText = card.querySelector('.card-toggle');
