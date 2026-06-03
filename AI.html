@@ -372,6 +372,110 @@
                                 </div>
                                 <div class="card-toggle">...（点击展开）</div>
                             </div>
+                            <div class="prompt-card" onclick="toggleCard(this)">
+                                <div class="card-header">
+                                    <span class="card-index">规则 16</span>
+                                    <span class="card-title">本地与云端项目同步规范</span>
+                                    <span class="card-source">来源：老板 · 2026-05-26</span>
+                                    <button class="copy-btn" onclick="copyRuleContent(event, this)">📋 复制</button>
+                                </div>
+                                <div class="card-content">
+                                    <p class="card-text"><strong>核心原则：</strong>本地与云端服务器上的项目必须通过<strong>Git版本管理</strong>同步，禁止在云端服务器上手动修改代码。<br><br>
+<strong>同步流程：</strong><br>
+1. 在<strong>本地电脑</strong>修改代码<br>
+2. 本地测试验证无误<br>
+3. 在本地执行 <code>git add</code> + <code>git commit</code> + <code>git push</code> 推送到远程仓库<br>
+4. 登录云服务器，执行 <code>git pull</code> 拉取最新代码<br>
+5. （如需要）<code>npm run build</code> 重新编译 + <code>pm2 restart</code> 重启<br><br>
+<strong>禁止行为：</strong><br>
+❌ 直接在云服务器上用 vim/nano 等编辑器修改源代码<br>
+❌ 在云服务器上手动复制/粘贴文件到项目中<br>
+❌ 在云服务器上改动文件后不做 git 管理<br><br>
+<strong>例外情况：</strong><br>
+- 配置文件（如 <code>.env</code>、nginx配置）不受此限制，可手动修改<br>
+- 临时调试排查可查看文件内容，但修改后必须用 git 覆盖回来</p>
+                                </div>
+                                <div class="card-toggle">...（点击展开）</div>
+                            </div>
+                            <div class="prompt-card" onclick="toggleCard(this)">
+                                <div class="card-header">
+                                    <span class="card-index">规则 17</span>
+                                    <span class="card-title">优先选技术方案，暴力方案兜底</span>
+                                    <span class="card-source">来源：老板 · 2026-05-29</span>
+                                    <button class="copy-btn" onclick="copyRuleContent(event, this)">📋 复制</button>
+                                </div>
+                                <div class="card-content">
+                                    <p class="card-text"><strong>核心原则：</strong>提供方案时，优先推荐用<strong>技术、算法、架构</strong>层面的方式解决问题，而不是靠加资源、改配置、增大限制等粗暴手段。<br><br>
+<strong>正反示例：</strong><br><br>
+<strong>❌ 暴力方案（不推荐）：</strong><br>
+- 文件太大？→ 加大 Nginx 上传限制、加大 Node 堆内存<br>
+- 接口太慢？→ 升级服务器配置<br>
+- 数据太多？→ 去掉限制，让用户一次查全部<br><br>
+<strong>✅ 技术方案（优先推荐）：</strong><br>
+- 文件太大？→ 流式解析、分片上传<br>
+- 接口太慢？→ 加缓存、加索引、异步处理<br>
+- 数据太多？→ 分页、虚拟滚动、懒加载<br><br>
+<strong>兜底原则：</strong>只有在技术方案确实不可行（如依赖库不支持、框架限制无法绕过、成本过高）时，才退而推荐暴力方案，且必须说明为什么技术方案不可行。</p>
+                                </div>
+                                <div class="card-toggle">...（点击展开）</div>
+                            </div>
+                            <div class="prompt-card" onclick="toggleCard(this)">
+                                <div class="card-header">
+                                    <span class="card-index">规则 18</span>
+                                    <span class="card-title">请示执行命令时必须附带备注说明</span>
+                                    <span class="card-source">来源：老板 · 2026-06-01</span>
+                                    <button class="copy-btn" onclick="copyRuleContent(event, this)">📋 复制</button>
+                                </div>
+                                <div class="card-content">
+                                    <p class="card-text"><strong>核心原则：</strong>在向老板请示是否执行某条命令时，必须在请示信息中附带<strong>备注</strong>，说明这条命令是干什么用的、操作的范围和目的。<br><br>
+<strong>执行要求：</strong>当需要老板授权执行操作时，按以下格式提问：<br><br>
+<code>是否执行操作：{命令}</code><br>
+<code>备注：这条命令用于{说明命令的作用、影响范围、操作目的等}</code><br>
+<code>若执行，请回复「执行」；若不执行，可以继续其他提问</code><br><br>
+<strong>示例：</strong><br><br>
+❌ <strong>之前的方式（没有备注）：</strong><br>
+<code>是否执行操作，若执行，请回复执行，若不执行，可以继续其他问题的提问</code><br><br>
+✅ <strong>新方式（带备注说明）：</strong><br>
+<code>是否执行操作：pm2 restart erp-backend</code><br>
+<code>备注：重启后端服务，使刚才 git pull 拉取的最新代码生效</code><br>
+<code>若执行请回复「执行」，若不执行可以继续其他提问</code><br><br>
+<strong>适用范围：</strong><br>
+- 所有需要老板授权执行的 shell 命令<br>
+- 所有需要老板授权执行的代码修改/文件操作<br>
+- 注意：日常追问需求细节等对话性操作不需要备注</p>
+                                </div>
+                                <div class="card-toggle">...（点击展开）</div>
+                            </div>
+                            <div class="prompt-card" onclick="toggleCard(this)">
+                                <div class="card-header">
+                                    <span class="card-index">规则 19</span>
+                                    <span class="card-title">定位代码必须优先用 CodeGraph</span>
+                                    <span class="card-source">来源：老板 · 2026-06-01</span>
+                                    <button class="copy-btn" onclick="copyRuleContent(event, this)">📋 复制</button>
+                                </div>
+                                <div class="card-content">
+                                    <p class="card-text"><strong>核心原则：</strong>接到涉及代码定位或分析的任务时，必须按以下固定流程执行：<br><br>
+<strong>执行流程：</strong><br>
+1. 收到任务<br>
+2. 判断是否涉及代码定位/源码分析 → <strong>是</strong> → 进入第3步<br>
+3. <strong>先用 CodeGraph</strong>：<br>
+   - 搜符号：<code>codegraph query "函数名/类名"</code><br>
+   - 构建上下文：<code>codegraph context "描述任务"</code><br>
+   - 查调用者：<code>codegraph callers SymbolName</code><br>
+   - 查被调者：<code>codegraph callees SymbolName</code><br>
+   - 影响分析：<code>codegraph impact SymbolName</code><br>
+4. CodeGraph 信息不够 → <strong>再用 <code>read</code></strong> 读具体源文件<br>
+5. 最后才用 <strong><code>exec grep</code> / <code>Select-String</code></strong> 兜底<br><br>
+<strong>如何判断项目是否已索引：</strong><br>
+- 运行 <code>codegraph status</code> 查看<br>
+- 未索引时先 <code>codegraph init</code> 再 <code>codegraph index</code><br>
+- 已索引的直接用 <code>codegraph context</code> 或 <code>codegraph query</code><br><br>
+<strong>违反后果：</strong><br>
+- 直接 read/grep 翻文件导致大量无效 token 消耗<br>
+- 公司有成本记得吧？</p>
+                                </div>
+                                <div class="card-toggle">...（点击展开）</div>
+                            </div>
                         </div>
                     </div>
                 </div>
