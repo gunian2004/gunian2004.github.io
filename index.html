@@ -90,6 +90,152 @@
                 <div class="experience-timeline">
                     <div class="experience-item">
                         <div class="exp-header">
+                            <span class="exp-title">全栈开发工程师</span>
+                            <span class="exp-period">2026.05 - 2026.06</span>
+                        </div>
+                        <p class="exp-company">跨境电商企业（SaaS系统开发）</p>
+
+                        <!-- 可折叠盒子 -->
+                        <div class="exp-box" id="erpExpBox">
+                            <div class="exp-box-preview" id="erpExpPreview">
+                                <p class="exp-desc">独立负责跨境电商ERP系统的全栈开发，从存量系统逆向分析到多平台架构重构的全生命周期交付。完成前端SPA系统重建、后端服务搭建与境外电商平台API全链路对接，实现一键自动化财务核算，替代原有数小时手工对账流程。</p>
+                                <div class="exp-box-actions">
+                                    <button class="exp-box-toggle" onclick="toggleExpBox('erpExpBox')">
+                                        <span class="toggle-icon">▼</span> 展开详情
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="exp-box-detail" id="erpExpDetail">
+                                <div class="exp-box-detail-inner">
+
+                                    <!-- 核心成就 -->
+                                    <div class="exp-section">
+                                        <h4 class="exp-subtitle">🏆 核心成就</h4>
+                                        <div class="exp-achievements">
+                                            <div class="achievement-card">
+                                                <span class="achievement-num">8.6×</span>
+                                                <span class="achievement-label">核算性能提升</span>
+                                            </div>
+                                            <div class="achievement-card">
+                                                <span class="achievement-num">40~60×</span>
+                                                <span class="achievement-label">内存占用优化</span>
+                                            </div>
+                                            <div class="achievement-card">
+                                                <span class="achievement-num">2~4天</span>
+                                                <span class="achievement-label">新平台接入周期</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 阶段一 -->
+                                    <div class="exp-section">
+                                        <h4 class="exp-subtitle">🔍 阶段一：存量系统逆向分析（7天）</h4>
+                                        <ul class="exp-highlights">
+                                            <li>无源码、无API文档、无数据库访问权限，仅通过<strong style="color: var(--primary);">浏览器远程调试协议</strong>（CDP）对存量系统进行全面扫描</li>
+                                            <li>批量提取 <strong style="color: var(--primary);">850个JS文件源码</strong>（~150MB），从中反推出 <strong style="color: var(--primary);">359个API路径</strong> 和完整数据模型</li>
+                                            <li>覆盖 <strong style="color: var(--primary);">17个业务模块、约450个功能页面</strong> 的结构分析，重点对财务模块完成深层字段级分析</li>
+                                            <li>攻克 Service Worker 拦截、跨域 iframe、ASP.NET AJAX 认证等6项技术难点</li>
+                                            <li>开发完整的逆向分析工具链（批量扫描、深层分析、源码下载、报告生成、Cookie注入）</li>
+                                        </ul>
+                                    </div>
+
+                                    <!-- 阶段二 -->
+                                    <div class="exp-section">
+                                        <h4 class="exp-subtitle">🎨 阶段二：前端SPA系统重建（4天）</h4>
+                                        <ul class="exp-highlights">
+                                            <li>完成技术选型评估：React 18 + TypeScript + Ant Design 5 + Vite 6 + Zustand</li>
+                                            <li>搭建完整SPA容器架构：<strong style="color: var(--primary);">19个业务模块导航、~500条菜单路由、多列悬浮菜单、标签页拖拽排序</strong></li>
+                                            <li>手写开发 <strong style="color: var(--primary);">20个真实业务功能页面</strong>（含完整交互逻辑和数据展示）</li>
+                                            <li>建立前端三层架构（API数据层 + Zustand状态层 + 业务视图层），Vite build编译通过（3156 modules）</li>
+                                        </ul>
+                                    </div>
+
+                                    <!-- 阶段三 -->
+                                    <div class="exp-section">
+                                        <h4 class="exp-subtitle">⚙️ 阶段三：后端搭建与API对接（15天）</h4>
+                                        <ul class="exp-highlights">
+                                            <li>Express + TypeScript 模块化分层架构，包含签名算法、认证授权、数据库持久化、进度追踪等完整基础设施</li>
+                                            <li>手工阅读 <strong style="color: var(--primary);">296个API接口文档</strong>，整理为结构化文档 + Apifox可导入格式</li>
+                                            <li>实现完整OAuth 2.0流程，攻克签名算法3个关键陷阱</li>
+                                            <li>财务数据字段映射历经 <strong style="color: var(--primary);">3个版本迭代</strong>，逐字段验证确保导出结果与官方数据完全一致</li>
+                                            <li>一键核算功能：9步编排，~7000次API调用，<strong style="color: var(--primary);">单次核算约3.5分钟</strong>（优化前30分钟）</li>
+                                            <li><strong style="color: var(--secondary);">并发优化</strong>：Promise.all → 滑动窗口 → 流水线模式，CPU利用率从低到持续满载</li>
+                                            <li><strong style="color: var(--secondary);">内存优化</strong>：全量缓存 → JSONL流式临时存储 + 流式Excel写入，驻堆内存降低75%~96%</li>
+                                            <li>双层超时保护 + 指数退避重试 + 同token翻页重试，保障API调用稳定性</li>
+                                        </ul>
+                                    </div>
+
+                                    <!-- 阶段四 -->
+                                    <div class="exp-section">
+                                        <h4 class="exp-subtitle">🏗️ 阶段四：多平台架构重构（6天）</h4>
+                                        <ul class="exp-highlights">
+                                            <li>设计 <strong style="color: var(--primary);">三层解耦架构</strong>：路由层 → 通用业务层 → 平台适配层，业务层零平台判断分支</li>
+                                            <li>实现 <strong style="color: var(--primary);">Platform Adapter模式</strong> + 工厂注册机制，新增平台只需1个Adapter类 + 1行注册代码</li>
+                                            <li>定义跨平台标准化类型体系，作为业务层与适配层的契约</li>
+                                            <li>Workflow编排模式：每步独立可执行、可并行、进度可追踪</li>
+                                            <li>CostProvider独立拆分，解耦成本查询与平台业务逻辑</li>
+                                        </ul>
+                                    </div>
+
+                                    <!-- 工程保障 -->
+                                    <div class="exp-section">
+                                        <h4 class="exp-subtitle">🛡️ 工程保障</h4>
+                                        <ul class="exp-highlights">
+                                            <li>用户权限系统：三级角色体系（超管/管理员/商家）+ JWT认证 + 安全加固</li>
+                                            <li>数据库自动初始化：幂等建表 + 自动迁移 + 种子数据</li>
+                                            <li>Token自动刷新中间件：内存缓存 + 过期预刷新 + 透明调用</li>
+                                            <li>操作日志系统：7处关键埋点 + 按条件查询</li>
+                                            <li>云服务器部署：PM2进程管理 + Nginx反代 + SSL + 0停机更新</li>
+                                            <li>交叉审查：13项架构改进全部实施，12项短板识别排期</li>
+                                        </ul>
+                                    </div>
+
+                                    <!-- Bug排查 -->
+                                    <div class="exp-section">
+                                        <h4 class="exp-subtitle">🐛 复杂Bug排查案例</h4>
+                                        <ul class="exp-highlights">
+                                            <li><strong style="color: var(--primary);">数据不一致</strong>：架构重构后每次导出结果不同 → 发现10处API调用缺重试、catch块静默吞异常 → 一次性修复</li>
+                                            <li><strong style="color: var(--primary);">隐式Bug</strong>：结算日期全部为空，字段映射正确 → 根因是迁移时日期窗口参数变更（±30天→原始日期）→ 症状与根因毫无关联</li>
+                                            <li><strong style="color: var(--primary);">分页数据丢失</strong>：偶尔少一批订单 → 发现API偶发返回空页但仍给翻页token → 实现同token重试机制</li>
+                                        </ul>
+                                    </div>
+
+                                    <!-- 技术栈 -->
+                                    <div class="exp-section">
+                                        <h4 class="exp-subtitle">🛠️ 技术栈</h4>
+                                        <div class="exp-tech-tags">
+                                            <span class="exp-tech-tag">TypeScript</span>
+                                            <span class="exp-tech-tag">Node.js</span>
+                                            <span class="exp-tech-tag">Express</span>
+                                            <span class="exp-tech-tag">React 18</span>
+                                            <span class="exp-tech-tag">Ant Design 5</span>
+                                            <span class="exp-tech-tag">MySQL 8.0</span>
+                                            <span class="exp-tech-tag">ExcelJS</span>
+                                            <span class="exp-tech-tag">Zustand</span>
+                                            <span class="exp-tech-tag">Vite</span>
+                                            <span class="exp-tech-tag">PM2</span>
+                                            <span class="exp-tech-tag">Nginx</span>
+                                            <span class="exp-tech-tag">JWT</span>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="exp-box-actions">
+                                    <button class="exp-box-toggle" onclick="toggleExpBox('erpExpBox')">
+                                        <span class="toggle-icon">▲</span> 收起详情
+                                    </button>
+                                    <button class="exp-box-fullscreen" onclick="openExpFullscreen('erpExpBox')">
+                                        <span>⛶</span> 全屏查看
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="experience-item">
+                        <div class="exp-header">
                             <span class="exp-title">AI产品开发工程师</span>
                             <span class="exp-period">2025.06 - 2026.03</span>
                         </div>
@@ -110,6 +256,24 @@
                 </div>
             </div>
         </section>
+
+        <!-- 全屏展示模态框 -->
+        <div class="exp-fullscreen-modal" id="expFullscreenModal">
+            <div class="exp-fullscreen-header">
+                <h3 class="exp-fullscreen-title" id="expFullscreenTitle">实习经历详情</h3>
+                <button class="exp-fullscreen-close" onclick="closeExpFullscreen()">
+                    <span class="fullscreen-close-icon">✕</span>
+                    <span class="fullscreen-close-text">退出全屏</span>
+                </button>
+            </div>
+            <div class="exp-fullscreen-body" id="expFullscreenBody"></div>
+            <div class="exp-fullscreen-footer">
+                <button class="exp-fullscreen-exit" onclick="closeExpFullscreen()">
+                    <span>↩</span> 返回页面
+                </button>
+                <span class="exp-fullscreen-hint">按 ESC 也可退出全屏</span>
+            </div>
+        </div>
 
         <section class="section">
             <h2 class="section-title"><span class="section-title-icon">🛠️</span>技术栈</h2>

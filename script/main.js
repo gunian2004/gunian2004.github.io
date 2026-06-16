@@ -144,3 +144,65 @@ document.querySelectorAll('.section').forEach(section => {
     section.style.animationPlayState = 'paused';
     observer.observe(section);
 });
+
+// ========== 实习经历折叠盒子交互 ==========
+function toggleExpBox(boxId) {
+    const box = document.getElementById(boxId);
+    const detail = box.querySelector('.exp-box-detail');
+    const previewActions = box.querySelector('.exp-box-preview .exp-box-actions');
+    const isExpanded = detail.classList.contains('expanded');
+
+    if (isExpanded) {
+        detail.classList.remove('expanded');
+        // 滚动到盒子位置
+        box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } else {
+        detail.classList.add('expanded');
+    }
+}
+
+function openExpFullscreen(boxId) {
+    const box = document.getElementById(boxId);
+    const detailInner = box.querySelector('.exp-box-detail-inner');
+    const modal = document.getElementById('expFullscreenModal');
+    const body = document.getElementById('expFullscreenBody');
+    const title = document.getElementById('expFullscreenTitle');
+
+    // 获取经历标题
+    const expItem = box.closest('.experience-item');
+    const expTitle = expItem.querySelector('.exp-title').textContent;
+    const expCompany = expItem.querySelector('.exp-company').textContent;
+    title.textContent = expTitle + ' — ' + expCompany;
+
+    // 克隆内容到模态框
+    body.innerHTML = detailInner.innerHTML;
+
+    // 显示模态框 + 隐藏导航按钮
+    modal.classList.add('active');
+    document.body.classList.add('exp-fullscreen-open');
+    document.body.style.overflow = 'hidden';
+
+    // 滚动到顶部
+    body.scrollTop = 0;
+}
+
+function closeExpFullscreen() {
+    const modal = document.getElementById('expFullscreenModal');
+    modal.classList.remove('active');
+    document.body.classList.remove('exp-fullscreen-open');
+    document.body.style.overflow = '';
+}
+
+// ESC 关闭全屏
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closeExpFullscreen();
+    }
+});
+
+// 点击遮罩关闭全屏
+document.getElementById('expFullscreenModal').addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) {
+        closeExpFullscreen();
+    }
+});
