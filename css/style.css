@@ -385,6 +385,50 @@ body {
     font-size: 0.75rem;
 }
 
+/* 项目卡片展开/收起 */
+.project-card-expandable .project-preview {
+    display: block;
+}
+
+.project-card-expandable .project-detail {
+    display: none;
+}
+
+.project-card-expandable.expanded .project-preview {
+    display: none;
+}
+
+.project-card-expandable.expanded .project-detail {
+    display: block;
+}
+
+.project-expand-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 10px;
+    padding: 6px 14px;
+    background: rgba(0, 212, 255, 0.08);
+    border: 1px solid rgba(0, 212, 255, 0.2);
+    border-radius: 14px;
+    color: var(--primary);
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+.project-expand-btn:hover {
+    background: rgba(0, 212, 255, 0.15);
+    border-color: var(--primary);
+    box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
+}
+
+.project-expand-btn .toggle-icon {
+    font-size: 0.65rem;
+    transition: transform 0.3s ease;
+}
+
 .awards-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));

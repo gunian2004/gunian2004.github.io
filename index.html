@@ -400,20 +400,34 @@
         <section class="section">
             <h2 class="section-title"><span class="section-title-icon">💼</span>项目作品</h2>
             <div class="projects-grid">
-                <div class="project-card">
+                <div class="project-card project-card-expandable" id="projErp">
                     <div class="project-header">
                         <span class="project-icon">🌐</span>
                         <h3 class="project-title">境外电商SaaS系统</h3>
                         <span class="project-tag">独立开发</span>
                     </div>
                     <p class="project-desc">独立开发的跨境电商ERP全栈系统，从存量系统逆向分析到多平台架构重构，实现一键自动化财务核算替代手工对账。</p>
-                    <ul class="project-highlights">
-                        <li>无源码无文档，通过浏览器调试协议逆向分析 <strong style="color: var(--primary);">850个JS文件</strong>，反推359个API与完整数据模型</li>
-                        <li>前端SPA重建：<strong style="color: var(--primary);">19个业务模块、~500条路由、20个业务页面</strong></li>
-                        <li>一键核算：9步编排~7000次API调用，<strong style="color: var(--secondary);">3.5分钟</strong>完成（原30分钟）</li>
-                        <li>设计三层解耦架构 + Platform Adapter模式，<strong style="color: var(--secondary);">新平台接入仅需1个Adapter类</strong></li>
-                        <li>并发优化（流水线模式）+ 内存优化（流式存储），驻堆内存降低75%~96%</li>
-                    </ul>
+                    <div class="project-preview">
+                        <ul class="project-highlights">
+                            <li>无源码无文档，逆向分析 <strong style="color: var(--primary);">850个JS文件</strong>，反推359个API与完整数据模型</li>
+                            <li>一键核算：9步编排~7000次API调用，<strong style="color: var(--secondary);">3.5分钟</strong>完成（原30分钟）</li>
+                        </ul>
+                        <button class="project-expand-btn" onclick="toggleProject('projErp')">
+                            <span class="toggle-icon">▼</span> 展开详情
+                        </button>
+                    </div>
+                    <div class="project-detail" id="projErpDetail">
+                        <ul class="project-highlights">
+                            <li>无源码无文档，通过浏览器调试协议逆向分析 <strong style="color: var(--primary);">850个JS文件</strong>，反推359个API与完整数据模型</li>
+                            <li>前端SPA重建：<strong style="color: var(--primary);">19个业务模块、~500条路由、20个业务页面</strong></li>
+                            <li>一键核算：9步编排~7000次API调用，<strong style="color: var(--secondary);">3.5分钟</strong>完成（原30分钟）</li>
+                            <li>设计三层解耦架构 + Platform Adapter模式，<strong style="color: var(--secondary);">新平台接入仅需1个Adapter类</strong></li>
+                            <li>并发优化（流水线模式）+ 内存优化（流式存储），驻堆内存降低75%~96%</li>
+                        </ul>
+                        <button class="project-expand-btn" onclick="toggleProject('projErp')">
+                            <span class="toggle-icon">▲</span> 收起
+                        </button>
+                    </div>
                     <div class="project-tech">
                         <span>TypeScript</span>
                         <span>Node.js</span>
@@ -433,94 +447,158 @@
                     <ul class="project-highlights">
                         <li>独立构建完整系统，从设计到部署全流程负责</li>
                         <li>集成多AI厂商API，实现智能视频生成</li>
-                        <li>开发批处理调度系统，优化资源利用</li>
                         <li>将单条视频制作周期从<strong style="color: var(--secondary);">数天缩短至分钟级</strong></li>
-                        <li>大幅提升内容生产效率</li>
                     </ul>
                     <div class="project-tech">
                         <span>Python</span>
                         <span>Node.js</span>
                         <span>AI API</span>
                         <span>自动化</span>
-                        <span>批处理</span>
                     </div>
                 </div>
 
-                <div class="project-card">
+                <div class="project-card project-card-expandable" id="projGuimi">
                     <div class="project-header">
                         <span class="project-icon">📱</span>
                         <h3 class="project-title">闺蜜机智能应用</h3>
                         <span class="project-tag">实习项目</span>
                     </div>
-                    <p class="project-desc">为用户打造的专属AI智能体，部署于多端系统（Web/Android/iOS）。</p>
-                    <ul class="project-highlights">
-                        <li>根据用户需求进行可行性分析与需求分析</li>
-                        <li>参与系统设计到编码开发的全流程</li>
-                        <li>负责产品测试与交付</li>
-                        <li>根据用户反馈持续优化产品</li>
-                    </ul>
+                    <p class="project-desc">面向硬件终端的AI智能体应用，支持语音交互与智能家居控制，部署于Web/Android/iOS三端。</p>
+                    <div class="project-preview">
+                        <ul class="project-highlights">
+                            <li>独立负责可行性分析→需求分析→系统设计→编码开发→测试交付 <strong style="color: var(--primary);">全流程</strong></li>
+                            <li>交付后根据用户反馈进行 <strong style="color: var(--secondary);">3轮迭代优化</strong>，持续提升产品体验</li>
+                        </ul>
+                        <button class="project-expand-btn" onclick="toggleProject('projGuimi')">
+                            <span class="toggle-icon">▼</span> 展开详情
+                        </button>
+                    </div>
+                    <div class="project-detail" id="projGuimiDetail">
+                        <ul class="project-highlights">
+                            <li>独立负责可行性分析→需求分析→系统设计→编码开发→测试交付 <strong style="color: var(--primary);">全流程</strong></li>
+                            <li>前端React开发，实现语音对话交互界面、设备状态面板、场景化控制组件</li>
+                            <li>后端Python开发，对接Agent Foundry平台智能体能力，实现意图识别→技能调用→结果渲染的完整链路</li>
+                            <li>交付后根据用户反馈进行 <strong style="color: var(--secondary);">3轮迭代优化</strong>：修复响应延迟、优化对话上下文记忆、新增场景推荐功能</li>
+                            <li>完成Web/Android/iOS三端部署与兼容性适配，通过Apifox接口测试 + JMeter性能测试</li>
+                        </ul>
+                        <button class="project-expand-btn" onclick="toggleProject('projGuimi')">
+                            <span class="toggle-icon">▲</span> 收起
+                        </button>
+                    </div>
                     <div class="project-tech">
                         <span>React</span>
-                        <span>Vue3</span>
                         <span>Python</span>
-                        <span>Java</span>
+                        <span>Agent Foundry</span>
+                        <span>多端部署</span>
                     </div>
                 </div>
 
-                <div class="project-card">
+                <div class="project-card project-card-expandable" id="projBattery">
                     <div class="project-header">
                         <span class="project-icon">🔋</span>
                         <h3 class="project-title">电池可行性分析智能体</h3>
                         <span class="project-tag">实习项目</span>
                     </div>
-                    <p class="project-desc">面向材料领域的AI智能体，帮助用户进行电池方案可行性分析。</p>
-                    <ul class="project-highlights">
-                        <li>深入理解行业需求，完成产品设计</li>
-                        <li>运用AI技术实现智能分析功能</li>
-                        <li>完成多端部署与测试交付</li>
-                    </ul>
+                    <p class="project-desc">面向材料行业的AI决策智能体，将电池领域专家经验转化为可执行的分析决策链路。</p>
+                    <div class="project-preview">
+                        <ul class="project-highlights">
+                            <li>将 <strong style="color: var(--primary);">行业专家经验知识</strong> 结构化，转化为AI可执行的决策链路</li>
+                            <li>后端Golang开发，前端React构建分析结果可视化面板</li>
+                        </ul>
+                        <button class="project-expand-btn" onclick="toggleProject('projBattery')">
+                            <span class="toggle-icon">▼</span> 展开详情
+                        </button>
+                    </div>
+                    <div class="project-detail" id="projBatteryDetail">
+                        <ul class="project-highlights">
+                            <li>将 <strong style="color: var(--primary);">行业专家经验知识</strong> 结构化，转化为AI可执行的决策链路</li>
+                            <li>深入理解电池材料领域业务逻辑，与领域专家协作梳理可行性分析流程：参数输入→方案比对→风险评估→结论输出</li>
+                            <li>后端Golang开发分析引擎，实现多维度参数校验与方案评分算法</li>
+                            <li>前端React构建分析结果可视化面板，支持参数调整与方案对比</li>
+                            <li>基于Agent Foundry平台实现智能体编排，完成多端部署与测试交付</li>
+                        </ul>
+                        <button class="project-expand-btn" onclick="toggleProject('projBattery')">
+                            <span class="toggle-icon">▲</span> 收起
+                        </button>
+                    </div>
                     <div class="project-tech">
-                        <span>Python</span>
                         <span>Golang</span>
-                        <span>AI</span>
-                        <span>Agent</span>
+                        <span>React</span>
+                        <span>Agent Foundry</span>
+                        <span>知识工程</span>
                     </div>
                 </div>
 
-                <div class="project-card">
+                <div class="project-card project-card-expandable" id="projAssistant">
                     <div class="project-header">
                         <span class="project-icon">🤖</span>
                         <h3 class="project-title">AI应用助手</h3>
                         <span class="project-tag">实习项目</span>
                     </div>
-                    <p class="project-desc">面向企业用户的AI智能应用助手，提供智能对话与任务处理能力。</p>
-                    <ul class="project-highlights">
-                        <li>参与产品需求分析与系统设计</li>
-                        <li>负责前端界面开发与后端API对接</li>
-                        <li>完成产品测试与部署上线</li>
-                    </ul>
+                    <p class="project-desc">面向企业用户的AI智能助手，提供多轮对话、文档解析与任务自动化处理能力。</p>
+                    <div class="project-preview">
+                        <ul class="project-highlights">
+                            <li>前端React + 后端Python全栈开发，实现 <strong style="color: var(--primary);">多轮对话与任务处理</strong> 能力</li>
+                            <li>完成Web/Android/iOS三端部署上线</li>
+                        </ul>
+                        <button class="project-expand-btn" onclick="toggleProject('projAssistant')">
+                            <span class="toggle-icon">▼</span> 展开详情
+                        </button>
+                    </div>
+                    <div class="project-detail" id="projAssistantDetail">
+                        <ul class="project-highlights">
+                            <li>前端React + 后端Python全栈开发，实现 <strong style="color: var(--primary);">多轮对话与任务处理</strong> 能力</li>
+                            <li>设计对话状态管理机制，支持上下文记忆、意图切换、多轮追问，保障对话连贯性</li>
+                            <li>实现文档解析模块：支持PDF/Word上传→内容提取→智能摘要→问答交互</li>
+                            <li>对接Agent Foundry平台的技能编排能力，实现任务自动拆解与执行</li>
+                            <li>完成Web/Android/iOS三端部署上线，编写自动化测试脚本保障交付质量</li>
+                        </ul>
+                        <button class="project-expand-btn" onclick="toggleProject('projAssistant')">
+                            <span class="toggle-icon">▲</span> 收起
+                        </button>
+                    </div>
                     <div class="project-tech">
                         <span>React</span>
-                        <span>Vue3</span>
                         <span>Python</span>
+                        <span>Agent Foundry</span>
+                        <span>文档解析</span>
                     </div>
                 </div>
 
-                <div class="project-card">
+                <div class="project-card project-card-expandable" id="projGateway">
                     <div class="project-header">
-                        <span class="project-icon">⚡</span>
-                        <h3 class="project-title">个人博客系统</h3>
-                        <span class="project-tag">Side Project</span>
+                        <span class="project-icon">🔀</span>
+                        <h3 class="project-title">AI模型路由网关</h3>
+                        <span class="project-tag">独立开发</span>
                     </div>
-                    <p class="project-desc">基于现代前端技术构建的响应式个人博客，支持Markdown文章管理。</p>
-                    <ul class="project-highlights">
-                        <li>采用React + TypeScript开发</li>
-                        <li>响应式设计，适配多端设备</li>
-                    </ul>
+                    <p class="project-desc">自研的多模型智能路由中间件，实现AI CLI工具与多厂商大模型之间的请求代理、负载均衡与故障切换。</p>
+                    <div class="project-preview">
+                        <ul class="project-highlights">
+                            <li>设计模型路由层：支持 <strong style="color: var(--primary);">多厂商模型动态切换</strong>，请求自动转发至可用模型</li>
+                            <li>实现故障自动降级：主模型不可用时秒级切换至备用模型，保障服务连续性</li>
+                        </ul>
+                        <button class="project-expand-btn" onclick="toggleProject('projGateway')">
+                            <span class="toggle-icon">▼</span> 展开详情
+                        </button>
+                    </div>
+                    <div class="project-detail" id="projGatewayDetail">
+                        <ul class="project-highlights">
+                            <li><strong style="color: var(--primary);">协议兼容层</strong>：完整实现OpenAI Chat Completions API协议，AI客户端（Codex CLI等）零改造接入，将请求透明转发至DeepSeek、通义千问等国产模型</li>
+                            <li><strong style="color: var(--primary);">模型路由引擎</strong>：基于配置的Provider注册机制，每个Provider声明模型ID、端点、认证方式；路由层根据请求中的model字段匹配Provider，动态构建目标请求</li>
+                            <li><strong style="color: var(--secondary);">故障降级策略</strong>：主Provider返回5xx/超时后，自动将请求重试至备用Provider，支持配置重试次数与超时阈值，降级过程对客户端完全透明</li>
+                            <li><strong style="color: var(--secondary);">流式响应透传</strong>：完整支持SSE（Server-Sent Events）流式输出，逐token转发模型响应，保持客户端打字机效果</li>
+                            <li>Token中转架构：通过第三方API网关统一管理多厂商API Key，网关侧做鉴权与限流，本服务仅持有网关凭证</li>
+                        </ul>
+                        <button class="project-expand-btn" onclick="toggleProject('projGateway')">
+                            <span class="toggle-icon">▲</span> 收起
+                        </button>
+                    </div>
                     <div class="project-tech">
-                        <span>React</span>
+                        <span>Node.js</span>
                         <span>TypeScript</span>
-                        <span>CSS3</span>
+                        <span>Express</span>
+                        <span>REST API</span>
+                        <span>SSE</span>
                     </div>
                 </div>
             </div>

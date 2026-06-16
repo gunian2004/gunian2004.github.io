@@ -206,3 +206,9 @@ document.getElementById('expFullscreenModal').addEventListener('click', (e) => {
         closeExpFullscreen();
     }
 });
+
+// ========== 项目卡片展开/收起 ==========
+function toggleProject(projId) {
+    const card = document.getElementById(projId);
+    card.classList.toggle('expanded');
+}
