@@ -652,40 +652,41 @@
                     </div>
                 </div>
 
-                <div class="project-card project-card-expandable" id="projGateway">
+                <div class="project-card project-card-expandable" id="projAutoListing">
                     <div class="project-header">
-                        <span class="project-icon">🔀</span>
-                        <h3 class="project-title">AI模型路由网关</h3>
+                        <span class="project-icon">📦</span>
+                        <h3 class="project-title">商品自动化上架系统</h3>
                         <span class="project-tag">独立开发</span>
                     </div>
-                    <p class="project-desc">自研的多模型智能路由中间件，实现AI CLI工具与多厂商大模型之间的请求代理、负载均衡与故障切换。</p>
+                    <p class="project-desc">TikTok Shop 商品发布自动化引擎，覆盖商品采集、SPU管理、定价与自动化上架全链路，多平台发布统一适配。</p>
                     <div class="project-preview">
                         <ul class="project-highlights">
-                            <li>设计模型路由层：支持 <strong style="color: var(--primary);">多厂商模型动态切换</strong>，请求自动转发至可用模型</li>
-                            <li>实现故障自动降级：主模型不可用时秒级切换至备用模型，保障服务连续性</li>
+                            <li>打通 <strong style="color: var(--primary);">商品采集 → SPU管理 → 定价 → 自动化上架</strong> 完整链路，替代人工逐条上架</li>
+                            <li>统一发布器架构，<strong style="color: var(--secondary);">TikTok / Shein / Temu</strong> 多平台一键适配</li>
                         </ul>
-                        <button class="project-expand-btn" onclick="toggleProject('projGateway')">
+                        <button class="project-expand-btn" onclick="toggleProject('projAutoListing')">
                             <span class="toggle-icon">▼</span> 展开详情
                         </button>
                     </div>
-                    <div class="project-detail" id="projGatewayDetail">
+                    <div class="project-detail" id="projAutoListingDetail">
                         <ul class="project-highlights">
-                            <li><strong style="color: var(--primary);">协议兼容层</strong>：完整实现OpenAI Chat Completions API协议，AI客户端（Codex CLI等）零改造接入，将请求透明转发至DeepSeek、通义千问等国产模型</li>
-                            <li><strong style="color: var(--primary);">模型路由引擎</strong>：基于配置的Provider注册机制，每个Provider声明模型ID、端点、认证方式；路由层根据请求中的model字段匹配Provider，动态构建目标请求</li>
-                            <li><strong style="color: var(--secondary);">故障降级策略</strong>：主Provider返回5xx/超时后，自动将请求重试至备用Provider，支持配置重试次数与超时阈值，降级过程对客户端完全透明</li>
-                            <li><strong style="color: var(--secondary);">流式响应透传</strong>：完整支持SSE（Server-Sent Events）流式输出，逐token转发模型响应，保持客户端打字机效果</li>
-                            <li>Token中转架构：通过第三方API网关统一管理多厂商API Key，网关侧做鉴权与限流，本服务仅持有网关凭证</li>
+                            <li><strong style="color: var(--primary);">数据采集层</strong>：Python FastAPI + Playwright 商品数据采集服务，会话管理与重试机制保障抓取稳定</li>
+                            <li><strong style="color: var(--primary);">统一发布引擎</strong>：TikTokPublisher / SheinPublisher / TemuPublisher + 图片上传器，平台差异收敛为统一发布接口</li>
+                            <li><strong style="color: var(--secondary);">商品监控</strong>：TikTok 商品概览监控，实时掌握商品状态与上架结果</li>
+                            <li><strong style="color: var(--secondary);">AI 描述生成</strong>：接入 AI 能力自动生成商品卖点描述，提升上架内容质量</li>
+                            <li>Vue 3 管理后台：自动化看板、SPU管理、定价中心、上架任务全流程可视化，支持 Tauri 桌面端封装</li>
                         </ul>
-                        <button class="project-expand-btn" onclick="toggleProject('projGateway')">
+                        <button class="project-expand-btn" onclick="toggleProject('projAutoListing')">
                             <span class="toggle-icon">▲</span> 收起
                         </button>
                     </div>
                     <div class="project-tech">
                         <span>Node.js</span>
-                        <span>TypeScript</span>
-                        <span>Express</span>
-                        <span>REST API</span>
-                        <span>SSE</span>
+                        <span>Python</span>
+                        <span>FastAPI</span>
+                        <span>Playwright</span>
+                        <span>Vue 3</span>
+                        <span>Tauri</span>
                     </div>
                 </div>
             </div>
@@ -734,6 +735,13 @@
                     <div class="award-content">
                         <h4>CSDN 最佳文章榜单</h4>
                         <p>技术文章斩获前十名，质量分数高达 94 分</p>
+                    </div>
+                </div>
+                <div class="award-item">
+                    <div class="award-icon">📜</div>
+                    <div class="award-content">
+                        <h4>影刀RPA高级证书</h4>
+                        <p>RPA 自动化流程开发高级认证</p>
                     </div>
                 </div>
                 <div class="award-item">
