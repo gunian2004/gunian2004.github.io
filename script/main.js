@@ -37,7 +37,7 @@ class Particle {
         const glowSize = this.size + Math.sin(this.pulse) * 0.5;
         ctx.beginPath();
         ctx.arc(this.x, this.y, glowSize, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(0, 212, 255, ${this.opacity})`;
+        ctx.fillStyle = `rgba(99, 102, 241, ${this.opacity})`;
         ctx.fill();
 
         ctx.beginPath();
@@ -46,8 +46,8 @@ class Particle {
             this.x, this.y, 0,
             this.x, this.y, glowSize * 2
         );
-        gradient.addColorStop(0, `rgba(0, 212, 255, ${this.opacity * 0.3})`);
-        gradient.addColorStop(1, 'rgba(0, 212, 255, 0)');
+        gradient.addColorStop(0, `rgba(99, 102, 241, ${this.opacity * 0.3})`);
+        gradient.addColorStop(1, 'rgba(99, 102, 241, 0)');
         ctx.fillStyle = gradient;
         ctx.fill();
     }
@@ -79,7 +79,7 @@ function animate() {
                 ctx.beginPath();
                 ctx.moveTo(p1.x, p1.y);
                 ctx.lineTo(p2.x, p2.y);
-                ctx.strokeStyle = `rgba(0, 212, 255, ${0.1 * (1 - dist / 150)})`;
+                ctx.strokeStyle = `rgba(99, 102, 241, ${0.1 * (1 - dist / 150)})`;
                 ctx.stroke();
             }
         });

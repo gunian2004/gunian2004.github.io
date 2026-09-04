@@ -7,7 +7,7 @@
     let mouse = { x: -1000, y: -1000 };
 
     const PARTICLE_COUNT = 720;
-    const PARTICLE_COLOR = '#22D3EE';
+    const PARTICLE_COLOR = '#94a3b8';
     const CONNECT_DISTANCE = 90;
     const MOUSE_RADIUS = 220;
     const TRAIL_ALPHA = 0.18;
@@ -119,7 +119,7 @@
     }
 
     function animate() {
-        ctx.fillStyle = `rgba(13, 14, 19, ${TRAIL_ALPHA})`;
+        ctx.fillStyle = `rgba(238, 242, 248, ${TRAIL_ALPHA})`;
         ctx.fillRect(0, 0, width, height);
 
         for (const particle of particles) {

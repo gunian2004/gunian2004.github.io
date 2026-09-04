@@ -4,10 +4,10 @@
     --success: #10b981;
     --danger: #ef4444;
     --warning: #f59e0b;
-    --bg-dark: #0f172a;
-    --bg-card: #1e293b;
-    --text-primary: #f1f5f9;
-    --text-secondary: #94a3b8;
+    --bg-dark: #eef2f8;
+    --bg-card: #ffffff;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
 }
 
 * {
@@ -30,7 +30,7 @@ body {
     gap: 0.5rem;
     padding: 0.75rem 1.5rem;
     background: var(--bg-card);
-    border: 1px solid rgba(255,255,255,0.1);
+    border: 1px solid rgba(15,23,42,0.06);
     border-radius: 8px;
     color: var(--text-primary);
     text-decoration: none;
@@ -72,15 +72,15 @@ h1 {
 
 .tool-card {
     background: var(--bg-card);
-    border: 1px solid rgba(255,255,255,0.1);
+    border: 1px solid rgba(15,23,42,0.06);
     border-radius: 12px;
     overflow: hidden;
     transition: all 0.3s ease;
 }
 
 .tool-card:hover {
-    border-color: rgba(255,255,255,0.2);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    border-color: rgba(15,23,42,0.06);
+    box-shadow: 0 4px 20px rgba(15,23,42,0.06);
 }
 
 .tool-card.expanded {
@@ -99,7 +99,7 @@ h1 {
 }
 
 .card-header:hover {
-    background: rgba(255,255,255,0.02);
+    background: rgba(15,23,42,0.04);
 }
 
 .card-title {
@@ -156,7 +156,7 @@ h1 {
     align-items: center;
     justify-content: center;
     border-radius: 6px;
-    background: rgba(255,255,255,0.05);
+    background: rgba(15,23,42,0.06);
     transition: all 0.3s;
     font-size: 0.8rem;
 }
@@ -180,7 +180,7 @@ h1 {
 }
 
 .card-content-inner {
-    border-top: 1px solid rgba(255,255,255,0.05);
+    border-top: 1px solid rgba(15,23,42,0.06);
     padding-top: 1.25rem;
 }
 
@@ -250,12 +250,12 @@ h1 {
 }
 
 .btn-secondary {
-    background: rgba(255,255,255,0.1);
+    background: rgba(15,23,42,0.06);
     color: var(--text-primary);
 }
 
 .btn-secondary:hover:not(:disabled) {
-    background: rgba(255,255,255,0.2);
+    background: rgba(15,23,42,0.06);
 }
 
 .speed-control {
@@ -277,7 +277,7 @@ h1 {
 }
 
 .info-item {
-    background: rgba(0,0,0,0.2);
+    background: rgba(15,23,42,0.05);
     padding: 1rem;
     border-radius: 8px;
     text-align: center;
@@ -297,7 +297,7 @@ h1 {
 
 .progress-bar {
     height: 4px;
-    background: rgba(255,255,255,0.1);
+    background: rgba(15,23,42,0.06);
     border-radius: 2px;
     overflow: hidden;
 }
@@ -317,7 +317,7 @@ h1 {
 .event-list {
     max-height: 200px;
     overflow-y: auto;
-    background: rgba(0,0,0,0.2);
+    background: rgba(15,23,42,0.05);
     border-radius: 8px;
     padding: 1rem;
     transition: max-height 0.3s ease;
@@ -335,7 +335,7 @@ h1 {
     width: 100%;
     padding: 0.5rem;
     margin-top: 0.5rem;
-    background: rgba(255,255,255,0.05);
+    background: rgba(15,23,42,0.06);
     border: none;
     border-radius: 6px;
     color: var(--text-secondary);
@@ -345,7 +345,7 @@ h1 {
 }
 
 .event-list-toggle:hover {
-    background: rgba(255,255,255,0.1);
+    background: rgba(15,23,42,0.06);
     color: var(--text-primary);
 }
 
@@ -362,12 +362,12 @@ h1 {
 }
 
 .event-list::-webkit-scrollbar-track {
-    background: rgba(255,255,255,0.05);
+    background: rgba(15,23,42,0.06);
     border-radius: 3px;
 }
 
 .event-list::-webkit-scrollbar-thumb {
-    background: rgba(255,255,255,0.2);
+    background: rgba(15,23,42,0.06);
     border-radius: 3px;
 }
 
@@ -383,7 +383,7 @@ h1 {
 }
 
 .event-item:hover {
-    background: rgba(255,255,255,0.05);
+    background: rgba(15,23,42,0.06);
 }
 
 .event-item.playing {
@@ -421,7 +421,7 @@ h1 {
     align-items: center;
     margin-bottom: 1rem;
     padding-bottom: 0.5rem;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
+    border-bottom: 1px solid rgba(15,23,42,0.06);
 }
 
 .event-count {
@@ -444,7 +444,7 @@ h1 {
 .demo-area {
     margin-top: 1rem;
     padding: 2rem;
-    background: rgba(0,0,0,0.2);
+    background: rgba(15,23,42,0.05);
     border-radius: 8px;
     text-align: center;
 }
@@ -474,8 +474,8 @@ h1 {
 
 .demo-input-sample {
     padding: 0.75rem 1rem;
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(15,23,42,0.06);
+    border: 1px solid rgba(15,23,42,0.06);
     border-radius: 8px;
     color: var(--text-primary);
     font-size: 0.9rem;
@@ -504,7 +504,7 @@ h1 {
 }
 
 .md-editor-panel {
-    background: rgba(0,0,0,0.2);
+    background: rgba(15,23,42,0.05);
     border-radius: 8px;
     overflow: hidden;
 }
@@ -514,8 +514,8 @@ h1 {
     align-items: center;
     justify-content: space-between;
     padding: 0.75rem 1rem;
-    background: rgba(0,0,0,0.2);
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    background: rgba(15,23,42,0.05);
+    border-bottom: 1px solid rgba(15,23,42,0.06);
 }
 
 .md-editor-title {
@@ -610,15 +610,15 @@ h1 {
     color: var(--text-primary);
 }
 
-.md-preview h1 { font-size: 1.75rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem; }
-.md-preview h2 { font-size: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem; }
+.md-preview h1 { font-size: 1.75rem; border-bottom: 1px solid rgba(15,23,42,0.06); padding-bottom: 0.5rem; }
+.md-preview h2 { font-size: 1.5rem; border-bottom: 1px solid rgba(15,23,42,0.06); padding-bottom: 0.5rem; }
 .md-preview h3 { font-size: 1.25rem; }
 .md-preview h4 { font-size: 1.1rem; }
 
 .md-preview p { margin: 0.75em 0; }
 
 .md-preview code {
-    background: rgba(0,0,0,0.3);
+    background: rgba(15,23,42,0.06);
     padding: 0.2em 0.4em;
     border-radius: 4px;
     font-family: 'Consolas', 'Monaco', monospace;
@@ -626,7 +626,7 @@ h1 {
 }
 
 .md-preview pre {
-    background: rgba(0,0,0,0.3);
+    background: rgba(15,23,42,0.06);
     padding: 1rem;
     border-radius: 8px;
     overflow-x: auto;
@@ -669,13 +669,13 @@ h1 {
 }
 
 .md-preview th, .md-preview td {
-    border: 1px solid rgba(255,255,255,0.1);
+    border: 1px solid rgba(15,23,42,0.06);
     padding: 0.5em 0.75em;
     text-align: left;
 }
 
 .md-preview th {
-    background: rgba(0,0,0,0.2);
+    background: rgba(15,23,42,0.05);
     font-weight: 600;
 }
 
@@ -686,7 +686,7 @@ h1 {
 
 .md-preview hr {
     border: none;
-    border-top: 1px solid rgba(255,255,255,0.1);
+    border-top: 1px solid rgba(15,23,42,0.06);
     margin: 1.5em 0;
 }
 
@@ -703,7 +703,7 @@ h1 {
 
 .md-btn {
     padding: 0.4rem 0.75rem;
-    background: rgba(255,255,255,0.1);
+    background: rgba(15,23,42,0.06);
     border: none;
     border-radius: 6px;
     color: var(--text-secondary);
@@ -732,7 +732,7 @@ h1 {
 }
 
 .data-tool-panel {
-    background: rgba(0,0,0,0.2);
+    background: rgba(15,23,42,0.05);
     border-radius: 8px;
     overflow: hidden;
 }
@@ -742,8 +742,8 @@ h1 {
     align-items: center;
     justify-content: space-between;
     padding: 0.75rem 1rem;
-    background: rgba(0,0,0,0.2);
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    background: rgba(15,23,42,0.05);
+    border-bottom: 1px solid rgba(15,23,42,0.06);
 }
 
 .data-tool-title {
@@ -792,7 +792,7 @@ h1 {
 
 .data-tool-btn {
     padding: 0.5rem 1rem;
-    background: rgba(255,255,255,0.1);
+    background: rgba(15,23,42,0.06);
     border: none;
     border-radius: 6px;
     color: var(--text-primary);
@@ -831,7 +831,7 @@ h1 {
 }
 
 .er-editor-panel {
-    background: rgba(0,0,0,0.2);
+    background: rgba(15,23,42,0.05);
     border-radius: 8px;
     overflow: hidden;
 }
@@ -841,8 +841,8 @@ h1 {
     align-items: center;
     justify-content: space-between;
     padding: 0.75rem 1rem;
-    background: rgba(0,0,0,0.2);
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    background: rgba(15,23,42,0.05);
+    border-bottom: 1px solid rgba(15,23,42,0.06);
 }
 
 .er-panel-title {
@@ -874,22 +874,22 @@ h1 {
 }
 
 .er-entity-scroll-area::-webkit-scrollbar-track {
-    background: rgba(255,255,255,0.05);
+    background: rgba(15,23,42,0.06);
     border-radius: 3px;
 }
 
 .er-entity-scroll-area::-webkit-scrollbar-thumb {
-    background: rgba(255,255,255,0.2);
+    background: rgba(15,23,42,0.06);
     border-radius: 3px;
 }
 
 .er-entity-scroll-area::-webkit-scrollbar-thumb:hover {
-    background: rgba(255,255,255,0.3);
+    background: rgba(15,23,42,0.15);
 }
 
 .er-entity-item {
-    background: rgba(0,0,0,0.2);
-    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(15,23,42,0.05);
+    border: 1px solid rgba(15,23,42,0.06);
     border-radius: 8px;
     overflow: hidden;
 }
@@ -899,7 +899,7 @@ h1 {
     align-items: center;
     justify-content: space-between;
     padding: 0.6rem 0.75rem;
-    background: rgba(255,255,255,0.05);
+    background: rgba(15,23,42,0.06);
     cursor: pointer;
 }
 
@@ -922,12 +922,12 @@ h1 {
 }
 
 .er-entity-fields::-webkit-scrollbar-track {
-    background: rgba(255,255,255,0.05);
+    background: rgba(15,23,42,0.06);
     border-radius: 2px;
 }
 
 .er-entity-fields::-webkit-scrollbar-thumb {
-    background: rgba(255,255,255,0.2);
+    background: rgba(15,23,42,0.06);
     border-radius: 2px;
 }
 
@@ -936,7 +936,7 @@ h1 {
     align-items: center;
     justify-content: space-between;
     padding: 0.3rem 0;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    border-bottom: 1px solid rgba(15,23,42,0.06);
 }
 
 .er-field-item:last-child {
@@ -973,14 +973,14 @@ h1 {
     display: flex;
     gap: 0.5rem;
     padding: 0.75rem 1rem;
-    border-top: 1px solid rgba(255,255,255,0.05);
+    border-top: 1px solid rgba(15,23,42,0.06);
 }
 
 .er-add-entity input {
     flex: 1;
     padding: 0.5rem 0.75rem;
-    background: rgba(0,0,0,0.3);
-    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(15,23,42,0.06);
+    border: 1px solid rgba(15,23,42,0.06);
     border-radius: 6px;
     color: var(--text-primary);
     font-size: 0.85rem;
@@ -997,7 +997,7 @@ h1 {
 
 .er-btn {
     padding: 0.4rem 0.75rem;
-    background: rgba(255,255,255,0.1);
+    background: rgba(15,23,42,0.06);
     border: none;
     border-radius: 6px;
     color: var(--text-primary);
@@ -1042,7 +1042,7 @@ h1 {
 /* 关系设置 */
 .er-relation-section {
     padding: 1rem;
-    border-top: 1px solid rgba(255,255,255,0.05);
+    border-top: 1px solid rgba(15,23,42,0.06);
 }
 
 .er-relation-title {
@@ -1061,8 +1061,8 @@ h1 {
 
 .er-relation-form select {
     padding: 0.4rem 0.6rem;
-    background: rgba(0,0,0,0.3);
-    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(15,23,42,0.06);
+    border: 1px solid rgba(15,23,42,0.06);
     border-radius: 6px;
     color: var(--text-primary);
     font-size: 0.8rem;
@@ -1084,7 +1084,7 @@ h1 {
     align-items: center;
     justify-content: space-between;
     padding: 0.4rem 0.5rem;
-    background: rgba(0,0,0,0.2);
+    background: rgba(15,23,42,0.05);
     border-radius: 4px;
     margin-bottom: 0.3rem;
     font-size: 0.8rem;
@@ -1167,7 +1167,7 @@ h1 {
     align-items: center;
     justify-content: space-between;
     padding: 0.5rem 0.75rem;
-    background: rgba(0,0,0,0.2);
+    background: rgba(15,23,42,0.05);
     border-radius: 8px 8px 0 0;
 }
 
@@ -1182,7 +1182,7 @@ h1 {
 }
 
 .er-code-content {
-    background: rgba(0,0,0,0.3);
+    background: rgba(15,23,42,0.06);
     border-radius: 0 0 8px 8px;
     padding: 1rem;
     font-family: 'Consolas', 'Monaco', monospace;
@@ -1224,8 +1224,8 @@ h1 {
     flex: 1;
     min-width: 120px;
     padding: 0.5rem 0.75rem;
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(15,23,42,0.04);
+    border: 1px solid rgba(15,23,42,0.06);
     border-radius: 8px;
     color: var(--text-primary);
     font-size: 0.85rem;
@@ -1239,14 +1239,14 @@ h1 {
 }
 
 .translate-select option {
-    background: #1e293b;
+    background: #ffffff;
     color: var(--text-primary);
 }
 
 .translate-swap-btn {
     padding: 0.5rem 0.75rem;
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(15,23,42,0.06);
+    border: 1px solid rgba(15,23,42,0.06);
     border-radius: 8px;
     color: var(--text-primary);
     font-size: 1rem;
@@ -1266,7 +1266,7 @@ h1 {
 }
 
 .translate-panel {
-    background: rgba(0,0,0,0.2);
+    background: rgba(15,23,42,0.05);
     border-radius: 8px;
     overflow: hidden;
 }
@@ -1276,8 +1276,8 @@ h1 {
     align-items: center;
     justify-content: space-between;
     padding: 0.5rem 0.75rem;
-    background: rgba(0,0,0,0.15);
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    background: rgba(15,23,42,0.04);
+    border-bottom: 1px solid rgba(15,23,42,0.06);
 }
 
 .translate-lang-label {
@@ -1288,7 +1288,7 @@ h1 {
 
 .translate-panel-btn {
     padding: 0.25rem 0.6rem;
-    background: rgba(255,255,255,0.1);
+    background: rgba(15,23,42,0.06);
     border: none;
     border-radius: 6px;
     color: var(--text-secondary);
@@ -1334,7 +1334,7 @@ h1 {
     font-size: 0.7rem;
     color: var(--text-secondary);
     text-align: right;
-    border-top: 1px solid rgba(255,255,255,0.05);
+    border-top: 1px solid rgba(15,23,42,0.06);
 }
 
 .translate-output {
