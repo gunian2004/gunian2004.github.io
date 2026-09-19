@@ -476,6 +476,34 @@
                                 </div>
                                 <div class="card-toggle">...（点击展开）</div>
                             </div>
+                            <div class="prompt-card" onclick="toggleCard(this)">
+                                <div class="card-header">
+                                    <span class="card-index">规则 20</span>
+                                    <span class="card-title">分析/抓取页面必须优先用 Crawl4AI</span>
+                                    <span class="card-source">来源：老板 · 2026-09-19</span>
+                                    <button class="copy-btn" onclick="copyRuleContent(event, this)">📋 复制</button>
+                                </div>
+                                <div class="card-content">
+                                    <p class="card-text"><strong>核心原则：</strong>接到涉及页面分析或网页抓取的任务时，必须优先使用 <strong>Crawl4AI</strong> 工具去抓取和分析页面，而不是用其他方式。<br><br>
+<strong>执行流程：</strong><br>
+1. 收到任务<br>
+2. 判断是否涉及<strong>页面分析 / 网页抓取</strong> → <strong>是</strong> → 进入第3步<br>
+3. <strong>优先用 Crawl4AI</strong>：<br>
+   - 抓取页面：<code>crawl4ai 抓取 {URL}</code><br>
+   - 分析页面：<code>crawl4ai 分析 {URL}</code><br>
+   - 结构化提取：<code>crawl4ai query "要提取的内容" {URL}</code><br>
+4. Crawl4AI 结果不理想 → 再考虑其他抓取方式兜底<br><br>
+<strong>为什么优先用 Crawl4AI：</strong><br>
+- 自动处理 JS 渲染、反爬、动态内容<br>
+- 输出结构化 Markdown，便于 AI 直接理解和分析<br>
+- 减少手工写爬虫脚本的麻烦和 token 消耗<br><br>
+<strong>适用范围：</strong><br>
+- 分析网页内容、提取文章正文<br>
+- 抓取页面数据、结构化信息<br>
+- 需要理解某个网址页面内容的场景</p>
+                                </div>
+                                <div class="card-toggle">...（点击展开）</div>
+                            </div>
                         </div>
                     </div>
                 </div>
