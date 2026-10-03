@@ -877,5 +877,26 @@
     <script src="script/main.js"></script>
     <script src="script/stars.js"></script>
     <script src="script/transition.js"></script>
+<script>
+(function(){
+  var rocket = document.querySelector('.avatar');
+  if(!rocket) return;
+  var count = 0, last = 0;
+  function go(){
+    if(window.TransitionManager && TransitionManager.toLifeGuide){
+      TransitionManager.toLifeGuide({currentTarget: rocket, preventDefault:function(){}, stopPropagation:function(){}});
+    } else {
+      window.location.href = 'life-guide.html';
+    }
+  }
+  rocket.addEventListener('click', function(){
+    var now = Date.now();
+    if(now - last > 800) count = 0;
+    last = now;
+    count++;
+    if(count >= 3){ count = 0; go(); }
+  });
+})();
+</script>
 </body>
 </html>
