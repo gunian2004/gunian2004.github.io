@@ -116,6 +116,7 @@
                         <h2 class="section-title">代理规则板块</h2>
                         <p class="section-desc">AI 代理的工作准则与行为规范，确保任务执行规范高效</p>
                     </div>
+                    <button class="copy-all-btn" onclick="copyAllRules(event, this)">📋 一键复制全部规则</button>
                     <div class="section-arrow">▼</div>
                 </div>
                 <div class="section-content">
@@ -125,7 +126,6 @@
                                 <div class="card-header">
                                     <span class="card-index">规则 1</span>
                                     <span class="card-title">任务规划先行</span>
-                                    <span class="card-source">来源：老板 · 2026-05-06</span>
                                     <button class="copy-btn" onclick="copyRuleContent(event, this)">📋 复制</button>
                                 </div>
                                 <div class="card-content">
@@ -137,7 +137,6 @@
                                 <div class="card-header">
                                     <span class="card-index">规则 2</span>
                                     <span class="card-title">阶段性汇报总结</span>
-                                    <span class="card-source">来源：老板 · 2026-05-06</span>
                                     <button class="copy-btn" onclick="copyRuleContent(event, this)">📋 复制</button>
                                 </div>
                                 <div class="card-content">
@@ -149,7 +148,6 @@
                                 <div class="card-header">
                                     <span class="card-index">规则 3</span>
                                     <span class="card-title">自主选方案 + 汇报等决策</span>
-                                    <span class="card-source">来源：老板 · 2026-05-06</span>
                                     <button class="copy-btn" onclick="copyRuleContent(event, this)">📋 复制</button>
                                 </div>
                                 <div class="card-content">
@@ -161,7 +159,6 @@
                                 <div class="card-header">
                                     <span class="card-index">规则 4</span>
                                     <span class="card-title">实际操作需授权</span>
-                                    <span class="card-source">来源：老板 · 2026-05-06</span>
                                     <button class="copy-btn" onclick="copyRuleContent(event, this)">📋 复制</button>
                                 </div>
                                 <div class="card-content">
@@ -173,7 +170,6 @@
                                 <div class="card-header">
                                     <span class="card-index">规则 5</span>
                                     <span class="card-title">路径明确才执行</span>
-                                    <span class="card-source">来源：老板 · 2026-05-06</span>
                                     <button class="copy-btn" onclick="copyRuleContent(event, this)">📋 复制</button>
                                 </div>
                                 <div class="card-content">
@@ -185,7 +181,6 @@
                                 <div class="card-header">
                                     <span class="card-index">规则 6</span>
                                     <span class="card-title">主动追问细节</span>
-                                    <span class="card-source">来源：老板 · 2026-05-06</span>
                                     <button class="copy-btn" onclick="copyRuleContent(event, this)">📋 复制</button>
                                 </div>
                                 <div class="card-content">
@@ -197,7 +192,6 @@
                                 <div class="card-header">
                                     <span class="card-index">规则 7</span>
                                     <span class="card-title">文件分类存放</span>
-                                    <span class="card-source">来源：老板 · 2026-05-06</span>
                                     <button class="copy-btn" onclick="copyRuleContent(event, this)">📋 复制</button>
                                 </div>
                                 <div class="card-content">
@@ -209,7 +203,6 @@
                                 <div class="card-header">
                                     <span class="card-index">规则 8</span>
                                     <span class="card-title">每日记忆同步</span>
-                                    <span class="card-source">来源：老板 · 2026-05-06</span>
                                     <button class="copy-btn" onclick="copyRuleContent(event, this)">📋 复制</button>
                                 </div>
                                 <div class="card-content">
@@ -221,7 +214,6 @@
                                 <div class="card-header">
                                     <span class="card-index">规则 9</span>
                                     <span class="card-title">遇问题先请示</span>
-                                    <span class="card-source">来源：老板 · 2026-05-06</span>
                                     <button class="copy-btn" onclick="copyRuleContent(event, this)">📋 复制</button>
                                 </div>
                                 <div class="card-content">
@@ -233,7 +225,6 @@
                                 <div class="card-header">
                                     <span class="card-index">规则 10</span>
                                     <span class="card-title">不凭感觉猜测页面信息</span>
-                                    <span class="card-source">来源：老板 · 2026-05-08</span>
                                     <button class="copy-btn" onclick="copyRuleContent(event, this)">📋 复制</button>
                                 </div>
                                 <div class="card-content">
@@ -262,7 +253,6 @@
                                 <div class="card-header">
                                     <span class="card-index">规则 11</span>
                                     <span class="card-title">不准为赶进度牺牲质量</span>
-                                    <span class="card-source">来源：老板 · 2026-05-08</span>
                                     <button class="copy-btn" onclick="copyRuleContent(event, this)">📋 复制</button>
                                 </div>
                                 <div class="card-content">
@@ -282,7 +272,6 @@
                                 <div class="card-header">
                                     <span class="card-index">规则 12</span>
                                     <span class="card-title">代码编写需Git管理 + 老板确认</span>
-                                    <span class="card-source">来源：老板 · 2026-05-08</span>
                                     <button class="copy-btn" onclick="copyRuleContent(event, this)">📋 复制</button>
                                 </div>
                                 <div class="card-content">
@@ -302,7 +291,6 @@
                                 <div class="card-header">
                                     <span class="card-index">规则 13</span>
                                     <span class="card-title">列出任务清单时必须详细完整</span>
-                                    <span class="card-source">来源：老板 · 2026-05-09</span>
                                     <button class="copy-btn" onclick="copyRuleContent(event, this)">📋 复制</button>
                                 </div>
                                 <div class="card-content">
@@ -328,7 +316,6 @@
                                 <div class="card-header">
                                     <span class="card-index">规则 14</span>
                                     <span class="card-title">接任务先复述再执行</span>
-                                    <span class="card-source">来源：老板 · 2026-05-09</span>
                                     <button class="copy-btn" onclick="copyRuleContent(event, this)">📋 复制</button>
                                 </div>
                                 <div class="card-content">
@@ -353,7 +340,6 @@
                                 <div class="card-header">
                                     <span class="card-index">规则 15</span>
                                     <span class="card-title">任务执行三阶段提示</span>
-                                    <span class="card-source">来源：老板 · 2026-05-09</span>
                                     <button class="copy-btn" onclick="copyRuleContent(event, this)">📋 复制</button>
                                 </div>
                                 <div class="card-content">
@@ -376,7 +362,6 @@
                                 <div class="card-header">
                                     <span class="card-index">规则 16</span>
                                     <span class="card-title">本地与云端项目同步规范</span>
-                                    <span class="card-source">来源：老板 · 2026-05-26</span>
                                     <button class="copy-btn" onclick="copyRuleContent(event, this)">📋 复制</button>
                                 </div>
                                 <div class="card-content">
@@ -401,7 +386,6 @@
                                 <div class="card-header">
                                     <span class="card-index">规则 17</span>
                                     <span class="card-title">优先选技术方案，暴力方案兜底</span>
-                                    <span class="card-source">来源：老板 · 2026-05-29</span>
                                     <button class="copy-btn" onclick="copyRuleContent(event, this)">📋 复制</button>
                                 </div>
                                 <div class="card-content">
@@ -423,7 +407,6 @@
                                 <div class="card-header">
                                     <span class="card-index">规则 18</span>
                                     <span class="card-title">请示执行命令时必须附带备注说明</span>
-                                    <span class="card-source">来源：老板 · 2026-06-01</span>
                                     <button class="copy-btn" onclick="copyRuleContent(event, this)">📋 复制</button>
                                 </div>
                                 <div class="card-content">
@@ -450,7 +433,6 @@
                                 <div class="card-header">
                                     <span class="card-index">规则 19</span>
                                     <span class="card-title">定位代码必须优先用 CodeGraph</span>
-                                    <span class="card-source">来源：老板 · 2026-06-01</span>
                                     <button class="copy-btn" onclick="copyRuleContent(event, this)">📋 复制</button>
                                 </div>
                                 <div class="card-content">
@@ -480,7 +462,6 @@
                                 <div class="card-header">
                                     <span class="card-index">规则 20</span>
                                     <span class="card-title">分析/抓取页面必须优先用 Crawl4AI</span>
-                                    <span class="card-source">来源：老板 · 2026-09-19</span>
                                     <button class="copy-btn" onclick="copyRuleContent(event, this)">📋 复制</button>
                                 </div>
                                 <div class="card-content">

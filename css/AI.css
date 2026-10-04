@@ -279,6 +279,7 @@
     .section-header {
         padding: 18px;
         gap: 12px;
+        flex-wrap: wrap;
     }
     
     .section-icon {
@@ -293,6 +294,14 @@
     
     .section-info .section-desc {
         font-size: 0.8rem;
+    }
+    
+    /* 小屏下按钮换行独占一行，避免挤压标题 */
+    .copy-all-btn {
+        order: 3;
+        flex: 1 1 100%;
+        padding: 8px 12px;
+        font-size: 0.75rem;
     }
     
     .content-inner {
@@ -460,11 +469,35 @@
     flex: 1;
 }
 
-.card-source {
-    color: var(--text-muted);
-    font-size: 0.75rem;
+/* 一键复制全部规则按钮样式 */
+.copy-all-btn {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border: none;
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
     flex-shrink: 0;
-    opacity: 0.7;
+    white-space: nowrap;
+    line-height: 1.4;
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.25);
+}
+
+.copy-all-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 22px rgba(0, 212, 255, 0.5);
+}
+
+.copy-all-btn:active {
+    transform: translateY(0);
+}
+
+.copy-all-btn.copied {
+    background: #00c96b;
+    box-shadow: 0 0 22px rgba(0, 255, 136, 0.45);
 }
 
 /* 复制按钮样式 */
