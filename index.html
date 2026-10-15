@@ -5,13 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>陈柏贤 | 软件工程师</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/blog.css">
     <link rel="stylesheet" href="css/transition.css">
-    <link rel="stylesheet" href="css/stars.css">
 </head>
 <body>
     <div class="loading-screen" id="loading">
         <div class="loader"></div>
     </div>
+
+    <!-- 顶部滚动进度条 -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+
+    <!-- 胶囊吸顶导航 -->
+    <nav class="site-nav" id="siteNav">
+        <a class="nav-logo" href="#top">陈柏贤</a>
+        <div class="nav-links" id="navLinks">
+            <span class="nav-indicator" id="navIndicator"></span>
+            <a href="#about">关于我</a>
+            <a href="#experience">工作经历</a>
+            <a href="#skills">技术栈</a>
+            <a href="#projects">项目作品</a>
+            <a href="#awards">荣誉奖项</a>
+            <a href="#contact">联系我</a>
+        </div>
+        <div class="nav-actions">
+            <a href="demo.html" class="nav-btn" title="项目演示" onclick="TransitionManager.toDemo(event); return false;"><span class="nav-btn-ico">🎬</span><span>项目演示</span></a>
+            <a href="AI.html" class="nav-btn is-primary" title="小技能" onclick="TransitionManager.toAI(event); return false;"><span class="nav-btn-ico">🤖</span><span>小技能</span></a>
+            <a href="tool.html" class="nav-btn" title="小工具" onclick="TransitionManager.toTool(event); return false;"><span class="nav-btn-ico">🛠️</span><span>小工具</span></a>
+            <button class="nav-toggle" id="navToggle" aria-label="展开菜单">☰</button>
+        </div>
+    </nav>
 
     <a href="demo.html" class="demo-btn" title="项目演示" onclick="TransitionManager.toDemo(event); return false;">
         <span class="demo-btn-icon">🎬</span>
@@ -29,7 +52,6 @@
     </a>
 
     <canvas id="canvas-bg"></canvas>
-    <canvas id="stars-canvas"></canvas>
     <div class="cursor" id="cursor"></div>
     <div class="cursor-dot" id="cursor-dot"></div>
 
@@ -48,9 +70,13 @@
                 <a href="#" class="social-link" title="掘金">📚</a>
                 <a href="#" class="social-link" title="邮箱">📧</a>
             </div>
+            <div class="hero-cta">
+                <a href="#projects" class="btn btn-primary">查看项目作品 →</a>
+                <a href="#contact" class="btn btn-ghost">联系我</a>
+            </div>
         </section>
 
-        <section class="section">
+        <section class="section" id="education">
             <h2 class="section-title"><span class="section-title-icon">🎓</span>教育背景</h2>
             <div class="card">
                 <div class="education-item">
@@ -73,7 +99,7 @@
             </div>
         </section>
 
-        <section class="section">
+        <section class="section" id="about">
             <h2 class="section-title"><span class="section-title-icon">👨‍💻</span>关于我</h2>
             <div class="card">
                 <p class="about-text">
@@ -84,7 +110,7 @@
             </div>
         </section>
 
-        <section class="section">
+        <section class="section" id="experience">
             <h2 class="section-title"><span class="section-title-icon">💼</span>工作经历</h2>
         <div class="card">
             <div class="experience-timeline timeline-alternating">
@@ -505,7 +531,7 @@
             </div>
         </div>
 
-        <section class="section">
+        <section class="section" id="skills">
             <h2 class="section-title"><span class="section-title-icon">🛠️</span>技术栈</h2>
             <div class="card">
                 <div class="skills-grid">
@@ -545,7 +571,7 @@
             </div>
         </section>
 
-        <section class="section">
+        <section class="section" id="projects">
             <h2 class="section-title"><span class="section-title-icon">💼</span>项目作品</h2>
             <div class="projects-grid">
                 <div class="project-card project-card-expandable" id="projErp">
@@ -753,7 +779,7 @@
             </div>
         </section>
 
-        <section class="section">
+        <section class="section" id="awards">
             <h2 class="section-title"><span class="section-title-icon">🏆</span>荣誉奖项</h2>
             <div class="awards-grid">
                 <div class="award-item">
@@ -815,7 +841,7 @@
             </div>
         </section>
 
-        <section class="section">
+        <section class="section" id="school">
             <h2 class="section-title"><span class="section-title-icon">📋</span>学校经历</h2>
             <div class="card">
                 <div class="experience-timeline">
@@ -849,7 +875,7 @@
             </div>
         </section>
 
-        <section class="section">
+        <section class="section" id="contact">
             <h2 class="section-title"><span class="section-title-icon">📬</span>联系我</h2>
             <div class="contact-list">
                 <a href="https://github.com/gunian2004" class="contact-item" target="_blank">
@@ -875,27 +901,144 @@
     </div>
 
     <script src="script/main.js"></script>
-    <script src="script/stars.js"></script>
     <script src="script/transition.js"></script>
+<!-- 彩蛋入口：选择面板（连点头像 3 次后弹出） -->
+<div class="egg-modal" id="eggModal" aria-hidden="true">
+    <div class="egg-modal-backdrop" data-egg-close></div>
+    <div class="egg-modal-card" role="dialog" aria-modal="true" aria-labelledby="eggTitle">
+        <button class="egg-modal-close" id="eggClose" aria-label="关闭">✕</button>
+        <div class="egg-modal-icon">🔒</div>
+        <h3 class="egg-modal-title" id="eggTitle">隐藏入口</h3>
+        <p class="egg-modal-desc">请选择要访问的内容</p>
+        <div class="egg-field">
+            <label for="eggSelect">内容</label>
+            <div class="egg-select-wrap">
+                <select id="eggSelect">
+                    <option value="">请选择…</option>
+                    <option value="life">人生指南</option>
+                    <option value="work">工作</option>
+                </select>
+            </div>
+        </div>
+        <div class="egg-modal-actions">
+            <button class="btn btn-ghost" id="eggCancel" type="button">取消</button>
+            <button class="btn btn-primary" id="eggConfirm" type="button">进入</button>
+        </div>
+        <p class="egg-modal-msg" id="eggMsg"></p>
+    </div>
+</div>
+
 <script>
 (function(){
   var rocket = document.querySelector('.avatar');
   if(!rocket) return;
   var count = 0, last = 0;
-  function go(){
-    if(window.TransitionManager && TransitionManager.toLifeGuide){
-      TransitionManager.toLifeGuide({currentTarget: rocket, preventDefault:function(){}, stopPropagation:function(){}});
-    } else {
-      window.location.href = 'life-guide.html';
+
+  var modal = document.getElementById('eggModal');
+  var sel = document.getElementById('eggSelect');
+  var msg = document.getElementById('eggMsg');
+
+  function openModal(){
+    if(!modal){ go('life'); return; }
+    if(msg) msg.textContent = '';
+    if(sel) sel.value = '';
+    modal.classList.add('active');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('egg-open');
+    if(sel) { try { sel.focus(); } catch(e){} }
+  }
+
+  function closeModal(){
+    if(!modal) return;
+    modal.classList.remove('active');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('egg-open');
+  }
+
+  function go(target){
+    if(target === 'life'){
+      if(window.TransitionManager && TransitionManager.toLifeGuide){
+        TransitionManager.toLifeGuide({currentTarget: rocket, preventDefault:function(){}, stopPropagation:function(){}});
+      } else {
+        window.location.href = 'life-guide.html';
+      }
     }
   }
+
   rocket.addEventListener('click', function(){
     var now = Date.now();
     if(now - last > 800) count = 0;
     last = now;
     count++;
-    if(count >= 3){ count = 0; go(); }
+    if(count >= 3){ count = 0; openModal(); }
   });
+
+  if(modal){
+    document.getElementById('eggClose').addEventListener('click', closeModal);
+    document.getElementById('eggCancel').addEventListener('click', closeModal);
+    modal.querySelector('.egg-modal-backdrop').addEventListener('click', closeModal);
+
+    document.getElementById('eggConfirm').addEventListener('click', function(){
+      var v = sel ? sel.value : '';
+      if(v === 'life'){
+        closeModal();
+        go('life');
+      } else if(v === 'work'){
+        if(msg) msg.textContent = '「工作」内容暂未开放，敬请期待。';
+      } else {
+        if(msg) msg.textContent = '请先选择要访问的内容。';
+      }
+    });
+
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Escape' && modal.classList.contains('active')) closeModal();
+    });
+  }
+})();
+</script>
+<script>
+/* ===== 导航交互：滚动进度条 + 滚动高亮 + 滑动指示器 + 移动菜单 ===== */
+(function () {
+  var progress = document.getElementById('scrollProgress');
+  var nav = document.getElementById('siteNav');
+  var indicator = document.getElementById('navIndicator');
+  var toggle = document.getElementById('navToggle');
+  var links = Array.prototype.slice.call(document.querySelectorAll('.nav-links a'));
+
+  function moveIndicator(el) {
+    if (!indicator || !el || window.innerWidth <= 860) return;
+    indicator.style.width = el.offsetWidth + 'px';
+    indicator.style.left = el.offsetLeft + 'px';
+    indicator.style.opacity = '1';
+  }
+
+  function onScroll() {
+    var st = window.pageYOffset || document.documentElement.scrollTop;
+    var max = document.documentElement.scrollHeight - window.innerHeight;
+    if (progress) { progress.style.width = (max > 0 ? (st / max) * 100 : 0) + '%'; }
+    if (nav) { nav.classList.toggle('visible', st > 40); }
+
+    var current = null;
+    links.forEach(function (a) {
+      var sec = document.getElementById(a.getAttribute('href').slice(1));
+      if (sec && sec.getBoundingClientRect().top <= 150) { current = a; }
+    });
+    links.forEach(function (a) { a.classList.remove('is-active'); });
+    if (current) { current.classList.add('is-active'); moveIndicator(current); }
+    else if (indicator) { indicator.style.opacity = '0'; }
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+  links.forEach(function (a) { a.addEventListener('mouseenter', function () { moveIndicator(a); }); });
+
+  if (toggle && nav) {
+    toggle.addEventListener('click', function () { nav.classList.toggle('menu-open'); });
+    links.forEach(function (a) { a.addEventListener('click', function () { nav.classList.remove('menu-open'); }); });
+  }
+
+  setTimeout(onScroll, 150);
+  window.addEventListener('load', onScroll);
 })();
 </script>
 </body>
