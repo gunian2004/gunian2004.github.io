@@ -1,4 +1,7 @@
-.claude
-.codebuddy
-.trae
-openspec
+.claude/
+.codebuddy/
+.trae/
+openspec/
+.agents/
+.backup/
+.workbuddy/

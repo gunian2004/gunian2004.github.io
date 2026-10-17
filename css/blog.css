@@ -597,6 +597,36 @@ footer { color: var(--text-muted); }
     box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
 }
 
+.egg-input {
+    width: 100%;
+    padding: 13px 16px;
+    border-radius: 14px;
+    border: 1.5px solid var(--border, #d9d9d9);
+    background: #fff;
+    font-size: 0.95rem;
+    color: var(--text-main, #1f2937);
+    outline: none;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+.egg-input:focus {
+    border-color: var(--primary, #2563eb);
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+}
+
+.egg-back {
+    align-self: flex-start;
+    margin-bottom: 10px;
+    padding: 4px 10px;
+    font-size: 0.82rem;
+    color: var(--text-muted, #6b7280);
+    background: transparent;
+    border: 1px solid var(--border, #e5e7eb);
+    border-radius: 999px;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+}
+.egg-back:hover { color: var(--primary, #2563eb); border-color: var(--primary, #2563eb); }
+
 .egg-modal-actions { display: flex; gap: 10px; margin-top: 22px; }
 .egg-modal-actions .btn { flex: 1; justify-content: center; padding: 12px 18px; font-size: 0.9rem; }
 
