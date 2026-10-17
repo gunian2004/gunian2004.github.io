@@ -29,24 +29,24 @@
             <a href="#contact">联系我</a>
         </div>
         <div class="nav-actions">
-            <a href="pages/demo.html" class="nav-btn" title="项目演示" onclick="TransitionManager.toDemo(event); return false;"><span class="nav-btn-ico">🎬</span><span>项目演示</span></a>
-            <a href="pages/AI.html" class="nav-btn is-primary" title="小技能" onclick="TransitionManager.toAI(event); return false;"><span class="nav-btn-ico">🤖</span><span>小技能</span></a>
-            <a href="pages/tool.html" class="nav-btn" title="小工具" onclick="TransitionManager.toTool(event); return false;"><span class="nav-btn-ico">🛠️</span><span>小工具</span></a>
+            <a href="pages/demo.html" class="nav-btn" title="项目演示" ><span class="nav-btn-ico">🎬</span><span>项目演示</span></a>
+            <a href="pages/AI.html" class="nav-btn is-primary" title="小技能" ><span class="nav-btn-ico">🤖</span><span>小技能</span></a>
+            <a href="pages/tool.html" class="nav-btn" title="小工具" ><span class="nav-btn-ico">🛠️</span><span>小工具</span></a>
             <button class="nav-toggle" id="navToggle" aria-label="展开菜单">☰</button>
         </div>
     </nav>
 
-    <a href="pages/demo.html" class="demo-btn" title="项目演示" onclick="TransitionManager.toDemo(event); return false;">
+    <a href="pages/demo.html" class="demo-btn" title="项目演示" >
         <span class="demo-btn-icon">🎬</span>
         <span class="demo-btn-text">项目演示</span>
     </a>
 
-    <a href="pages/AI.html" class="ai-mode-btn" title="小技能" onclick="TransitionManager.toAI(event); return false;">
+    <a href="pages/AI.html" class="ai-mode-btn" title="小技能" >
         <span class="ai-btn-icon">🤖</span>
         <span class="ai-btn-text">小技能</span>
     </a>
 
-    <a href="pages/tool.html" class="tool-btn" title="小工具" onclick="TransitionManager.toTool(event); return false;">
+    <a href="pages/tool.html" class="tool-btn" title="小工具" >
         <span class="tool-btn-icon">🛠️</span>
         <span class="tool-btn-text">小工具</span>
     </a>
@@ -940,7 +940,7 @@
   var msg = document.getElementById('eggMsg');
   var confirmBtn = document.getElementById('eggConfirm');
   // 目标页路由；密码验证完全由各目标页内置的密码门负责，首页只做跳转
-  var ROUTES = { life: 'pages/life-guide.html', design: 'pages/frontend-style.html' };
+  var ROUTES = { life: 'pages/life-guide.html?requirePassword=1', work: 'pages/work.html?requirePassword=1', design: 'pages/frontend-style.html?requirePassword=1' };
   function openModal(){
     if(!modal){ window.location.href = 'pages/life-guide.html'; return; }
     if(msg) msg.textContent = '';

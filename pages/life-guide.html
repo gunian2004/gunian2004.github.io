@@ -193,15 +193,26 @@ footer a{color:var(--t2)}
   var err = document.getElementById('err');
   var back = document.getElementById('back');
   function unlock(){ gate.style.display='none'; back.style.display='inline-flex'; }
+  // 首页彩蛋入口要求重新验证；消费标记并清除旧会话解锁状态。
+  var forcePasswordPrompt = false;
+  try {
+    var currentUrl = new URL(location.href);
+    forcePasswordPrompt = currentUrl.searchParams.get('requirePassword') === '1';
+    if (forcePasswordPrompt) {
+      currentUrl.searchParams.delete('requirePassword');
+      history.replaceState(null, '', currentUrl.pathname + currentUrl.search + currentUrl.hash);
+      sessionStorage.removeItem('hltb_unlocked');
+    }
+  } catch(e) {}
   // 来自首页弹窗的令牌：正确则直接放行（避免二次输入），并清掉地址栏令牌
-  if (location.hash && location.hash.length > 1) {
+  if (!forcePasswordPrompt && location.hash && location.hash.length > 1) {
     try {
       var tok = atob(decodeURIComponent(location.hash.slice(1)));
       history.replaceState(null, '', location.pathname + location.search);
       if (tok === PW) { sessionStorage.setItem('hltb_unlocked','1'); unlock(); return; }
     } catch(e) {}
   }
-  if (sessionStorage.getItem('hltb_unlocked')==='1'){ unlock(); }
+  if (!forcePasswordPrompt && sessionStorage.getItem('hltb_unlocked')==='1'){ unlock(); }
   function check(){
     if (pw.value === PW){
       sessionStorage.setItem('hltb_unlocked','1');
