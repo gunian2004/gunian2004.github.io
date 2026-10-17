@@ -123,7 +123,8 @@ document.querySelectorAll('a, button, .skill-tag').forEach(el => {
 
 window.addEventListener('load', () => {
     setTimeout(() => {
-        document.getElementById('loading').classList.add('hidden');
+        const loading = document.getElementById('loading');
+        if (loading) loading.classList.add('hidden');
     }, 800);
 });
 
@@ -187,6 +188,7 @@ function openExpFullscreen(boxId) {
 }
 
 function closeExpFullscreen() {
+    if (!document.getElementById('expFullscreenModal')) return;
     const modal = document.getElementById('expFullscreenModal');
     modal.classList.remove('active');
     document.body.classList.remove('exp-fullscreen-open');
@@ -201,11 +203,14 @@ document.addEventListener('keydown', (e) => {
 });
 
 // 点击遮罩关闭全屏
-document.getElementById('expFullscreenModal').addEventListener('click', (e) => {
-    if (e.target === e.currentTarget) {
-        closeExpFullscreen();
-    }
-});
+const expFullscreenModalEl = document.getElementById('expFullscreenModal');
+if (expFullscreenModalEl) {
+    expFullscreenModalEl.addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) {
+            closeExpFullscreen();
+        }
+    });
+}
 
 // ========== 项目卡片展开/收起 ==========
 function toggleProject(projId) {

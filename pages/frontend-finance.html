@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>金融类 · 前端设计规范库</title>
+<link rel="stylesheet" href="css/frontend-finance.css">
+</head>
+<body class="mask">
+<header class="fs-header">
+  <a class="fs-back" href="frontend-style.html">← 返回规范库</a>
+  <div class="fs-brand">
+    <span class="fs-brand-zh">金融类</span>
+    <span class="fs-brand-en">Financial · Card Styles</span>
+  </div>
+  <p class="fs-hint">5 套皮肤试验卡 · 票据存根卡</p>
+</header>
+
+<main class="fs-main">
+  <section class="fs-categories">
+    <article class="fs-category">
+      <header class="fs-cat-head">
+        <span class="fs-cat-icon">🏦</span>
+        <div class="fs-cat-text">
+          <h3 class="fs-cat-name">金融类 <span class="fs-cat-en">Financial</span></h3>
+          <p class="fs-cat-desc">同一业务域，两套完全不同的组件语言 —— 左：皮肤可切换的账户卡；右：纸面票据卡</p>
+        </div>
+        <span class="fs-cat-badge">2 张卡片</span>
+      </header>
+
+      <section class="fs-stage" aria-labelledby="fsStageTitle">
+
+        <div class="fs-stage-head">
+          <div class="fs-stage-head-text">
+            <h4 class="fs-stage-title" id="fsStageTitle">同一业务域，两套组件语言</h4>
+            <p class="fs-stage-desc">点开任一卡片查看实况：试验卡在详情内切 5 套皮肤，票据卡覆盖信息 / 表单 / 确认 / 弹窗四类场景</p>
+          </div>
+        </div>
+
+        <div class="fs-cards">
+
+          <!-- 卡 A：风格试验卡（5 皮肤，详情内切换） -->
+          <div class="fs-card-stage theme-feed" id="fsCardStage">
+
+            <div class="fs-stage-meta">
+              <span class="fs-stage-meta-label">当前皮肤</span>
+              <b id="fsSkinName">财富社区</b>
+              <span class="fs-stage-meta-dot"></span>
+              <span id="fsSkinFrom">灵感 · 小红书</span>
+            </div>
+
+            <div class="fs-demo" aria-hidden="true">
+
+              <div class="fs-d-top">
+                <span class="fs-d-brand">信托账户 · 稳健配置</span>
+                <span class="fs-d-tag">在售</span>
+              </div>
+
+              <div class="fs-d-kpi">
+                <span class="fs-d-label">资产净值</span>
+                <strong class="fs-d-num">¥ 1,284,560.00</strong>
+                <span class="fs-d-delta">▲ 2.34%</span>
+              </div>
+
+              <div class="fs-d-rows">
+                <div class="fs-d-row">
+                  <span class="fs-d-row-name">沪深300ETF</span>
+                  <b class="fs-d-row-val">3.842</b>
+                  <i class="fs-d-row-chg is-up">+1.21%</i>
+                </div>
+                <div class="fs-d-row">
+                  <span class="fs-d-row-name">中证500</span>
+                  <b class="fs-d-row-val">5.671</b>
+                  <i class="fs-d-row-chg is-down">-0.86%</i>
+                </div>
+              </div>
+
+              <div class="fs-d-nav">
+                <span class="fs-d-navitem is-on">概览</span>
+                <span class="fs-d-navitem">持仓</span>
+                <span class="fs-d-navitem">成交</span>
+                <span class="fs-d-navitem">风控</span>
+                <span class="fs-d-navitem">设置</span>
+              </div>
+
+              <div class="fs-d-controls">
+                <span class="fs-d-input is-static">搜索产品 / 代码</span>
+                <span class="fs-d-btn">确认申购</span>
+              </div>
+
+            </div>
+
+            <button class="fs-card-hit" id="fsOpenDetail" type="button" aria-label="打开完整组件视图"></button>
+          </div>
+
+          <!-- 卡 B：票据存根卡（独立规范） -->
+          <button class="ledger-card" id="ledgerCard" type="button" aria-label="打开票据存根卡规范与场景">
+            <span class="lg-stub">
+
+              <span class="lg-head">
+                <span class="lg-seal">票</span>
+                <span class="lg-titles">
+                  <span class="lg-title">信托认购票据</span>
+                  <span class="lg-no">NO. 2026-1017-018</span>
+                </span>
+                <span class="lg-badge">待存根</span>
+              </span>
+
+              <span class="lg-body">
+                <span class="lg-row"><em>认购人</em><b>陈 **</b></span>
+                <span class="lg-row"><em>产品</em><b>稳盈 3 号</b></span>
+                <span class="lg-amount">
+                  <em>认购金额</em>
+                  <strong>¥ 500,000.00</strong>
+                  <span>人民币伍拾万元整</span>
+                </span>
+                <span class="lg-row"><em>期限</em><b>365 天</b></span>
+                <span class="lg-row"><em>风险等级</em><b>R3 平衡型</b></span>
+                <span class="lg-row"><em>起息日</em><b>2026-10-20</b></span>
+                <span class="lg-row"><em>到期日</em><b>2027-10-20</b></span>
+              </span>
+
+              <span class="lg-sign">
+                <small>经办 · 张 *</small>
+                <span class="lg-stamp">业务<br>专用章</span>
+              </span>
+
+              <span class="lg-foot">
+                <span>存根 · 客户留存</span>
+                <span>2026-10-17</span>
+              </span>
+
+            </span>
+          </button>
+
+        </div>
+
+        <div class="fs-stage-foot">
+          <span class="fs-stage-note">左卡：内容固定、皮肤可切；右卡：纸面语言、场景完整。两卡点开均为独立视图</span>
+        </div>
+
+      </section>
+    </article>
+
+  </section>
+</main>
+
+<!-- ===== 卡 A：完整组件视图（内含风格切换器） ===== -->
+<div class="fs-detail" id="fsDetail" aria-hidden="true">
+  <div class="fs-detail-inner" id="fsTheme">
+    <button class="fs-close" id="fsClose" aria-label="关闭">✕</button>
+
+    <div class="fs-detail-head">
+      <div class="fs-detail-headtext">
+        <div class="fs-detail-kicker" id="fsKicker">灵感 · 小红书</div>
+        <div class="fs-detail-title" id="fsTitle">财富社区</div>
+        <div class="fs-detail-sub" id="fsSub">内容驱动的 C 端理财社区</div>
+      </div>
+
+      <div class="fs-detail-switch" id="fsSwitcher" role="tablist" aria-label="切换风格">
+        <button class="fs-detail-tab is-active" type="button" role="tab" data-skin="feed" aria-selected="true" tabindex="0">财富社区</button>
+        <button class="fs-detail-tab" type="button" role="tab" data-skin="neon" aria-selected="false" tabindex="-1">行情短视频</button>
+        <button class="fs-detail-tab" type="button" role="tab" data-skin="terminal" aria-selected="false" tabindex="-1">机构终端</button>
+        <button class="fs-detail-tab" type="button" role="tab" data-skin="minimal" aria-selected="false" tabindex="-1">极简工作台</button>
+        <button class="fs-detail-tab" type="button" role="tab" data-skin="luxe" aria-selected="false" tabindex="-1">高净值财富</button>
+      </div>
+    </div>
+
+    <div class="fs-showcase">
+
+      <div class="fs-block fs-block--wide">
+        <h4>色彩体系 / Palette</h4>
+        <div class="fs-swatches">
+          <div class="fs-swatch"><span style="background:var(--primary)"></span>主色</div>
+          <div class="fs-swatch"><span style="background:var(--up)"></span>涨</div>
+          <div class="fs-swatch"><span style="background:var(--down)"></span>跌</div>
+          <div class="fs-swatch"><span style="background:var(--danger)"></span>危险</div>
+          <div class="fs-swatch"><span style="background:var(--surface)"></span>表面</div>
+          <div class="fs-swatch"><span style="background:var(--surface-2)"></span>次级表面</div>
+          <div class="fs-swatch"><span style="background:var(--text)"></span>文字</div>
+        </div>
+      </div>
+
+      <div class="fs-block">
+        <h4>按钮 Buttons</h4>
+        <div class="fs-row">
+          <button class="fs-btn fs-btn-primary" type="button">主要按钮</button>
+          <button class="fs-btn fs-btn-ghost" type="button">次要按钮</button>
+          <button class="fs-btn fs-btn-danger" type="button">危险操作</button>
+        </div>
+        <div class="fs-row" style="margin-top:10px">
+          <button class="fs-btn fs-btn-primary" type="button">执行 <kbd class="fs-kbd">⌘↵</kbd></button>
+          <button class="fs-btn fs-btn-ghost" type="button">快捷键 <kbd class="fs-kbd">F1</kbd></button>
+        </div>
+      </div>
+
+      <div class="fs-block">
+        <h4>输入框 / 选择器 Inputs</h4>
+        <div class="fs-row fs-col">
+          <input class="fs-input" type="text" placeholder="请输入内容…" />
+          <label class="fs-field">
+            <span class="fs-field-icon">⌕</span>
+            <input class="fs-input" type="text" value="聚焦查看描边态" />
+          </label>
+          <div class="fs-select-wrap">
+            <select class="fs-input fs-select">
+              <option>请选择状态</option>
+              <option>进行中</option>
+              <option>已完成</option>
+              <option>已驳回</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="fs-block fs-block--wide">
+        <h4>表格 Table（涨红跌绿 · 涨跌双色）</h4>
+        <div class="fs-table-wrap">
+          <table class="fs-table">
+            <thead>
+              <tr><th>产品</th><th>代码</th><th class="num">最新价</th><th class="num">涨跌幅</th><th>状态</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>沪深300ETF</td><td>510300</td><td class="num">3.842</td><td class="num fs-up">▲ +1.21%</td><td><span class="fs-tag">持有</span></td></tr>
+              <tr><td>中证500</td><td>000905</td><td class="num">5.671</td><td class="num fs-down">▼ -0.86%</td><td><span class="fs-tag">关注</span></td></tr>
+              <tr><td>国债逆回购</td><td>204001</td><td class="num">1.985</td><td class="num fs-up">▲ +0.05%</td><td><span class="fs-tag">可用</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="fs-block">
+        <h4>导航 / 菜单 Navigation</h4>
+        <nav class="fs-nav">
+          <button class="fs-nav-item is-active" type="button"><i class="fs-nav-ico">◉</i>概览</button>
+          <button class="fs-nav-item" type="button"><i class="fs-nav-ico">▤</i>持仓</button>
+          <button class="fs-nav-item" type="button"><i class="fs-nav-ico">◎</i>成交</button>
+          <button class="fs-nav-item" type="button"><i class="fs-nav-ico">⚑</i>风控</button>
+          <button class="fs-nav-item" type="button"><i class="fs-nav-ico">⚙</i>设置</button>
+        </nav>
+      </div>
+
+      <div class="fs-block">
+        <h4>标签 / 开关 / 分段</h4>
+        <div class="fs-row">
+          <span class="fs-tag">持有</span>
+          <span class="fs-tag">关注</span>
+          <span class="fs-tag">高风险</span>
+        </div>
+        <div class="fs-row" style="margin-top:12px">
+          <button class="fs-switch is-on" type="button" aria-label="开关示例：开" aria-pressed="true"></button>
+          <button class="fs-switch" type="button" aria-label="开关示例：关" aria-pressed="false"></button>
+        </div>
+        <div class="fs-row" style="margin-top:12px">
+          <div class="fs-seg">
+            <button class="fs-seg-item is-active" type="button">近7日</button>
+            <button class="fs-seg-item" type="button">近30日</button>
+            <button class="fs-seg-item" type="button">近1年</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="fs-block fs-block--wide">
+        <h4>提示条 Banner</h4>
+        <div class="fs-banner">
+          <span class="fs-banner-tag">ALERT</span>
+          <span class="fs-banner-ico">!</span>
+          <div class="fs-banner-text">
+            <strong>交易日 15:00 后提交的赎回申请将于下一交易日确认</strong>
+            <span>请确认资金到账时间，避免影响 T+1 结算。</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="fs-block">
+        <h4>数据卡片 Card</h4>
+        <div class="fs-demo-card">
+          <div class="fs-demo-card-title">账户总资产</div>
+          <div class="fs-demo-card-num">¥ 1,284,560.00</div>
+          <div class="fs-demo-card-meta"><span class="fs-up">▲ 2.34%</span> 较上一交易日</div>
+        </div>
+      </div>
+
+      <div class="fs-block">
+        <h4>弹窗 Modal</h4>
+        <p class="fs-note">点击下方按钮，查看当前风格下的模态框（圆角、边框、阴影、按钮形态均随主题）。</p>
+        <button class="fs-btn fs-btn-primary" id="fsOpenModal" type="button">预览弹窗</button>
+      </div>
+
+    </div>
+
+    <!-- 该风格下的拟态框 -->
+    <div class="fs-theme-modal" id="fsThemeModal" aria-hidden="true">
+      <div class="fs-theme-modal-backdrop" data-fs-modal-close></div>
+      <div class="fs-theme-modal-card">
+        <h3>确认提交复核？</h3>
+        <p>这是当前风格作用域下的模态框。取消与确认按钮继承该风格的控件高度、圆角与边框规则，不单独定义。</p>
+        <div class="fs-row" style="justify-content:flex-end">
+          <button class="fs-btn fs-btn-ghost" data-fs-modal-close type="button">取消</button>
+          <button class="fs-btn fs-btn-primary" data-fs-modal-close type="button">确认</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 卡 B：票据存根式 · 规范与场景 ===== -->
+<div class="lg-app" id="lgApp" aria-hidden="true">
+  <div class="lg-panel">
+    <button class="lg-close" id="lgClose" aria-label="关闭">✕</button>
+
+    <div class="lg-app-head">
+      <div class="lg-kicker">Ledger Stub · 票据存根式</div>
+      <div class="lg-app-title">信托认购票据</div>
+      <div class="lg-app-sub">纸面语言 · 账本栅格 · 下划线控件 · 盖章式确认</div>
+    </div>
+
+    <div class="lg-tabs" id="lgTabs" role="tablist" aria-label="场景">
+      <button class="lg-tab" type="button" role="tab" data-scene="info" aria-selected="true" tabindex="0"><i>01</i>信息展示</button>
+      <button class="lg-tab" type="button" role="tab" data-scene="form" aria-selected="false" tabindex="-1"><i>02</i>表单输入</button>
+      <button class="lg-tab" type="button" role="tab" data-scene="confirm" aria-selected="false" tabindex="-1"><i>03</i>操作确认</button>
+      <button class="lg-tab" type="button" role="tab" data-scene="dialog" aria-selected="false" tabindex="-1"><i>04</i>弹窗交互</button>
+      <button class="lg-tab" type="button" role="tab" data-scene="spec" aria-selected="false" tabindex="-1"><i>05</i>规范说明</button>
+    </div>
+
+    <!-- 01 信息展示 -->
+    <div class="lg-scene active" data-scene="info" role="tabpanel">
+      <div class="lg-split">
+        <div class="lg-demo-col">
+          <div class="lg-paper">
+            <div class="lg-stub">
+              <div class="lg-head">
+                <div class="lg-seal">票</div>
+                <div class="lg-titles">
+                  <div class="lg-title">信托认购票据</div>
+                  <div class="lg-no">NO. 2026-1017-018</div>
+                </div>
+                <div class="lg-badge">待存根</div>
+              </div>
+              <div class="lg-body">
+                <div class="lg-row"><em>认购人</em><b>陈 **</b></div>
+                <div class="lg-row"><em>产品</em><b>稳盈 3 号</b></div>
+                <div class="lg-amount">
+                  <em>认购金额</em>
+                  <strong>¥ 500,000.00</strong>
+                  <span>人民币伍拾万元整</span>
+                </div>
+                <div class="lg-row"><em>期限</em><b>365 天</b></div>
+                <div class="lg-row"><em>风险等级</em><b>R3 平衡型</b></div>
+                <div class="lg-row"><em>起息日</em><b>2026-10-20</b></div>
+                <div class="lg-row"><em>到期日</em><b>2027-10-20</b></div>
+              </div>
+              <div class="lg-sign">
+                <small>经办 · 张 *</small>
+                <div class="lg-stamp">业务<br>专用章</div>
+              </div>
+              <div class="lg-foot">
+                <span>存根 · 客户留存</span>
+                <span>2026-10-17</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <aside class="lg-notes">
+          <h5>信息展示规则</h5>
+          <ul>
+            <li><b>票头</b>：印章字 + 衬线标题 + 等宽票号，右端状态徽标（待存根 / 已存根）。</li>
+            <li><b>账本脊线</b>：左侧 20px 处的 1px 竖线贯穿整张纸，所有内容与它对齐。</li>
+            <li><b>行</b>：1px 点线分隔，标签灰墨小字，值用衬线 13px，右对齐到脊线右缘。</li>
+            <li><b>金额</b>：衬线 30px 等宽数字 + 下方大写，是整张票唯一的视觉重心。</li>
+            <li><b>存根脚</b>：虚线撕口 + 等宽小字，标注留存方与日期。</li>
+          </ul>
+        </aside>
+      </div>
+    </div>
+
+    <!-- 02 表单输入 -->
+    <div class="lg-scene" data-scene="form" role="tabpanel">
+      <div class="lg-split">
+        <div class="lg-demo-col">
+          <div class="lg-form">
+            <label class="lg-field">
+              <span class="lg-flabel">认购金额</span>
+              <span class="lg-fbox">
+                <span class="lg-pre">¥</span>
+                <input class="lg-input" id="lgAmount" type="text" inputmode="decimal" value="500000" autocomplete="off" />
+              </span>
+              <span class="lg-fhint" id="lgAmountCn">人民币伍拾万元整</span>
+            </label>
+
+            <label class="lg-field">
+              <span class="lg-flabel">产品期限</span>
+              <span class="lg-fbox">
+                <select class="lg-input lg-select" id="lgTerm">
+                  <option value="90 天">90 天</option>
+                  <option value="365 天" selected>365 天</option>
+                  <option value="730 天">730 天</option>
+                </select>
+              </span>
+            </label>
+
+            <div class="lg-field">
+              <span class="lg-flabel">风险等级</span>
+              <div class="lg-chips" id="lgRisk">
+                <button class="lg-chip" type="button" data-risk="R1 保守型">R1 保守</button>
+                <button class="lg-chip is-on" type="button" data-risk="R3 平衡型" aria-pressed="true">R3 平衡</button>
+                <button class="lg-chip" type="button" data-risk="R5 进取型">R5 进取</button>
+              </div>
+            </div>
+
+            <div class="lg-actions">
+              <button class="lg-btn lg-btn-ghost" type="button" id="lgReset">重置</button>
+              <button class="lg-btn lg-btn-seal" type="button" id="lgSubmit">确认认购 · 盖章提交</button>
+            </div>
+          </div>
+        </div>
+        <aside class="lg-notes">
+          <h5>表单规则</h5>
+          <ul>
+            <li><b>输入框</b>：只有 1px 底线，聚焦时底线变 <b>2px 墨黑</b>，光标为印章红。</li>
+            <li><b>大写回显</b>：输入即换算，跟随在底线下方，灰绿色 11px。</li>
+            <li><b>单选</b>：印章式方框，选中后红框 + 右上角朱砂三角，不用胶囊。</li>
+            <li><b>提交</b>：虚线红框「盖章」按钮，按下时出现内阴影（压印），不缩放。</li>
+            <li><b>取消/重置</b>：纯文字 + 1px 底线，hover 底线加到 2px。</li>
+          </ul>
+        </aside>
+      </div>
+    </div>
+
+    <!-- 03 操作确认 -->
+    <div class="lg-scene" data-scene="confirm" role="tabpanel">
+      <div class="lg-split">
+        <div class="lg-demo-col">
+          <div class="lg-recap">
+            <h5>认购核对单</h5>
+            <div class="lg-recap-row"><span>产品</span><b>稳盈 3 号</b></div>
+            <div class="lg-recap-row"><span>期限</span><b id="lgRecapTerm">365 天</b></div>
+            <div class="lg-recap-row"><span>风险等级</span><b id="lgRecapRisk">R3 平衡型</b></div>
+            <div class="lg-recap-total">
+              <em>认购金额</em>
+              <strong id="lgRecapAmount">¥ 500,000.00</strong>
+            </div>
+            <p class="lg-fhint" id="lgRecapCn" style="margin-top:8px">人民币伍拾万元整</p>
+            <div class="lg-actions">
+              <button class="lg-btn lg-btn-ghost" type="button" data-lg-go="form">返回修改</button>
+              <button class="lg-btn lg-btn-seal" type="button" id="lgOpenSheet">上滑存根</button>
+            </div>
+            <div class="lg-state" id="lgState" hidden>已存根 · NO. 2026-1017-018</div>
+          </div>
+        </div>
+        <aside class="lg-notes">
+          <h5>确认规则</h5>
+          <ul>
+            <li><b>不打断</b>：确认从底部上滑，不遮住正在核对的单据。</li>
+            <li><b>打孔边</b>：sheet 上沿是一排半圆缺口，像从本子上撕下来的一联。</li>
+            <li><b>二次确认</b>：核对项与表单同源，金额同时给数字与大写。</li>
+            <li><b>可退</b>：返回修改回到表单，已填内容保留。</li>
+          </ul>
+        </aside>
+      </div>
+    </div>
+
+    <!-- 04 弹窗交互 -->
+    <div class="lg-scene" data-scene="dialog" role="tabpanel">
+      <div class="lg-split">
+        <div class="lg-demo-col">
+          <div class="lg-recap">
+            <h5>弹层与菜单</h5>
+            <div class="lg-recap-row"><span>目录</span><b>右侧竖排 · 01 / 02 / 03</b></div>
+            <div class="lg-recap-row"><span>条款</span><b>居中纸片 · 顶部虚线</b></div>
+            <div class="lg-actions">
+              <button class="lg-btn lg-btn-ghost" type="button" id="lgOpenDrawer">打开目录菜单</button>
+              <button class="lg-btn lg-btn-seal" type="button" id="lgOpenTerms">查看条款</button>
+            </div>
+            <p class="lg-fhint" style="margin-top:10px">Esc 逐层关闭：条款 → 存根 → 目录 → 详情</p>
+          </div>
+        </div>
+        <aside class="lg-notes">
+          <h5>弹层规则</h5>
+          <ul>
+            <li><b>菜单</b>：从右侧推入的抽屉，序号用印章红等宽字，项间点线分隔。</li>
+            <li><b>条款</b>：居中纸片，顶部一条虚线，标题衬线，正文灰墨。</li>
+            <li><b>层级</b>：条款 > 存根 sheet > 目录抽屉 > 详情面板，Esc 只关最上层。</li>
+            <li><b>遮罩</b>：同一层 50% 墨色，不做模糊——纸面语言不需要玻璃感。</li>
+          </ul>
+        </aside>
+      </div>
+    </div>
+
+    <!-- 05 规范说明 -->
+    <div class="lg-scene" data-scene="spec" role="tabpanel">
+      <div class="lg-spec">
+
+        <div class="lg-spec-block">
+          <h5>色板 Palette</h5>
+          <div class="lg-swatch-row">
+            <div class="lg-swatch"><i style="background:#f7f3e9"></i>纸白 #f7f3e9</div>
+            <div class="lg-swatch"><i style="background:#f1ebdc"></i>次级纸 #f1ebdc</div>
+            <div class="lg-swatch"><i style="background:#1c1a17"></i>墨黑 #1c1a17</div>
+            <div class="lg-swatch"><i style="background:#5a5449"></i>灰墨 #5a5449</div>
+            <div class="lg-swatch"><i style="background:#a8352a"></i>印章红 #a8352a</div>
+            <div class="lg-swatch"><i style="background:#5c6b5a"></i>灰绿 #5c6b5a</div>
+          </div>
+        </div>
+
+        <div class="lg-spec-block">
+          <h5>字体层级 Type</h5>
+          <div class="lg-type-row"><span>Display</span><b style="font-size:30px">¥ 500,000.00</b></div>
+          <div class="lg-type-row"><span>Title</span><b style="font-size:17px">信托认购票据</b></div>
+          <div class="lg-type-row"><span>Body</span><b style="font-size:13px;font-weight:400">衬线正文，行高 1.85</b></div>
+          <div class="lg-type-row"><span>Label · mono</span><b style="font-family:var(--lg-mono);font-size:9.5px;letter-spacing:.18em">SUBSCRIPTION STUB</b></div>
+        </div>
+
+        <div class="lg-spec-block">
+          <h5>间距与描边 Spacing</h5>
+          <table class="lg-rule-table">
+            <tr><th>项</th><th>值</th></tr>
+            <tr><td>圆角</td><td>2px（纸的切边），全站唯一</td></tr>
+            <tr><td>描边</td><td>1px 实线用于纸边与输入底线；1px 点线用于账本行；1px 虚线用于撕口</td></tr>
+            <tr><td>阴影</td><td>无模糊阴影，只有 0 2px 0 的纸厚</td></tr>
+            <tr><td>间距</td><td>行内 10px，块间 20px，纸边内衬 22px</td></tr>
+          </table>
+        </div>
+
+        <div class="lg-spec-block">
+          <h5>组件样张 Components</h5>
+          <div class="lg-spec-demo">
+            <button class="lg-btn lg-btn-seal" type="button">盖章主操作</button>
+            <button class="lg-btn lg-btn-ghost" type="button">下划线次操作</button>
+          </div>
+          <div class="lg-spec-demo" style="margin-top:12px">
+            <span class="lg-chip is-on">R3 平衡</span>
+            <span class="lg-badge">待存根</span>
+            <span class="lg-stamp" style="width:44px;height:44px;font-size:9px">业务<br>专用章</span>
+          </div>
+          <div class="lg-spec-demo" style="margin-top:12px">
+            <span class="lg-fbox" style="flex:1 1 180px">
+              <span class="lg-pre">¥</span>
+              <input class="lg-input" type="text" value="500000" aria-label="示例输入" />
+            </span>
+          </div>
+        </div>
+
+        <div class="lg-spec-block" style="grid-column:1/-1">
+          <h5>组件规则总表 Rules</h5>
+          <table class="lg-rule-table">
+            <tr><th>组件</th><th>规则</th><th>与试验卡的差异</th></tr>
+            <tr><td>按钮·主</td><td>1px 虚线印章红框 + 衬线字；按下红框转实线并出现内阴影</td><td>不是实心填充，无投影</td></tr>
+            <tr><td>按钮·次</td><td>纯文字 + 1px 底线，hover 底线 2px</td><td>不是浅底描边块</td></tr>
+            <tr><td>输入框</td><td>仅 1px 底线；聚焦 2px 墨黑；光标印章红；无背景无圆角</td><td>不是灰底 12px 圆角</td></tr>
+            <tr><td>单选</td><td>方框 + 朱砂角标，选中红框</td><td>不是胶囊标签</td></tr>
+            <tr><td>菜单</td><td>右侧抽屉，序号 01/02/03，点线分隔</td><td>不是横向 Tab</td></tr>
+            <tr><td>弹窗</td><td>底部上滑 sheet（打孔边）与居中条款纸片</td><td>不是单一居中 Modal</td></tr>
+            <tr><td>表格</td><td>账本行：无表头底色、点线分隔、金额右对齐衬线</td><td>不是独立卡片表</td></tr>
+            <tr><td>点击反馈</td><td>位移 1px + 内阴影（压印），无缩放、无波纹</td><td>不是缩放 + 波纹</td></tr>
+          </table>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 底部存根 sheet -->
+    <div class="lg-veil" id="lgVeil"></div>
+
+    <div class="lg-sheet" id="lgSheet" aria-hidden="true">
+      <div class="lg-sheet-inner">
+        <h4>请核对并存根</h4>
+        <p class="lg-sheet-sub">Subscription Stub · 确认后盖章生效</p>
+        <div class="lg-recap-row"><span>认购金额</span><b id="lgSheetAmount">¥ 500,000.00</b></div>
+        <div class="lg-recap-row"><span>金额大写</span><b id="lgSheetCn">人民币伍拾万元整</b></div>
+        <div class="lg-recap-row"><span>产品期限</span><b id="lgSheetTerm">365 天</b></div>
+        <div class="lg-recap-row"><span>风险等级</span><b id="lgSheetRisk">R3 平衡型</b></div>
+        <div class="lg-sheet-actions">
+          <button class="lg-btn lg-btn-ghost" type="button" id="lgSheetBack">返回修改</button>
+          <button class="lg-btn lg-btn-seal" type="button" id="lgSheetOk">确认盖章</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 右侧目录抽屉 -->
+    <div class="lg-drawer" id="lgDrawer" aria-hidden="true">
+      <h5>Contents</h5>
+      <div class="lg-drawer-title">目录</div>
+      <button class="lg-menu-item" type="button" data-lg-menu="terms">
+        <span class="lg-menu-no">01</span><span class="lg-menu-label">产品条款</span><span class="lg-menu-meta">PDF</span>
+      </button>
+      <button class="lg-menu-item" type="button" data-lg-menu="revoke">
+        <span class="lg-menu-no">02</span><span class="lg-menu-label">撤销申请</span><span class="lg-menu-meta">T+0</span>
+      </button>
+      <button class="lg-menu-item" type="button" data-lg-menu="stubs">
+        <span class="lg-menu-no">03</span><span class="lg-menu-label">存根记录</span><span class="lg-menu-meta">3</span>
+      </button>
+    </div>
+
+    <!-- 条款纸片 -->
+    <div class="lg-modal" id="lgModal" aria-hidden="true">
+      <div class="lg-modal-card">
+        <h4>产品条款摘要</h4>
+        <p>本票据为信托认购意向的存根凭证，不构成最终合同。认购金额以实际到账为准，冷静期内可无条件撤销。</p>
+        <p>风险等级 R3 表示中等风险，历史业绩不代表未来收益。票据撕口一旦分离，存根联不再具备对账效力。</p>
+        <div class="lg-actions">
+          <button class="lg-btn lg-btn-ghost" type="button" data-lg-modal-close>关闭</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ===== 系统级规范 · 卡片详情 ===== -->
+<script src="js/frontend-finance.js"></script>
+</body>
+</html>

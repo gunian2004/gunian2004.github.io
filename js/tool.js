@@ -960,7 +960,7 @@ function urlClear() {
 
 // ========== ER 图生成器 ==========
 // 初始化 Mermaid
-mermaid.initialize({
+if (window.mermaid) mermaid.initialize({
     startOnLoad: false,
     theme: 'dark',
     er: {
@@ -1265,6 +1265,7 @@ async function erRefreshPreview() {
 
     try {
         const id = 'er-diagram-' + Date.now();
+        if (!window.mermaid) { throw new Error('mermaid 未加载'); }
         const { svg } = await mermaid.render(id, code);
         // 包装 SVG 并添加样式修复
         previewArea.innerHTML = `<div class="mermaid er-diagram-fix">${svg}</div>`;

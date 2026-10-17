@@ -29,24 +29,24 @@
             <a href="#contact">联系我</a>
         </div>
         <div class="nav-actions">
-            <a href="demo.html" class="nav-btn" title="项目演示" onclick="TransitionManager.toDemo(event); return false;"><span class="nav-btn-ico">🎬</span><span>项目演示</span></a>
-            <a href="AI.html" class="nav-btn is-primary" title="小技能" onclick="TransitionManager.toAI(event); return false;"><span class="nav-btn-ico">🤖</span><span>小技能</span></a>
-            <a href="tool.html" class="nav-btn" title="小工具" onclick="TransitionManager.toTool(event); return false;"><span class="nav-btn-ico">🛠️</span><span>小工具</span></a>
+            <a href="pages/demo.html" class="nav-btn" title="项目演示" onclick="TransitionManager.toDemo(event); return false;"><span class="nav-btn-ico">🎬</span><span>项目演示</span></a>
+            <a href="pages/AI.html" class="nav-btn is-primary" title="小技能" onclick="TransitionManager.toAI(event); return false;"><span class="nav-btn-ico">🤖</span><span>小技能</span></a>
+            <a href="pages/tool.html" class="nav-btn" title="小工具" onclick="TransitionManager.toTool(event); return false;"><span class="nav-btn-ico">🛠️</span><span>小工具</span></a>
             <button class="nav-toggle" id="navToggle" aria-label="展开菜单">☰</button>
         </div>
     </nav>
 
-    <a href="demo.html" class="demo-btn" title="项目演示" onclick="TransitionManager.toDemo(event); return false;">
+    <a href="pages/demo.html" class="demo-btn" title="项目演示" onclick="TransitionManager.toDemo(event); return false;">
         <span class="demo-btn-icon">🎬</span>
         <span class="demo-btn-text">项目演示</span>
     </a>
 
-    <a href="AI.html" class="ai-mode-btn" title="小技能" onclick="TransitionManager.toAI(event); return false;">
+    <a href="pages/AI.html" class="ai-mode-btn" title="小技能" onclick="TransitionManager.toAI(event); return false;">
         <span class="ai-btn-icon">🤖</span>
         <span class="ai-btn-text">小技能</span>
     </a>
 
-    <a href="tool.html" class="tool-btn" title="小工具" onclick="TransitionManager.toTool(event); return false;">
+    <a href="pages/tool.html" class="tool-btn" title="小工具" onclick="TransitionManager.toTool(event); return false;">
         <span class="tool-btn-icon">🛠️</span>
         <span class="tool-btn-text">小工具</span>
     </a>
@@ -917,6 +917,7 @@
                     <option value="">请选择…</option>
                     <option value="life">人生指南</option>
                     <option value="work">工作</option>
+                    <option value="design">前端设计规范库</option>
                 </select>
             </div>
         </div>
@@ -937,9 +938,11 @@
   var modal = document.getElementById('eggModal');
   var sel = document.getElementById('eggSelect');
   var msg = document.getElementById('eggMsg');
-
+  var confirmBtn = document.getElementById('eggConfirm');
+  // 目标页路由；密码验证完全由各目标页内置的密码门负责，首页只做跳转
+  var ROUTES = { life: 'pages/life-guide.html', design: 'pages/frontend-style.html' };
   function openModal(){
-    if(!modal){ go('life'); return; }
+    if(!modal){ window.location.href = 'pages/life-guide.html'; return; }
     if(msg) msg.textContent = '';
     if(sel) sel.value = '';
     modal.classList.add('active');
@@ -953,16 +956,6 @@
     modal.classList.remove('active');
     modal.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('egg-open');
-  }
-
-  function go(target){
-    if(target === 'life'){
-      if(window.TransitionManager && TransitionManager.toLifeGuide){
-        TransitionManager.toLifeGuide({currentTarget: rocket, preventDefault:function(){}, stopPropagation:function(){}});
-      } else {
-        window.location.href = 'life-guide.html';
-      }
-    }
   }
 
   rocket.addEventListener('click', function(){
@@ -980,9 +973,9 @@
 
     document.getElementById('eggConfirm').addEventListener('click', function(){
       var v = sel ? sel.value : '';
-      if(v === 'life'){
+      if(v && ROUTES[v]){
         closeModal();
-        go('life');
+        window.location.href = ROUTES[v];
       } else if(v === 'work'){
         if(msg) msg.textContent = '「工作」内容暂未开放，敬请期待。';
       } else {

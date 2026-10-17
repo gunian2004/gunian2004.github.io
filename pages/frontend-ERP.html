@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ERP 进销存 · 前端设计规范库</title>
+<link rel="stylesheet" href="css/frontend-base.css">
+<link rel="stylesheet" href="css/frontend-ERP.css">
+</head>
+<body>
+<div class="sy-scope">
+  <div class="fa-shell chrome-erp" id="faShell">
+    <div class="fa-top">
+      <button class="fa-menu-btn" id="faMenuBtn" type="button" aria-label="展开菜单">☰</button>
+      <a class="fa-home" href="frontend-style.html" aria-label="返回规范库">←</a>
+      <div class="fa-brand"><span class="fa-logo" id="faLogo">E</span><span id="faName">ERP 进销存</span></div>
+      <div class="fa-tabs" id="faTabs"></div>
+      <div class="fa-crumbs" id="faCrumbs"></div>
+      
+      <div class="fa-search"><input id="faSearch" type="text" placeholder="搜索当前页…" autocomplete="off" /></div>
+      <button class="fa-close" id="faClose" type="button" aria-label="返回规范库">✕</button>
+    </div>
+    <div class="fa-body">
+      <aside class="fa-side" id="faSide"></aside>
+      <main class="fa-main" id="faMain">
+        
+        <div id="faPage"></div>
+      </main>
+    </div>
+    <div class="fa-modal" id="faModal"><div class="fa-modal-card" id="faModalCard"></div></div>
+    <div class="fa-toast-wrap" id="faToast"></div>
+  </div>
+</div>
+<script src="js/frontend-core.js"></script>
+<script src="js/frontend-ERP.js"></script>
+</body>
+</html>

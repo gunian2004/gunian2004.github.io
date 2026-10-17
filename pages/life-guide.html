@@ -183,15 +183,24 @@ footer a{color:var(--t2)}
     <div id="err" style="color:#f87171;margin-top:12px;font-size:13px;height:18px;"></div>
   </div>
 </div>
-<a href="index.html" id="back" style="position:fixed;bottom:18px;left:18px;z-index:99998;display:none;align-items:center;gap:6px;padding:9px 14px;background:rgba(18,18,31,.85);border:1px solid #3a3a55;border-radius:22px;color:#cbd2e6;text-decoration:none;font-size:13px;backdrop-filter:blur(8px);">← 返回首页</a>
+<a href="../index.html" id="back" style="position:fixed;bottom:18px;left:18px;z-index:99998;display:none;align-items:center;gap:6px;padding:9px 14px;background:rgba(18,18,31,.85);border:1px solid #3a3a55;border-radius:22px;color:#cbd2e6;text-decoration:none;font-size:13px;backdrop-filter:blur(8px);">← 返回首页</a>
 <script>
 (function(){
-  var PW = "betterlife2026";
+  window['life-PW'] = 'life2026';
+  var PW = window['life-PW'];
   var gate = document.getElementById('gate');
   var pw = document.getElementById('pw');
   var err = document.getElementById('err');
   var back = document.getElementById('back');
   function unlock(){ gate.style.display='none'; back.style.display='inline-flex'; }
+  // 来自首页弹窗的令牌：正确则直接放行（避免二次输入），并清掉地址栏令牌
+  if (location.hash && location.hash.length > 1) {
+    try {
+      var tok = atob(decodeURIComponent(location.hash.slice(1)));
+      history.replaceState(null, '', location.pathname + location.search);
+      if (tok === PW) { sessionStorage.setItem('hltb_unlocked','1'); unlock(); return; }
+    } catch(e) {}
+  }
   if (sessionStorage.getItem('hltb_unlocked')==='1'){ unlock(); }
   function check(){
     if (pw.value === PW){
@@ -354,4 +363,5 @@ const io=new IntersectionObserver(es=>{
 },{rootMargin:'-70px 0px -75% 0px'});
 cards.forEach(c=>io.observe(c));
 if(jump) secs.forEach(s=>io.observe(s));
-</script></body></html>
+</script>
+</body></html>

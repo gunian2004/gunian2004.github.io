@@ -154,6 +154,11 @@
         particleContainer.innerHTML = '';
     }
 
+    // 页面已迁入 pages/，这里按当前所在目录解析目标路径
+    var IN_PAGES = /\/pages\//.test(window.location.pathname);
+    function pagePath(name) { return IN_PAGES ? name : 'pages/' + name; }
+    function homePath() { return IN_PAGES ? '../index.html' : 'index.html'; }
+
     window.TransitionManager = {
         init: function() {
             createElements();
@@ -170,7 +175,7 @@
             const centerX = rect.left + rect.width / 2;
             const centerY = rect.top + rect.height / 2;
             
-            playEnterAnimation('AI.html', centerX, centerY, 'vibrant');
+            playEnterAnimation(pagePath('AI.html'), centerX, centerY, 'vibrant');
         },
         
         toDemo: function(event) {
@@ -184,7 +189,7 @@
             const centerX = rect.left + rect.width / 2;
             const centerY = rect.top + rect.height / 2;
             
-            playEnterAnimation('demo.html', centerX, centerY, 'gentle');
+            playEnterAnimation(pagePath('demo.html'), centerX, centerY, 'gentle');
         },
         
         toIndex: function(event) {
@@ -198,7 +203,7 @@
             const centerX = rect.left + rect.width / 2;
             const centerY = rect.top + rect.height / 2;
 
-            playEnterAnimation('index.html', centerX, centerY, 'gentle');
+            playEnterAnimation(homePath(), centerX, centerY, 'gentle');
         },
 
         toTool: function(event) {
@@ -212,7 +217,7 @@
             const centerX = rect.left + rect.width / 2;
             const centerY = rect.top + rect.height / 2;
 
-            playEnterAnimation('tool.html', centerX, centerY, 'vibrant');
+            playEnterAnimation(pagePath('tool.html'), centerX, centerY, 'vibrant');
         },
 
         toLifeGuide: function(event) {
@@ -226,7 +231,7 @@
             const centerX = rect.left + rect.width / 2;
             const centerY = rect.top + rect.height / 2;
 
-            playEnterAnimation('life-guide.html', centerX, centerY, 'vibrant');
+            playEnterAnimation(pagePath('life-guide.html'), centerX, centerY, 'vibrant');
         },
 
         isTransitioning: false

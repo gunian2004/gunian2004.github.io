@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>系统级规范 · 前端设计规范库</title>
+<link rel="stylesheet" href="css/frontend-base.css">
+</head>
+<body class="spec-page sy-scope">
+<header class="fa-top" style="position:sticky">
+  <a class="fa-home" href="frontend-style.html" aria-label="返回规范库">←</a>
+  <div class="fa-brand"><span class="fa-logo" style="background:#4f46e5">S</span><span>系统级组件规范</span></div>
+</header>
+<main class="sy-scope" style="padding:24px">
+    <article class="fs-category" id="syCategory">
+      <header class="fs-cat-head">
+        <span class="fs-cat-icon">🧩</span>
+        <div class="fs-cat-text">
+          <h3 class="fs-cat-name">系统级规范 <span class="fs-cat-en">Enterprise UI</span></h3>
+          <p class="fs-cat-desc">一张卡收齐令牌、组件与七类页面范式 —— 点开后用左侧目录逐节查看</p>
+        </div>
+        <span class="fs-cat-badge">1 张卡 · 13 节</span>
+      </header>
+
+      
+        <div class="sy-entry-wrap">
+          <button class="sy-entry" id="syEntry" type="button" data-sy="tokens" aria-haspopup="dialog" aria-label="展开系统级组件规范">
+            <span class="sy-entry-top">
+              <span class="sy-entry-kicker">Enterprise UI</span>
+              <span class="sy-entry-badge">13 节</span>
+            </span>
+            <span class="sy-entry-title">系统级组件规范</span>
+            <span class="sy-entry-desc">令牌、组件与七类后台页面范式，全部收在这一张卡里</span>
+
+            <span class="sy-entry-preview" aria-hidden="true">
+              <span class="sep-bar"><i></i><i></i><i></i></span>
+              <span class="sep-kpis">
+                <b><em>GMV</em><strong>2.84M</strong></b>
+                <b><em>净收入</em><strong>412k</strong></b>
+                <b><em>差异</em><strong>3</strong></b>
+              </span>
+              <span class="sep-rows">
+                <span class="sep-row"><i class="dot"></i><b>PO-1042</b><em class="tag warn">待复核</em><strong>128,400.00</strong></span>
+                <span class="sep-row"><i class="dot"></i><b>PO-1041</b><em class="tag ok">已入库</em><strong>86,120.00</strong></span>
+                <span class="sep-row"><i class="dot"></i><b>PO-1038</b><em class="tag">已驳回</em><strong>12,050.00</strong></span>
+              </span>
+              <span class="sep-actions"><span class="sep-btn">新建订单</span><span class="sep-btn ghost">导出</span></span>
+            </span>
+
+            <span class="sy-entry-go">点击展开 · 13 节样式与七类页面 →</span>
+          </button>
+        </div>
+    </article>
+
+</main>
+<!-- ===== 系统级规范 · 卡片详情 ===== -->
+<div class="sy-scope">
+  <div class="sy-overlay" id="syOverlay" aria-hidden="true">
+    <div class="sy-overlay-panel" role="dialog" aria-modal="true" aria-label="样式详情">
+      <button class="sy-ov-close" id="syClose" type="button" aria-label="关闭">✕</button>
+
+      <div class="sy-ov-head">
+        <div class="sy-ov-eyebrow">Enterprise UI System</div>
+        <div class="sy-ov-title">系统级组件规范</div>
+        <p class="sy-ov-sub">左侧目录切换 · 每一节都是可直接复用的样式与页面范式</p>
+      </div>
+
+      <nav class="sy-doc-nav" id="syNav" aria-label="规范目录">
+        <div class="sy-nav-group">基础</div>
+        <button class="sy-nav-item" type="button" data-sy="tokens" aria-current="true"><i>A1</i>设计令牌</button>
+        <div class="sy-nav-group">组件</div>
+        <button class="sy-nav-item" type="button" data-sy="buttons"><i>A2</i>按钮</button>
+        <button class="sy-nav-item" type="button" data-sy="inputs"><i>A3</i>输入与选择</button>
+        <button class="sy-nav-item" type="button" data-sy="feedback"><i>A4</i>反馈与弹层</button>
+        <button class="sy-nav-item" type="button" data-sy="table"><i>A5</i>数据表格</button>
+        <div class="sy-nav-group">页面范式</div>
+        <button class="sy-nav-item" type="button" data-sy="erp"><i>A6</i>ERP / 进销存</button>
+        <button class="sy-nav-item" type="button" data-sy="crm"><i>A7</i>CRM / 销售管道</button>
+        <button class="sy-nav-item" type="button" data-sy="sop"><i>A8</i>SOP / 流程</button>
+        <button class="sy-nav-item" type="button" data-sy="project"><i>A9</i>项目与协作</button>
+        <button class="sy-nav-item" type="button" data-sy="bi"><i>A10</i>BI / 数据看板</button>
+        <button class="sy-nav-item" type="button" data-sy="oa"><i>A11</i>HR / OA 审批</button>
+        <button class="sy-nav-item" type="button" data-sy="finance"><i>A12</i>财务 / 费控</button>
+        <div class="sy-nav-group">规范</div>
+        <button class="sy-nav-item" type="button" data-sy="motion"><i>A13</i>动效与响应式</button>
+      </nav>
+      <div class="sy-detail active" data-sy-panel="tokens">
+        <div class="sy-detail-head">
+          <div class="sy-ov-eyebrow">A1 · FOUNDATION</div>
+          <div class="sy-ov-title">设计令牌</div>
+          <p class="sy-ov-sub">色板、字阶、间距、圆角、阴影——本页所有组件只允许引用这里的变量。</p>
+        </div>
+
+<div class="sy-spec-grid">
+  <div class="sy-panel sy-panel-pad">
+    <h4 style="font-size:13px;margin-bottom:10px">中性色与表面</h4>
+    <div class="sy-swatch-row">
+      <div class="sy-swatch-item"><i style="background:#f6f7f9"></i><span>--bg</span></div>
+      <div class="sy-swatch-item"><i style="background:#ffffff"></i><span>--surface</span></div>
+      <div class="sy-swatch-item"><i style="background:#f2f4f7"></i><span>--surface-2</span></div>
+      <div class="sy-swatch-item"><i style="background:#e9edf2"></i><span>--surface-3</span></div>
+      <div class="sy-swatch-item"><i style="background:#e4e7ec"></i><span>--border</span></div>
+      <div class="sy-swatch-item"><i style="background:#d0d5dd"></i><span>--border-strong</span></div>
+      <div class="sy-swatch-item"><i style="background:#101828"></i><span>--text</span></div>
+      <div class="sy-swatch-item"><i style="background:#8a94a3"></i><span>--text-3</span></div>
+    </div>
+  </div>
+  <div class="sy-panel sy-panel-pad">
+    <h4 style="font-size:13px;margin-bottom:10px">主色与语义色</h4>
+    <div class="sy-swatch-row">
+      <div class="sy-swatch-item"><i style="background:#4f46e5"></i><span>--primary</span></div>
+      <div class="sy-swatch-item"><i style="background:#eef0ff"></i><span>--primary-weak</span></div>
+      <div class="sy-swatch-item"><i style="background:#0f9d63"></i><span>--success</span></div>
+      <div class="sy-swatch-item"><i style="background:#b45309"></i><span>--warning</span></div>
+      <div class="sy-swatch-item"><i style="background:#d92d20"></i><span>--danger / --up</span></div>
+      <div class="sy-swatch-item"><i style="background:#0b6bcb"></i><span>--info</span></div>
+      <div class="sy-swatch-item"><i style="background:#0f9d63"></i><span>--down</span></div>
+    </div>
+    <p style="font-size:11px;color:var(--text-3);margin-top:10px;line-height:1.6">主色占比控制在 10% 以内：按钮、当前项、进度。金额与涨跌不用主色。</p>
+  </div>
+  <div class="sy-panel sy-panel-pad">
+    <h4 style="font-size:13px;margin-bottom:6px">字体层级</h4>
+    <div class="sy-type-row"><span>display / 28</span><b style="font-size:28px;letter-spacing:-.02em">1,284,560.00</b></div>
+    <div class="sy-type-row"><span>title / 20</span><b style="font-size:20px">采购订单</b></div>
+    <div class="sy-type-row"><span>subtitle / 16</span><b style="font-size:16px">供应商对账</b></div>
+    <div class="sy-type-row"><span>body / 14</span><b style="font-size:14px;font-weight:400">正文与表单值</b></div>
+    <div class="sy-type-row"><span>table / 13</span><b style="font-size:13px;font-weight:400">表格单元格</b></div>
+    <div class="sy-type-row"><span>meta / 12</span><b style="font-size:12px;font-weight:400;color:var(--text-2)">辅助说明、时间戳</b></div>
+    <div class="sy-type-row"><span>overline / 11</span><b style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3)">Column Label</b></div>
+  </div>
+  <div class="sy-panel sy-panel-pad">
+    <h4 style="font-size:13px;margin-bottom:6px">间距 / 圆角 / 阴影</h4>
+    <div class="sy-type-row"><span>space</span><b style="font-size:12px;font-weight:400">4 · 8 · 12 · 16 · 20 · 24 · 32 · 40 · 56</b></div>
+    <div class="sy-type-row"><span>radius</span><b style="font-size:12px;font-weight:400">6 控件 · 8 输入 · 10 卡片 · 14 面板 · 999 胶囊</b></div>
+    <div class="sy-type-row"><span>shadow</span><b style="font-size:12px;font-weight:400">1 贴边 · 2 悬浮 · 3 弹层</b></div>
+    <div class="sy-type-row"><span>grid</span><b style="font-size:12px;font-weight:400">4pt 栅格，行高 40 / 表头 34</b></div>
+    <div style="display:flex;gap:10px;margin-top:12px">
+      <div style="flex:1;height:40px;border-radius:10px;background:#fff;border:1px solid var(--border);box-shadow:var(--sh-1);display:grid;place-items:center;font-size:10px;color:var(--text-3)">sh-1</div>
+      <div style="flex:1;height:40px;border-radius:10px;background:#fff;border:1px solid var(--border);box-shadow:var(--sh-2);display:grid;place-items:center;font-size:10px;color:var(--text-3)">sh-2</div>
+      <div style="flex:1;height:40px;border-radius:10px;background:#fff;border:1px solid var(--border);box-shadow:var(--sh-3);display:grid;place-items:center;font-size:10px;color:var(--text-3)">sh-3</div>
+    </div>
+  </div>
+</div>
+
+      </div>
+      <div class="sy-detail" data-sy-panel="buttons">
+        <div class="sy-detail-head">
+          <div class="sy-ov-eyebrow">A2 · COMPONENTS</div>
+          <div class="sy-ov-title">按钮</div>
+          <p class="sy-ov-sub">四种变体 × 三种尺寸；按下 scale(.98)，禁用降透明度。</p>
+        </div>
+
+<div class="sy-panel">
+  <div class="sy-toolbar"><b style="font-size:13px">变体与尺寸</b><span style="font-size:12px;color:var(--text-3)">高度 28 / 34 / 40</span></div>
+  <div class="sy-panel-pad" style="display:flex;flex-direction:column;gap:16px">
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <button class="sy-btn sy-btn-primary" type="button">新建订单</button>
+      <button class="sy-btn sy-btn-secondary" type="button">导出</button>
+      <button class="sy-btn sy-btn-ghost" type="button">取消</button>
+      <button class="sy-btn sy-btn-danger" type="button">删除</button>
+      <button class="sy-btn sy-btn-danger-soft" type="button">撤销审批</button>
+      <button class="sy-btn sy-btn-secondary" type="button" disabled>已禁用</button>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <button class="sy-btn sy-btn-primary sy-btn-sm" type="button">小号</button>
+      <button class="sy-btn sy-btn-primary" type="button">中号</button>
+      <button class="sy-btn sy-btn-primary sy-btn-lg" type="button">大号</button>
+      <button class="sy-btn sy-btn-secondary sy-btn-icon" type="button" aria-label="更多">⋯</button>
+      <button class="sy-btn sy-btn-secondary" type="button"><span class="sy-ico">＋</span>带图标</button>
+    </div>
+  </div>
+</div>
+
+      </div>
+      <div class="sy-detail" data-sy-panel="inputs">
+        <div class="sy-detail-head">
+          <div class="sy-ov-eyebrow">A3 · COMPONENTS</div>
+          <div class="sy-ov-title">输入与选择</div>
+          <p class="sy-ov-sub">底线式输入、错误态、搜索、复选、开关、分段——聚焦统一 3px 柔光环。</p>
+        </div>
+
+<div class="sy-panel">
+  <div class="sy-toolbar"><b style="font-size:13px">表单控件</b><span style="font-size:12px;color:var(--text-3)">错误态只换边框与提示色</span></div>
+  <div class="sy-panel-pad sy-grid2" style="gap:16px">
+    <div class="sy-field">
+      <label class="sy-label" for="syDemoA">订单金额<span class="req">*</span></label>
+      <input class="sy-input" id="syDemoA" value="128,400.00" />
+      <span class="sy-help">支持千分位，失焦后自动格式化</span>
+    </div>
+    <div class="sy-field">
+      <label class="sy-label" for="syDemoB">供应商</label>
+      <select class="sy-select" id="syDemoB"><option>华东电子元件有限公司</option><option>深圳捷创科技</option></select>
+    </div>
+    <div class="sy-field">
+      <label class="sy-label" for="syDemoC">错误态</label>
+      <input class="sy-input" id="syDemoC" value="2026-13-40" aria-invalid="true" />
+      <span class="sy-error">日期格式不正确，应为 YYYY-MM-DD</span>
+    </div>
+    <div class="sy-field">
+      <label class="sy-label" for="syDemoD">搜索</label>
+      <div class="sy-search"><span class="sy-search-ico">⌕</span><input class="sy-input" id="syDemoD" placeholder="搜索单号 / 供应商" /><kbd class="sy-kbd">/</kbd></div>
+    </div>
+    <div class="sy-field">
+      <span class="sy-label">复选</span>
+      <div style="display:flex;gap:16px;flex-wrap:wrap">
+        <label class="sy-check"><input type="checkbox" checked /><span class="sy-box"></span>自动对账</label>
+        <label class="sy-check"><input type="checkbox" /><span class="sy-box"></span>仅看异常</label>
+      </div>
+    </div>
+    <div class="sy-field">
+      <span class="sy-label">开关 / 分段</span>
+      <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+        <button class="sy-switch" type="button" role="switch" aria-checked="true" aria-label="示例开关"></button>
+        <div class="sy-seg">
+          <span class="sy-seg-ind" style="width:0"></span>
+          <button class="sy-seg-btn" type="button" aria-selected="true">近 7 天</button>
+          <button class="sy-seg-btn" type="button" aria-selected="false">近 30 天</button>
+          <button class="sy-seg-btn" type="button" aria-selected="false">本季度</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+      </div>
+      <div class="sy-detail" data-sy-panel="feedback">
+        <div class="sy-detail-head">
+          <div class="sy-ov-eyebrow">A4 · COMPONENTS</div>
+          <div class="sy-ov-title">反馈与弹层</div>
+          <p class="sy-ov-sub">弹窗、抽屉、Toast、命令面板与空状态——四种反馈各有分工。</p>
+        </div>
+
+<div class="sy-panel">
+  <div class="sy-toolbar"><b style="font-size:13px">触发与状态</b><span style="font-size:12px;color:var(--text-3)">弹窗 180ms 缩放淡入 · 抽屉 240ms 右滑</span></div>
+  <div class="sy-panel-pad sy-grid2" style="gap:16px">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="sy-btn sy-btn-secondary" type="button" data-open="modal">打开弹窗</button>
+        <button class="sy-btn sy-btn-secondary" type="button" data-open="drawer">打开抽屉</button>
+        <button class="sy-btn sy-btn-secondary" type="button" data-open="toast">触发 Toast</button>
+        <button class="sy-btn sy-btn-secondary" type="button" data-open="cmdk">命令面板</button>
+      </div>
+      <div class="sy-empty" style="border:1px dashed var(--border);border-radius:10px">
+        <div class="sy-empty-ico">◍</div>
+        <b>还没有数据</b>
+        <span>调整筛选条件，或先新建一条记录。空状态要给出下一步，而不是只说「没有」。</span>
+        <button class="sy-btn sy-btn-primary sy-btn-sm" style="margin-top:6px" type="button">新建记录</button>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <span class="sy-badge">草稿</span>
+        <span class="sy-badge sy-badge-info"><i></i>处理中</span>
+        <span class="sy-badge sy-badge-warning"><i></i>待复核</span>
+        <span class="sy-badge sy-badge-danger"><i></i>已驳回</span>
+        <span class="sy-badge sy-badge-success"><i></i>已通过</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="sy-avatar">陈</span>
+        <span class="sy-avatar sy-avatar-lg" style="background:#4f46e5">张</span>
+        <span class="sy-avatar" style="background:#0f9d63">L</span>
+        <span style="font-size:12px;color:var(--text-3)">头像 24 / 32，按姓名首字取色</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <span class="sy-skel" style="height:12px;width:70%"></span>
+        <span class="sy-skel" style="height:12px;width:88%"></span>
+        <span class="sy-skel" style="height:12px;width:54%"></span>
+      </div>
+      <p style="font-size:11px;color:var(--text-3)">骨架屏用同尺寸占位，避免加载完成后布局跳动。</p>
+    </div>
+  </div>
+</div>
+
+      </div>
+      <div class="sy-detail" data-sy-panel="table">
+        <div class="sy-detail-head">
+          <div class="sy-ov-eyebrow">A5 · COMPONENTS</div>
+          <div class="sy-ov-title">数据表格</div>
+          <p class="sy-ov-sub">选中行弹出批量条，行悬停只改背景、不做位移。</p>
+        </div>
+
+<div class="sy-panel">
+  <div class="sy-toolbar"><b style="font-size:13px">采购订单</b><span style="font-size:12px;color:var(--text-3)">勾选任意行查看批量条</span></div>
+  <div class="sy-bulkbar" id="bulkbar">
+    <b>已选 <span id="bulkCount">0</span> 项</b>
+    <button class="sy-btn sy-btn-primary sy-btn-sm" type="button">批量审批</button>
+    <button class="sy-btn sy-btn-secondary sy-btn-sm" type="button">导出所选</button>
+    <button class="sy-btn sy-btn-ghost sy-btn-sm" type="button" id="bulkClear">取消选择</button>
+  </div>
+  <div class="sy-table-wrap">
+    <table class="sy-table" id="demoTable">
+      <thead>
+        <tr>
+          <th style="width:34px"><label class="sy-check"><input type="checkbox" id="checkAll" aria-label="全选" /><span class="sy-box"></span></label></th>
+          <th>单号</th><th>供应商</th><th>状态</th><th class="num">金额</th><th>负责人</th><th>更新</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr data-row>
+          <td><label class="sy-check"><input type="checkbox" class="sy-rowcheck" aria-label="选择" /><span class="sy-box"></span></label></td>
+          <td class="sy-mono">PO-2026-1042</td><td>华东电子元件</td>
+          <td><span class="sy-badge sy-badge-warning"><i></i>待复核</span></td>
+          <td class="num">128,400.00</td>
+          <td><span class="sy-cell-user"><span class="sy-avatar" style="width:20px;height:20px;font-size:9px">陈</span>陈柏贤</span></td>
+          <td class="muted">2 分钟前</td>
+        </tr>
+        <tr data-row>
+          <td><label class="sy-check"><input type="checkbox" class="sy-rowcheck" aria-label="选择" /><span class="sy-box"></span></label></td>
+          <td class="sy-mono">PO-2026-1041</td><td>深圳捷创科技</td>
+          <td><span class="sy-badge sy-badge-success"><i></i>已入库</span></td>
+          <td class="num">86,120.00</td>
+          <td><span class="sy-cell-user"><span class="sy-avatar" style="width:20px;height:20px;font-size:9px;background:#0f9d63">张</span>张敏</span></td>
+          <td class="muted">1 小时前</td>
+        </tr>
+        <tr data-row>
+          <td><label class="sy-check"><input type="checkbox" class="sy-rowcheck" aria-label="选择" /><span class="sy-box"></span></label></td>
+          <td class="sy-mono">PO-2026-1038</td><td>苏州瑞泰</td>
+          <td><span class="sy-badge sy-badge-danger"><i></i>已驳回</span></td>
+          <td class="num">12,050.00</td>
+          <td><span class="sy-cell-user"><span class="sy-avatar" style="width:20px;height:20px;font-size:9px;background:#b45309">李</span>李洋</span></td>
+          <td class="muted">昨天</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="sy-pager">
+    <span>共 128 条</span><span class="sy-spacer"></span>
+    <button class="sy-page" type="button" aria-label="上一页">‹</button>
+    <button class="sy-page" type="button" aria-current="page">1</button>
+    <button class="sy-page" type="button">2</button>
+    <button class="sy-page" type="button">3</button>
+    <button class="sy-page" type="button" aria-label="下一页">›</button>
+  </div>
+</div>
+
+      </div>
+      <div class="sy-detail" data-sy-panel="motion">
+        <div class="sy-detail-head">
+          <div class="sy-ov-eyebrow">A13 · MOTION & RESPONSIVE</div>
+          <div class="sy-ov-title">动效与响应式</div>
+          <p class="sy-ov-sub">三种动效、两个断点策略；后台动效只解释「从哪来、到哪去」。</p>
+        </div>
+
+<div class="sy-panel sy-panel-pad" style="display:grid;grid-template-columns:1.2fr 1fr;gap:24px;margin-bottom:16px">
+  <div>
+    <div class="sy-motion-row"><span>--t1 · 120ms</span><div class="sy-motion-demo" data-motion>·</div><span style="color:var(--text-2)">颜色、边框、背景等「贴边变化」</span></div>
+    <div class="sy-motion-row"><span>--t2 · 180ms</span><div class="sy-motion-demo" data-motion>·</div><span style="color:var(--text-2)">弹窗缩放淡入、Toast 淡入</span></div>
+    <div class="sy-motion-row"><span>--t3 · 240ms</span><div class="sy-motion-demo" data-motion>·</div><span style="color:var(--text-2)">抽屉滑动、分段指示器移动</span></div>
+    <div class="sy-motion-row"><span>ease</span><code style="font-size:11px;color:var(--text-2)">cubic-bezier(.2,.8,.2,1)</code><span style="color:var(--text-2)">默认</span></div>
+    <div class="sy-motion-row"><span>ease-out</span><code style="font-size:11px;color:var(--text-2)">cubic-bezier(.16,1,.3,1)</code><span style="color:var(--text-2)">弹层进入 / 指示器</span></div>
+    <button class="sy-btn sy-btn-secondary sy-btn-sm" type="button" id="motionReplay" style="margin-top:12px">重放动画</button>
+  </div>
+  <div style="font-size:12px;color:var(--text-2);line-height:1.8">
+    <p><b style="color:var(--text)">降级</b>：<code>prefers-reduced-motion: reduce</code> 时全部时长压到 0.01ms。</p>
+    <p style="margin-top:8px"><b style="color:var(--text)">不做</b>：列表逐个淡入、卡片弹跳、按钮波浪、背景视差。</p>
+  </div>
+</div>
+<div class="sy-panel" style="overflow:hidden">
+  <table class="sy-token-table">
+    <thead><tr><th>断点</th><th>范围</th><th>布局规则</th></tr></thead>
+    <tbody>
+      <tr><td>xl</td><td>≥ 1280px</td><td>左侧 240px 导航常驻；内容区 12 栏；表格全列显示</td></tr>
+      <tr><td>lg</td><td>1024–1279px</td><td>导航折叠为 52px 图标栏；详情改抽屉</td></tr>
+      <tr><td>md</td><td>768–1023px</td><td>KPI 四列变两列；看板横向滚动；表格隐藏次要列</td></tr>
+      <tr><td>sm</td><td>&lt; 768px</td><td>单列；导航收进菜单；批量操作改底部浮条；表单全宽</td></tr>
+    </tbody>
+  </table>
+</div>
+
+      </div>
+      <div class="sy-detail" data-sy-panel="erp">
+        <div class="sy-detail-head">
+          <div class="sy-ov-eyebrow">A6 · ERP</div>
+          <div class="sy-ov-title">ERP / 进销存</div>
+          <p class="sy-ov-sub">密集表格 + 批量操作 + 侧边详情</p>
+        </div>
+<div class="sy-arch-grid">
+        <div class="sy-arch-demo">
+          <div class="sy-app">
+            <div class="sy-rail">
+              <div class="sy-rail-logo">E</div>
+              <div class="sy-rail-item is-on">▤</div>
+              <div class="sy-rail-item">▦</div>
+              <div class="sy-rail-item">⇄</div>
+              <div class="sy-rail-item">⚙</div>
+            </div>
+            <div class="sy-app-body">
+              <div class="sy-appbar">
+                <span class="sy-appbar-title">采购订单</span>
+                <span class="sy-badge">128</span>
+                <span class="sy-spacer"></span>
+                <button class="sy-btn sy-btn-secondary sy-btn-sm" type="button">筛选</button>
+                <button class="sy-btn sy-btn-primary sy-btn-sm" type="button">新建</button>
+              </div>
+              <div class="sy-app-content">
+                <div style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-3)">近 8 周订单量</div>
+                <div class="sy-bars" style="height:26px;gap:4px">
+                  <i style="height:40%"></i><i style="height:65%"></i><i style="height:35%"></i><i style="height:80%"></i><i style="height:55%"></i><i style="height:95%" class="is-on"></i><i style="height:60%"></i><i style="height:45%"></i>
+                </div>
+                <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden">
+                  <table class="sy-table">
+                    <thead><tr><th>单号</th><th>供应商</th><th class="num">金额</th><th>状态</th></tr></thead>
+                    <tbody>
+                      <tr><td class="sy-mono">PO-1042</td><td>华东电子</td><td class="num">128,400.00</td><td><span class="sy-badge sy-badge-warning"><i></i>待复核</span></td></tr>
+                      <tr><td class="sy-mono">PO-1041</td><td>深圳捷创</td><td class="num">86,120.00</td><td><span class="sy-badge sy-badge-success"><i></i>已入库</span></td></tr>
+                      <tr><td class="sy-mono">PO-1038</td><td>苏州瑞泰</td><td class="num">12,050.00</td><td><span class="sy-badge sy-badge-danger"><i></i>已驳回</span></td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <aside class="sy-arch-notes">
+          <h5>可借鉴</h5>
+          <ul>
+            <li><b>左侧图标栏 52px</b>：常驻但不抢宽度，模块切换一屏完成。</li>
+            <li><b>顶部工具栏</b>承载筛选与新建，不放业务字段。</li>
+            <li><b>状态用徽标</b>而不是文字颜色，颜色只是第二信号。</li>
+            <li><b>批量条</b>在选中时才展开，避免常驻占高。</li>
+          </ul>
+          <h5>别照搬</h5>
+          <ul>
+            <li>不要给表格加斑马纹 + 网格线 + 悬停位移三件套。</li>
+          </ul>
+        </aside>
+      </div>
+      </div>
+      <div class="sy-detail" data-sy-panel="crm">
+        <div class="sy-detail-head">
+          <div class="sy-ov-eyebrow">A7 · CRM</div>
+          <div class="sy-ov-title">CRM / 销售管道</div>
+          <p class="sy-ov-sub">看板 + 卡片 + 拖拽语义</p>
+        </div>
+<div class="sy-arch-grid">
+        <div class="sy-arch-demo">
+          <div class="sy-app">
+            <div class="sy-rail">
+              <div class="sy-rail-logo">E</div>
+              <div class="sy-rail-item">▤</div>
+              <div class="sy-rail-item is-on">◫</div>
+              <div class="sy-rail-item">◎</div>
+              <div class="sy-rail-item">⚙</div>
+            </div>
+            <div class="sy-app-body">
+              <div class="sy-appbar">
+                <span class="sy-appbar-title">销售管道 · Q4</span>
+                <span class="sy-spacer"></span>
+                <div class="sy-seg">
+                  <span class="sy-seg-ind" style="width:0"></span>
+                  <button class="sy-seg-btn" type="button" aria-selected="true">看板</button>
+                  <button class="sy-seg-btn" type="button" aria-selected="false">列表</button>
+                </div>
+              </div>
+              <div class="sy-app-content">
+                <div class="sy-kanban">
+                  <div class="sy-kcol">
+                    <div class="sy-kcol-head">线索<em>¥ 240k</em></div>
+                    <div class="sy-kcard"><b>恒信资产·开户咨询</b><div class="amt">¥ 80,000 · 3 天未跟进</div><div class="sy-kcard-foot"><span class="sy-avatar">陈</span><span class="sy-badge sy-badge-primary">热</span></div></div>
+                    <div class="sy-kcard"><b>东岸家族办公室</b><div class="amt">¥ 160,000 · 今天</div><div class="sy-kcard-foot"><span class="sy-avatar" style="background:#0f9d63">张</span></div></div>
+                  </div>
+                  <div class="sy-kcol">
+                    <div class="sy-kcol-head">报价<em>¥ 380k</em></div>
+                    <div class="sy-kcard"><b>瑞和信托·渠道合作</b><div class="amt">¥ 380,000 · 报价已发</div><div class="sy-kcard-foot"><span class="sy-avatar" style="background:#b45309">李</span><span class="sy-badge sy-badge-warning"><i></i>待回</span></div></div>
+                  </div>
+                  <div class="sy-kcol">
+                    <div class="sy-kcol-head">成交<em>¥ 512k</em></div>
+                    <div class="sy-kcard"><b>明德资本·年度顾问</b><div class="amt">¥ 512,000 · 已签约</div><div class="sy-kcard-foot"><span class="sy-avatar" style="background:#4f46e5">王</span><span class="sy-badge sy-badge-success"><i></i>赢单</span></div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <aside class="sy-arch-notes">
+          <h5>可借鉴</h5>
+          <ul>
+            <li><b>列头带汇总</b>（¥ 240k），让"这列值多少钱"一眼可见。</li>
+            <li><b>卡片只放三件事</b>：谁、多少钱、多久没动。</li>
+            <li><b>拖拽用位移反馈</b>（上浮 1px + 阴影），不用旋转或放大。</li>
+            <li><b>看板/列表切换</b>用分段控件，同一份数据两种看法。</li>
+          </ul>
+          <h5>别照搬</h5>
+          <ul>
+            <li>卡内不要塞 8 个字段；详情放抽屉里。</li>
+          </ul>
+        </aside>
+      </div>
+      </div>
+      <div class="sy-detail" data-sy-panel="sop">
+        <div class="sy-detail-head">
+          <div class="sy-ov-eyebrow">A8 · SOP</div>
+          <div class="sy-ov-title">SOP / 流程与知识库</div>
+          <p class="sy-ov-sub">步骤时间线 + 检查项 + 运行记录</p>
+        </div>
+<div class="sy-arch-grid">
+        <div class="sy-arch-demo">
+          <div class="sy-app">
+            <div class="sy-rail">
+              <div class="sy-rail-logo">E</div>
+              <div class="sy-rail-item">▤</div>
+              <div class="sy-rail-item is-on">☰</div>
+              <div class="sy-rail-item">⌸</div>
+              <div class="sy-rail-item">⚙</div>
+            </div>
+            <div class="sy-app-body">
+              <div class="sy-appbar">
+                <span class="sy-appbar-title">月度对账 SOP</span>
+                <span class="sy-badge sy-badge-info"><i></i>执行中</span>
+                <span class="sy-spacer"></span>
+                <button class="sy-btn sy-btn-secondary sy-btn-sm" type="button">运行记录</button>
+              </div>
+              <div class="sy-app-content sy-grid2">
+                <div class="sy-panel" style="padding:10px 12px;border-radius:10px">
+                  <div class="sy-steps">
+                    <div class="sy-step done"><span class="sy-step-dot">✓</span><div class="sy-step-body"><b>导出上月流水</b><span>系统自动 · 09:00 完成</span></div></div>
+                    <div class="sy-step done"><span class="sy-step-dot">✓</span><div class="sy-step-body"><b>匹配银行回单</b><span>张敏 · 09:12 完成</span></div></div>
+                    <div class="sy-step now"><span class="sy-step-dot">3</span><div class="sy-step-body"><b>差异复核</b><span>待你处理 · 3 条差异</span></div></div>
+                    <div class="sy-step"><span class="sy-step-dot">4</span><div class="sy-step-body"><b>生成凭证</b><span>未开始</span></div></div>
+                  </div>
+                </div>
+                <div class="sy-panel" style="padding:10px 12px;border-radius:10px">
+                  <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-3);margin-bottom:6px">当前步骤检查项</div>
+                  <label class="sy-check" style="margin:6px 0"><input type="checkbox" checked /><span class="sy-box"></span>核对差异金额 ≤ 0.01</label>
+                  <label class="sy-check" style="margin:6px 0"><input type="checkbox" checked /><span class="sy-box"></span>确认回单影像齐全</label>
+                  <label class="sy-check" style="margin:6px 0"><input type="checkbox" /><span class="sy-box"></span>差异说明已填写</label>
+                  <div style="margin-top:10px;font-family:var(--mono);font-size:10px;color:var(--text-3);line-height:1.7">
+                    09:12 差异 3 条进入队列<br>09:13 已通知财务复核人
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <aside class="sy-arch-notes">
+          <h5>可借鉴</h5>
+          <ul>
+            <li><b>步骤用状态点</b>区分完成/进行/未开始，连线表示顺序。</li>
+            <li><b>当前步骤给出可勾选的检查项</b>，SOP 才算能落地。</li>
+            <li><b>运行记录用等宽小字</b>，弱化但可追溯。</li>
+          </ul>
+          <h5>别照搬</h5>
+          <ul>
+            <li>不要把 SOP 做成拖拽画布，执行者关心的是"下一步点哪"。</li>
+          </ul>
+        </aside>
+      </div>
+      </div>
+      <div class="sy-detail" data-sy-panel="project">
+        <div class="sy-detail-head">
+          <div class="sy-ov-eyebrow">A9 · PROJECT</div>
+          <div class="sy-ov-title">项目与协作</div>
+          <p class="sy-ov-sub">列表 + 分组 + 命令面板</p>
+        </div>
+<div class="sy-arch-grid">
+        <div class="sy-arch-demo">
+          <div class="sy-app">
+            <div class="sy-rail">
+              <div class="sy-rail-logo">E</div>
+              <div class="sy-rail-item is-on">☑</div>
+              <div class="sy-rail-item">◫</div>
+              <div class="sy-rail-item">◷</div>
+              <div class="sy-rail-item">⚙</div>
+            </div>
+            <div class="sy-app-body">
+              <div class="sy-appbar">
+                <span class="sy-appbar-title">结算系统重构</span>
+                <span class="sy-badge">12 / 20</span>
+                <span class="sy-spacer"></span>
+                <button class="sy-btn sy-btn-secondary sy-btn-sm" type="button" data-open="cmdk">⌘K 命令</button>
+              </div>
+              <div class="sy-app-content">
+                <div style="font-size:11px;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase">进行中</div>
+                <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden">
+                  <div class="sy-invoice" style="padding:11px 12px">
+                    <span class="sy-invoice-ico" style="background:var(--warning-weak);color:var(--warning)">●</span>
+                    <div><b>对账差异自动归集</b><span>ENG-241 · 高优先</span></div>
+                    <span class="sy-avatar" style="margin-left:auto">陈</span>
+                    <span class="sy-badge sy-badge-warning">今天</span>
+                  </div>
+                  <div class="sy-invoice" style="padding:11px 12px">
+                    <span class="sy-invoice-ico">○</span>
+                    <div><b>多币种汇率快照</b><span>ENG-238 · 中优先</span></div>
+                    <span class="sy-avatar" style="margin-left:auto;background:#0f9d63">张</span>
+                    <span class="sy-badge">周四</span>
+                  </div>
+                  <div class="sy-invoice" style="padding:11px 12px">
+                    <span class="sy-invoice-ico">○</span>
+                    <div><b>凭证导出模板</b><span>ENG-235 · 低优先</span></div>
+                    <span class="sy-avatar" style="margin-left:auto;background:#b45309">李</span>
+                    <span class="sy-badge">下周一</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <aside class="sy-arch-notes">
+          <h5>可借鉴</h5>
+          <ul>
+            <li><b>标题栏右侧放进度</b>（12 / 20），不用单独进度条。</li>
+            <li><b>状态点用形状</b>（实心/空心）而不只靠颜色。</li>
+            <li><b>⌘K 是入口不是装饰</b>：跳转、新建、切换视图都收进去。</li>
+          </ul>
+          <h5>别照搬</h5>
+          <ul>
+            <li>不要给列表行加 hover 位移，滚动时会晃。</li>
+          </ul>
+        </aside>
+      </div>
+      </div>
+      <div class="sy-detail" data-sy-panel="bi">
+        <div class="sy-detail-head">
+          <div class="sy-ov-eyebrow">A10 · BI</div>
+          <div class="sy-ov-title">BI / 数据看板</div>
+          <p class="sy-ov-sub">KPI 行 + 图表 + 时间范围</p>
+        </div>
+<div class="sy-arch-grid">
+        <div class="sy-arch-demo">
+          <div class="sy-app">
+            <div class="sy-rail">
+              <div class="sy-rail-logo">E</div>
+              <div class="sy-rail-item">▤</div>
+              <div class="sy-rail-item is-on">◔</div>
+              <div class="sy-rail-item">◷</div>
+              <div class="sy-rail-item">⚙</div>
+            </div>
+            <div class="sy-app-body">
+              <div class="sy-appbar">
+                <span class="sy-appbar-title">经营看板</span>
+                <span class="sy-spacer"></span>
+                <div class="sy-seg">
+                  <span class="sy-seg-ind" style="width:0"></span>
+                  <button class="sy-seg-btn" type="button" aria-selected="false">日</button>
+                  <button class="sy-seg-btn" type="button" aria-selected="true">周</button>
+                  <button class="sy-seg-btn" type="button" aria-selected="false">月</button>
+                </div>
+              </div>
+              <div class="sy-app-content">
+                <div class="sy-kpi-row">
+                  <div class="sy-kpi"><div class="sy-kpi-label">GMV</div><div class="sy-kpi-val">¥ 2.84M</div><div class="sy-kpi-delta"><span class="sy-up">▲ 12.4%</span></div></div>
+                  <div class="sy-kpi"><div class="sy-kpi-label">净收入</div><div class="sy-kpi-val">¥ 412k</div><div class="sy-kpi-delta"><span class="sy-up">▲ 6.1%</span></div></div>
+                  <div class="sy-kpi"><div class="sy-kpi-label">退款率</div><div class="sy-kpi-val">1.8%</div><div class="sy-kpi-delta"><span class="sy-down">▼ 0.4pt</span></div></div>
+                  <div class="sy-kpi"><div class="sy-kpi-label">对账差异</div><div class="sy-kpi-val">3</div><div class="sy-kpi-delta" style="color:var(--text-3)">待处理</div></div>
+                </div>
+                <div class="sy-chart2">
+                  <div class="sy-chart">
+                    <div class="sy-chart-head">近 12 周净收入<span class="sy-spacer"></span><span class="sy-badge sy-badge-success">+6.1%</span></div>
+                    <svg class="sy-chart-svg" viewBox="0 0 320 86" preserveAspectRatio="none" aria-label="净收入趋势">
+                      <defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#4f46e5" stop-opacity=".22"/>
+                        <stop offset="100%" stop-color="#4f46e5" stop-opacity="0"/>
+                      </linearGradient></defs>
+                      <path d="M0,64 L29,58 L58,62 L87,46 L116,50 L145,38 L174,42 L203,30 L232,34 L261,22 L290,26 L320,14 L320,86 L0,86 Z" fill="url(#g1)"/>
+                      <path d="M0,64 L29,58 L58,62 L87,46 L116,50 L145,38 L174,42 L203,30 L232,34 L261,22 L290,26 L320,14" fill="none" stroke="#4f46e5" stroke-width="2" stroke-linejoin="round"/>
+                    </svg>
+                  </div>
+                  <div class="sy-chart">
+                    <div class="sy-chart-head">分渠道</div>
+                    <div class="sy-bars">
+                      <i style="height:82%"></i><i style="height:64%"></i><i style="height:48%" class="is-on"></i><i style="height:36%"></i><i style="height:22%"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <aside class="sy-arch-notes">
+          <h5>可借鉴</h5>
+          <ul>
+            <li><b>KPI 四宫格</b>：标签 11px、数值 20px，涨跌单独一行。</li>
+            <li><b>图表去掉网格线与边框</b>，只留一条基线。</li>
+            <li><b>涨跌用色固定在数值上</b>，不要给整张卡片上色。</li>
+          </ul>
+          <h5>别照搬</h5>
+          <ul>
+            <li>不要用 3D 饼图；渠道对比用条形更准。</li>
+          </ul>
+        </aside>
+      </div>
+      </div>
+      <div class="sy-detail" data-sy-panel="oa">
+        <div class="sy-detail-head">
+          <div class="sy-ov-eyebrow">A11 · OA</div>
+          <div class="sy-ov-title">HR / OA 审批</div>
+          <p class="sy-ov-sub">表单 + 审批流 + 移动端卡片</p>
+        </div>
+<div class="sy-arch-grid">
+        <div class="sy-arch-demo">
+          <div class="sy-app">
+            <div class="sy-rail">
+              <div class="sy-rail-logo">E</div>
+              <div class="sy-rail-item is-on">◈</div>
+              <div class="sy-rail-item">▤</div>
+              <div class="sy-rail-item">☷</div>
+              <div class="sy-rail-item">⚙</div>
+            </div>
+            <div class="sy-app-body">
+              <div class="sy-appbar">
+                <span class="sy-appbar-title">付款申请</span>
+                <span class="sy-badge sy-badge-warning"><i></i>审批中</span>
+                <span class="sy-spacer"></span>
+                <button class="sy-btn sy-btn-secondary sy-btn-sm" type="button">保存草稿</button>
+                <button class="sy-btn sy-btn-primary sy-btn-sm" type="button">提交</button>
+              </div>
+              <div class="sy-app-content sy-grid2 sy-grid2-wide">
+                <div class="sy-panel" style="padding:12px;border-radius:10px">
+                  <div class="sy-form-grid">
+                    <div class="sy-field"><span class="sy-label">申请人</span><input class="sy-input" value="陈柏贤" /></div>
+                    <div class="sy-field"><span class="sy-label">所属部门</span><input class="sy-input" value="资金运营部" /></div>
+                    <div class="sy-field"><span class="sy-label">付款金额<span class="req">*</span></span><input class="sy-input" value="28,600.00" /></div>
+                    <div class="sy-field"><span class="sy-label">用途</span><select class="sy-select"><option>供应商货款</option><option>差旅报销</option></select></div>
+                    <div class="sy-field span2"><span class="sy-label">事由说明</span><textarea class="sy-textarea" rows="2">10 月云服务费用结算，合同编号 CT-2026-088。</textarea></div>
+                  </div>
+                </div>
+                <div class="sy-panel" style="padding:12px;border-radius:10px">
+                  <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-3);margin-bottom:6px">审批流</div>
+                  <div class="sy-steps">
+                    <div class="sy-step done"><span class="sy-step-dot">✓</span><div class="sy-step-body"><b>直属主管 · 张敏</b><span>10-16 14:02 通过</span></div></div>
+                    <div class="sy-step now"><span class="sy-step-dot">2</span><div class="sy-step-body"><b>财务复核 · 李洋</b><span>处理中 · 已等待 3 小时</span></div></div>
+                    <div class="sy-step"><span class="sy-step-dot">3</span><div class="sy-step-body"><b>出纳付款</b><span>未开始</span></div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <aside class="sy-arch-notes">
+          <h5>可借鉴</h5>
+          <ul>
+            <li><b>表单两列</b>，短字段并排，长文本跨两列。</li>
+            <li><b>审批流与表单并置</b>，提交前就知道会经过谁。</li>
+            <li><b>状态用「已等待 X 小时」</b>，比"处理中"更有用。</li>
+          </ul>
+          <h5>别照搬</h5>
+          <ul>
+            <li>不要把所有字段都标必填；只标真正会卡住流程的。</li>
+          </ul>
+        </aside>
+      </div>
+      </div>
+      <div class="sy-detail" data-sy-panel="finance">
+        <div class="sy-detail-head">
+          <div class="sy-ov-eyebrow">A12 · FINANCE</div>
+          <div class="sy-ov-title">财务 / 费控对账</div>
+          <p class="sy-ov-sub">票据列表 + 多币种 + 汇总卡</p>
+        </div>
+<div class="sy-arch-grid">
+        <div class="sy-arch-demo">
+          <div class="sy-app">
+            <div class="sy-rail">
+              <div class="sy-rail-logo">E</div>
+              <div class="sy-rail-item">▤</div>
+              <div class="sy-rail-item is-on">◧</div>
+              <div class="sy-rail-item">⇄</div>
+              <div class="sy-rail-item">⚙</div>
+            </div>
+            <div class="sy-app-body">
+              <div class="sy-appbar">
+                <span class="sy-appbar-title">票据对账</span>
+                <span class="sy-badge sy-badge-danger"><i></i>3 条差异</span>
+                <span class="sy-spacer"></span>
+                <button class="sy-btn sy-btn-secondary sy-btn-sm" type="button">导入</button>
+              </div>
+              <div class="sy-app-content sy-grid2 sy-grid2-wide">
+                <div class="sy-panel" style="padding:10px 12px;border-radius:10px">
+                  <div class="sy-invoice"><span class="sy-invoice-ico">￥</span><div><b>INV-8821 · 阿里云</b><span>2026-10-12 · CNY</span></div><span class="amt">28,600.00</span></div>
+                  <div class="sy-invoice"><span class="sy-invoice-ico">$</span><div><b>INV-8820 · AWS</b><span>2026-10-11 · USD</span></div><span class="amt">4,120.00</span></div>
+                  <div class="sy-invoice"><span class="sy-invoice-ico">€</span><div><b>INV-8819 · Stripe</b><span>2026-10-09 · EUR</span></div><span class="amt">1,860.00</span></div>
+                  <div class="sy-invoice"><span class="sy-invoice-ico">￥</span><div><b>INV-8818 · 顺丰</b><span>2026-10-08 · CNY</span></div><span class="amt">860.00</span></div>
+                </div>
+                <div class="sy-panel" style="padding:12px;border-radius:10px;display:flex;flex-direction:column;gap:8px">
+                  <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-3)">本币折算</div>
+                  <div style="font-size:22px;font-weight:600;font-variant-numeric:tabular-nums">¥ 68,742.30</div>
+                  <div style="font-size:11px;color:var(--text-3)">汇率快照 2026-10-17 09:00</div>
+                  <div style="display:flex;flex-direction:column;gap:6px;margin-top:6px">
+                    <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--text-2)">已匹配</span><b>38</b></div>
+                    <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--text-2)">待确认</span><b style="color:var(--warning)">3</b></div>
+                    <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--text-2)">差异金额</span><b class="sy-up">-1,240.00</b></div>
+                  </div>
+                  <button class="sy-btn sy-btn-primary sy-btn-sm" type="button" style="margin-top:auto">处理差异</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <aside class="sy-arch-notes">
+          <h5>可借鉴</h5>
+          <ul>
+            <li><b>币种符号做图标</b>，比标签更省空间。</li>
+            <li><b>汇总卡贴在数据右侧</b>，视线不用来回跳。</li>
+            <li><b>差异金额用涨跌色</b>并标注符号，负数不能只靠颜色。</li>
+          </ul>
+          <h5>别照搬</h5>
+          <ul>
+            <li>不要把汇率写成 4 位小数，界面只显示必要精度。</li>
+          </ul>
+        </aside>
+      </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- sy 弹层：Modal / Drawer / 命令面板 / Toast -->
+  <div class="sy-veil" id="veil"></div>
+
+  <div class="sy-modal" id="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="确认提交审批">
+    <div class="sy-modal-card">
+      <div class="sy-modal-head">
+        <div>
+          <div class="sy-modal-title">确认提交审批？</div>
+          <p class="sy-modal-desc">提交后将进入「财务复核」节点，期间无法修改金额。如需调整，请先保存草稿。</p>
+        </div>
+        <button class="sy-modal-close" type="button" data-close aria-label="关闭">✕</button>
+      </div>
+      <div class="sy-modal-foot">
+        <button class="sy-btn sy-btn-secondary" type="button" data-close>取消</button>
+        <button class="sy-btn sy-btn-primary" type="button" data-close>确认提交</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sy-drawer" id="drawer" aria-hidden="true" role="dialog" aria-modal="true" aria-label="订单详情">
+    <div class="sy-drawer-head">
+      <span class="sy-drawer-title">PO-2026-1042</span>
+      <span class="sy-badge sy-badge-warning"><i></i>待复核</span>
+      <button class="sy-modal-close" style="margin-left:auto" type="button" data-close aria-label="关闭">✕</button>
+    </div>
+    <div class="sy-drawer-body">
+      <div class="sy-field"><span class="sy-label">供应商</span><input class="sy-input" value="华东电子元件有限公司" /></div>
+      <div class="sy-field"><span class="sy-label">金额</span><input class="sy-input" value="128,400.00" /></div>
+      <div class="sy-field"><span class="sy-label">备注</span><textarea class="sy-textarea" rows="3">10 月第三批电容采购，含税。</textarea></div>
+      <div class="sy-steps">
+        <div class="sy-step done"><span class="sy-step-dot">✓</span><div class="sy-step-body"><b>采购申请</b><span>10-15 由陈柏贤提交</span></div></div>
+        <div class="sy-step now"><span class="sy-step-dot">2</span><div class="sy-step-body"><b>财务复核</b><span>处理中</span></div></div>
+      </div>
+    </div>
+    <div class="sy-drawer-foot">
+      <button class="sy-btn sy-btn-secondary" type="button" data-close>关闭</button>
+      <button class="sy-btn sy-btn-primary" type="button" data-close>通过</button>
+    </div>
+  </div>
+
+  <div class="sy-cmdk" id="cmdk" aria-hidden="true">
+    <div class="sy-cmdk-card">
+      <input class="sy-cmdk-input" id="cmdkInput" placeholder="搜索页面、订单、操作…" autocomplete="off" />
+      <div class="sy-cmdk-list">
+        <button class="sy-cmdk-item is-on" type="button">▤ 采购订单 <span>页面</span></button>
+        <button class="sy-cmdk-item" type="button">◫ 销售管道 <span>页面</span></button>
+        <button class="sy-cmdk-item" type="button">☰ 月度对账 SOP <span>流程</span></button>
+        <button class="sy-cmdk-item" type="button">◔ 经营看板 <span>页面</span></button>
+        <button class="sy-cmdk-item" type="button">＋ 新建付款申请 <span>操作</span></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sy-toasts" id="toasts"></div>
+</div>
+
+
+<!-- ===== 六类系统应用外壳 ===== -->
+<div class="sy-scope">
+  <div class="fa-shell" id="faShell" aria-hidden="true">
+    <div class="fa-top">
+      <button class="fa-menu-btn" id="faMenuBtn" type="button" aria-label="展开菜单">☰</button>
+      <div class="fa-brand"><span class="fa-logo" id="faLogo">E</span><span id="faName">ERP</span></div>
+      <div class="fa-tabs" id="faTabs"></div>
+      <div class="fa-crumbs" id="faCrumbs"></div>
+      <div class="fa-period"><span style="font-size:11px;color:var(--text-3)">期间</span>
+        <select id="faPeriod" aria-label="期间">
+          <option>2026-10</option><option>2026-09</option><option>2026-Q3</option>
+        </select>
+      </div>
+      <div class="fa-search"><input id="faSearch" type="text" placeholder="搜索当前页…" autocomplete="off" /></div>
+      <button class="fa-close" id="faClose" type="button" aria-label="退出系统">✕</button>
+    </div>
+    <div class="fa-body">
+      <aside class="fa-side" id="faSide"></aside>
+      <main class="fa-main" id="faMain">
+        <div class="fa-filterbar" id="faFilterBar">
+          <select aria-label="时间范围"><option>近 12 周</option><option>近 30 天</option><option>本季度</option></select>
+          <select aria-label="渠道"><option>全部渠道</option><option>自营</option><option>渠道</option></select>
+          <select aria-label="区域"><option>全部区域</option><option>华东</option><option>华南</option></select>
+          <span class="chip">对比上期</span>
+        </div>
+        <div id="faPage"></div>
+      </main>
+    </div>
+    <div class="fa-modal" id="faModal"><div class="fa-modal-card" id="faModalCard"></div></div>
+    <div class="fa-toast-wrap" id="faToast"></div>
+  </div>
+</div>
+
+
+<script src="js/frontend-spec.js"></script>
+</body>
+</html>
