@@ -40,6 +40,11 @@
     if (subEl) subEl.textContent = meta.sub;
     if (skinNameEl) skinNameEl.textContent = meta.title;
     if (skinFromEl) skinFromEl.textContent = meta.kicker;
+    document.querySelectorAll('[data-preview-skin]').forEach(function (button) {
+      button.setAttribute('aria-pressed', String(button.dataset.previewSkin === key));
+    });
+    var copy = document.getElementById('fsPreviewCopy');
+    if (copy) copy.textContent = meta.sub;
 
     tabs.forEach(function (t) {
       var on = t.getAttribute('data-skin') === key;
@@ -49,6 +54,10 @@
       if (on && focusTab) t.focus();
     });
   }
+
+  document.querySelectorAll('[data-preview-skin]').forEach(function (button) {
+    button.addEventListener('click', function () { setSkin(button.dataset.previewSkin); });
+  });
 
   tabs.forEach(function (t) {
     t.addEventListener('click', function () { setSkin(t.getAttribute('data-skin')); });

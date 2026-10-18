@@ -112,6 +112,7 @@
     var page = CFG.pages[id];
     if (!page) return;
     state.page = id;
+    shell.dataset.page = id;
     Array.prototype.forEach.call(faSide.querySelectorAll('[data-page]'), function (b) {
       b.classList.toggle('is-on', b.getAttribute('data-page') === id);
     });
@@ -122,13 +123,19 @@
     Array.prototype.forEach.call(faSide.querySelectorAll('[data-toggle]'), function (t) {
       var sub = faSide.querySelector('[data-sub="' + t.getAttribute('data-toggle') + '"]');
       if (!sub) return;
-      if (sub.querySelector('[data-page="' + id + '"]')) sub.classList.add('open');
+      if (sub.querySelector('[data-page="' + id + '"]')) { sub.classList.add('open'); t.setAttribute('aria-expanded', 'true'); }
     });
     faCrumbs.innerHTML = '<span>' + CFG.name + '</span><span>/</span><b>' + page.title + '</b>';
     faPage.innerHTML = '<div class="fa-page-head"><div class="fa-page-title">' + page.title +
-      '</div><div class="fa-page-desc">' + page.desc + '</div></div>' + page.render();
+      '</div><div class="fa-page-desc">' + page.desc + '</div></div>' + page.render() +
+      (id !== 'workspace' && CFG.designGuide ? CFG.designGuide() : '');
     faMain.scrollTop = 0;
-    if (faSearch) faSearch.value = '';
+    if (faSearch) {
+      faSearch.value = '';
+      faSearch.disabled = !faPage.querySelector('.sy-table tbody tr, [data-search-item]');
+      faSearch.placeholder = faSearch.disabled ? '当前页无需检索' : '搜索当前页记录…';
+    }
+    document.dispatchEvent(new CustomEvent('fa:pagechange', {detail:{page:id}}));
   }
 
   function renderNav() {
@@ -205,6 +212,7 @@
   }
 
   function boot(cfg) {
+    if (window.FAExperience) cfg = window.FAExperience.prepare(cfg);
     CFG = cfg;
     shell = document.getElementById('faShell');
     if (!shell) return;
@@ -229,6 +237,7 @@
     faLogo.textContent = cfg.logo;
     faLogo.style.background = cfg.accent;
 
+    if (window.FAExperience) window.FAExperience.setup();
     renderNav();
     renderTabs();
     setPage(cfg.start || Object.keys(cfg.pages)[0]);
@@ -243,7 +252,7 @@
         if (sub) sub.classList.toggle('open', !on);
         return;
       }
-      var pageBtn = e.target.closest('[data-page]');
+      var pageBtn = e.target.closest('button[data-page], a[data-page]');
       if (pageBtn) { setPage(pageBtn.getAttribute('data-page')); return; }
 
       var act = e.target.closest('[data-act]');
@@ -290,34 +299,33 @@
     if (faSearch) {
       faSearch.addEventListener('input', function () {
         var q = faSearch.value.trim().toLowerCase();
-        var tbody = faPage.querySelector('.sy-table tbody');
-        if (!tbody) return;
+        var records = faPage.querySelectorAll('.sy-table tbody tr, [data-search-item]');
         var shown = 0;
-        Array.prototype.forEach.call(tbody.querySelectorAll('tr'), function (tr) {
-          var hit = !q || tr.textContent.toLowerCase().indexOf(q) > -1;
-          tr.style.display = hit ? '' : 'none';
+        Array.prototype.forEach.call(records, function (item) {
+          var hit = !q || item.textContent.toLowerCase().indexOf(q) > -1;
+          item.hidden = !hit;
           if (hit) shown++;
         });
         var empty = faPage.querySelector('.fa-empty');
         if (empty) empty.remove();
-        if (!shown) {
+        if (!shown && q) {
           var div = document.createElement('div');
           div.className = 'fa-empty';
+          div.setAttribute('role', 'status');
           div.textContent = '没有匹配「' + faSearch.value + '」的记录';
-          var wrap = faPage.querySelector('.sy-table-wrap');
-          if (wrap) wrap.appendChild(div);
+          faPage.appendChild(div);
         }
       });
     }
 
     if (faClose) faClose.addEventListener('click', function () { location.href = 'frontend-style.html'; });
-    if (faMenuBtn) faMenuBtn.addEventListener('click', function () { faSide.classList.toggle('open'); });
-    if (faMain) faMain.addEventListener('click', function () { faSide.classList.remove('open'); });
+    if (faMenuBtn) faMenuBtn.addEventListener('click', function () { var open = faSide.classList.toggle('open'); faMenuBtn.setAttribute('aria-expanded', String(open)); });
+    if (faMain) faMain.addEventListener('click', function () { faSide.classList.remove('open'); if (faMenuBtn) faMenuBtn.setAttribute('aria-expanded', 'false'); });
 
     document.addEventListener('keydown', function (e) {
       if (e.key !== 'Escape') return;
       if (faModal.classList.contains('active')) { closeModal(); return; }
-      if (faSide.classList.contains('open')) { faSide.classList.remove('open'); }
+      if (faSide.classList.contains('open')) { faSide.classList.remove('open'); if (faMenuBtn) faMenuBtn.setAttribute('aria-expanded', 'false'); }
     });
 
     // 支持页面直接跳转：frontend-ERP.html#po

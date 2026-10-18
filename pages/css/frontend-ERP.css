@@ -1,1 +1,43 @@
-/* ERP 进销存 专属样式：主色与局部微调（外壳骨架在 frontend-base.css） */
+/* Industrial operations: compact modules, technical labels, warehouse matrix. */
+.chrome-erp { --primary:#345c52; --primary-weak:#e5ede8; --ds-accent:#345c52; --ds-muted:#66746a; --ds-line:#d7ded6; --r-lg:4px; --r-xl:6px; }
+.chrome-erp .fa-body { grid-template-columns:196px minmax(0,1fr); }
+.chrome-erp .fa-top,.chrome-erp .fa-side { background:#15252b; }
+.chrome-erp .fa-main { background:#f2f4f0; }
+.chrome-erp .fa-home,.chrome-erp .fa-group { color:#93a6a5; }
+.chrome-erp .fa-nav { border-radius:3px; color:#b6c4bf; font-size:12px; }
+.chrome-erp .fa-nav.is-on { background:#30443f; color:#edc47a; border-left:2px solid #edc47a; }
+.chrome-erp .fa-nav:hover { color:#fff; background:#22373a; }
+.chrome-erp .fa-page-title { font-family:var(--mono); }
+.chrome-erp .sy-panel,.chrome-erp .sy-kpi,.chrome-erp .fa-fact { border-radius:4px; box-shadow:none; border-color:#d7ded6; }
+.chrome-erp .sy-toolbar { background:#e9eee7; }
+.chrome-erp .sy-table th { background:#e9eee7; font-size:10px; letter-spacing:.03em; }
+.chrome-erp .sy-table td { padding:10px 12px; }
+.chrome-erp .sy-kpi { border-top:2px solid #345c52; }
+.chrome-erp .sy-btn { border-radius:3px; }
+.erp-strip { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); border:1px solid #d7ded6; background:#fff; }
+.erp-strip>div { padding:20px 22px; border-right:1px solid #d7ded6; display:flex; flex-direction:column; gap:6px; }
+.erp-strip>div:last-child { border-right:0; background:#f5ebd8; }
+.erp-strip span,.erp-strip small { font:10px/1.6 var(--mono); color:#657368; }
+.erp-strip strong { font:500 clamp(23px,2.5vw,34px)/1.5 var(--mono); letter-spacing:-.06em; }
+.erp-flow { display:flex; margin:22px 0; border-bottom:1px solid #d7ded6; }
+.erp-flow button { flex:1; display:flex; align-items:center; gap:10px; padding:14px 12px; border:0; border-top:2px solid #345c52; margin-right:4px; background:transparent; font:inherit; font-size:12px; cursor:pointer; transition:background .2s; }
+.erp-flow button:hover { background:#e3e9e0; }
+.erp-flow small { font:10px var(--mono); color:#7b877c; }
+.erp-flow span { margin-left:auto; color:#829080; }
+.erp-workgrid { display:grid; grid-template-columns:minmax(0,1.8fr) minmax(230px,1fr); gap:24px; }
+.erp-warehouse { padding:24px; background:#15252b; color:#eff4ee; --ds-line:#3d4f4d; --ds-muted:#b5c6bf; --ds-accent:#d8b66b; }
+.erp-warehouse .ds-segment button[aria-pressed="true"] { color:#15252b; }
+.erp-wh-caption { font:10px var(--mono); color:#afc4bb; padding:20px 0; }
+.erp-matrix { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:8px; }
+.erp-cell { background:#213a3d; border:1px solid #365155; padding:10px 8px; position:relative; }
+.erp-cell>span { display:block; font:9px var(--mono); color:#adbfba; }
+.erp-cell b { display:block; margin:8px 0; font:18px var(--mono); color:#d6e8dd; }
+.erp-cell b small { font-size:9px; margin-left:2px; }
+.erp-cell i { display:block; height:3px; background:linear-gradient(90deg,#7aaf93 var(--fill),#ffffff12 var(--fill)); }
+.erp-cell.is-full { background:#305548; border-color:#64896b; }
+.erp-cell.is-low { background:#493d28; border-color:#85683a; }
+.erp-cell.is-low b { color:#f3c77d; }.erp-cell.is-low i { background:linear-gradient(90deg,#e8b56a var(--fill),#ffffff12 var(--fill)); }
+.erp-legend { display:flex; flex-wrap:wrap; gap:16px; padding-top:18px; font-size:10px; color:#9ab6a6; }.erp-legend span:last-child { color:#e8b56a; }
+.erp-alerts { padding:24px 0; }.erp-alerts h2 { margin-bottom:12px; }.erp-alerts>button { position:relative; width:100%; text-align:left; padding:20px 30px 20px 0; border:0; border-bottom:1px solid #d7ded6; color:#23342e; background:transparent; cursor:pointer; }.erp-alerts>button:hover b { color:#92621a; }.erp-alerts small { display:block; font:10px var(--mono); color:#7d816d; }.erp-alerts b { display:block; font-size:14px; margin:7px 0; }.erp-alerts span { font-size:11px; color:#687363; }.erp-alerts i { position:absolute; right:4px; top:42px; font-style:normal; }
+@media(max-width:1150px) { .erp-workgrid { grid-template-columns:1fr; }.erp-alerts { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; }.erp-alerts>.ds-eyebrow,.erp-alerts>h2 { grid-column:1/-1; margin:0; }.erp-strip>div { padding:16px; } }
+@media(max-width:760px) { .erp-strip { grid-template-columns:repeat(2,minmax(0,1fr)); }.erp-strip>div { border-bottom:1px solid #d7ded6; }.erp-strip>div:nth-child(2) { border-right:0; }.erp-warehouse { padding:18px 12px; }.erp-matrix { grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; }.erp-flow button { flex-direction:column; gap:4px; padding:10px 4px; }.erp-flow span { display:none; }.erp-alerts { grid-template-columns:1fr; }.erp-cell { padding:8px 6px; }.erp-cell b { font-size:17px; } }

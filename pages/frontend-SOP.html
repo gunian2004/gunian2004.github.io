@@ -5,24 +5,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SOP 流程 · 前端设计规范库</title>
 <link rel="stylesheet" href="css/frontend-base.css">
+<link rel="stylesheet" href="css/frontend-experience.css">
 <link rel="stylesheet" href="css/frontend-SOP.css">
 </head>
 <body>
 <div class="sy-scope">
   <div class="fa-shell chrome-sop" id="faShell">
     <div class="fa-top">
-      <button class="fa-menu-btn" id="faMenuBtn" type="button" aria-label="展开菜单">☰</button>
+      <button class="fa-menu-btn" id="faMenuBtn" type="button" aria-label="展开菜单" aria-expanded="false" aria-controls="faSide">☰</button>
       <a class="fa-home" href="frontend-style.html" aria-label="返回规范库">←</a>
       <div class="fa-brand"><span class="fa-logo" id="faLogo">S</span><span id="faName">SOP 流程</span></div>
       <div class="fa-tabs" id="faTabs"></div>
       <div class="fa-crumbs" id="faCrumbs"></div>
       
-      <div class="fa-search"><input id="faSearch" type="text" placeholder="搜索当前页…" autocomplete="off" /></div>
+      <div class="fa-search"><input id="faSearch" aria-label="搜索当前页记录" type="search" placeholder="搜索当前页…" autocomplete="off" /></div>
       <button class="fa-close" id="faClose" type="button" aria-label="返回规范库">✕</button>
     </div>
     <div class="fa-body">
       <aside class="fa-side" id="faSide"></aside>
-      <main class="fa-main" id="faMain">
+      <main class="fa-main" id="faMain" tabindex="-1">
         
         <div id="faPage"></div>
       </main>
@@ -32,6 +33,7 @@
   </div>
 </div>
 <script src="js/frontend-core.js"></script>
+<script src="js/frontend-experience.js"></script>
 <script src="js/frontend-SOP.js"></script>
 </body>
 </html>

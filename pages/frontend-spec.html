@@ -5,19 +5,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>系统级规范 · 前端设计规范库</title>
 <link rel="stylesheet" href="css/frontend-base.css">
+<link rel="stylesheet" href="css/frontend-spec.css">
 </head>
 <body class="spec-page sy-scope">
 <header class="fa-top" style="position:sticky">
   <a class="fa-home" href="frontend-style.html" aria-label="返回规范库">←</a>
   <div class="fa-brand"><span class="fa-logo" style="background:#4f46e5">S</span><span>系统级组件规范</span></div>
 </header>
-<main class="sy-scope" style="padding:24px">
+<main class="sy-scope spec-main">
+<section class="spec-intro"><p>THE SYSTEM BEHIND THE INTERFACE / 08</p><h1>好的界面，<br>从一套清晰的规则开始。</h1><span>调一组令牌，看组件如何响应。再进入 13 节规范，查看完整的组件状态与页面范式。</span></section>
+<section class="spec-lab" aria-labelledby="specLabTitle"><div class="spec-controls"><p class="spec-kicker">TOKEN PLAYGROUND</p><h2 id="specLabTitle">亲手调一套组件。</h2><label>圆角 <output id="specRadiusValue">12 px</output><input id="specRadius" type="range" min="0" max="24" value="12"></label><fieldset><legend>界面密度</legend><button type="button" data-lab-density="12" aria-pressed="true">紧凑</button><button type="button" data-lab-density="20" aria-pressed="false">舒展</button></fieldset><fieldset><legend>强调色</legend><button class="spec-color" type="button" data-lab-color="#476658" style="--choice:#476658" aria-label="苔绿色" aria-pressed="true"></button><button class="spec-color" type="button" data-lab-color="#465db2" style="--choice:#465db2" aria-label="鸢尾蓝" aria-pressed="false"></button><button class="spec-color" type="button" data-lab-color="#8761a5" style="--choice:#8761a5" aria-label="灰紫色" aria-pressed="false"></button></fieldset><pre id="specTokenCode"></pre><button class="spec-copy" type="button" id="specCopyTokens">复制这组 CSS 令牌 ↗</button><span class="spec-copy-status" id="specCopyStatus" role="status"></span></div><div class="spec-live-surface"><span class="spec-preview-label">LIVE COMPONENT / 实时预览</span><div id="specLive" class="spec-live"><div class="spec-live-top"><span>项目空间</span><b>进行中</b></div><h3>让每个组件，说同一种语言。</h3><p>间距、圆角与强调色，组成了界面的性格。</p><label>项目名称<input type="text" value="Design System / 2026" aria-label="预览项目名称"></label><div class="spec-live-list"><div><span>令牌与变量</span><b>08</b></div><div><span>组件与状态</span><b>24</b></div><div><span>布局与范式</span><b>07</b></div></div><button type="button" id="specPreviewAction" aria-pressed="false">选择这套风格</button><small>预览按钮可以切换选择状态。</small></div></div></section>
+<div class="spec-systems"><a href="frontend-ERP.html"><small>01 / OPERATIONS</small><b>工业工作台 ↗</b></a><a href="frontend-CRM.html"><small>02 / RELATIONSHIPS</small><b>销售画布 ↗</b></a><a href="frontend-SOP.html"><small>03 / PLAYBOOK</small><b>纸张手册 ↗</b></a><a href="frontend-BI.html"><small>04 / ANALYTICS</small><b>数据观测台 ↗</b></a><a href="frontend-OA.html"><small>05 / TEAMWORK</small><b>审批收件箱 ↗</b></a><a href="frontend-FIN.html"><small>06 / LEDGER</small><b>资金账簿 ↗</b></a></div>
     <article class="fs-category" id="syCategory">
       <header class="fs-cat-head">
         <span class="fs-cat-icon">🧩</span>
         <div class="fs-cat-text">
           <h3 class="fs-cat-name">系统级规范 <span class="fs-cat-en">Enterprise UI</span></h3>
-          <p class="fs-cat-desc">一张卡收齐令牌、组件与七类页面范式 —— 点开后用左侧目录逐节查看</p>
+          <p class="fs-cat-desc">继续查阅 13 节完整规范：令牌、组件状态、反馈与页面范式。</p>
         </div>
         <span class="fs-cat-badge">1 张卡 · 13 节</span>
       </header>
@@ -894,5 +898,6 @@
 
 
 <script src="js/frontend-spec.js"></script>
+<script src="js/frontend-token-lab.js"></script>
 </body>
 </html>
