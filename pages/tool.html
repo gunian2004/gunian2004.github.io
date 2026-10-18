@@ -3,30 +3,357 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>小工具</title>
-    <link rel="stylesheet" href="../css/style.css">
+    <meta name="description" content="柏贤的工具工作台：Markdown、JSON、YAML、编码转换、ER 图、翻译与操作录制。">
+    <meta name="theme-color" content="#f4f2ed">
+    <title>小工具 · 工具工作台 | 陈柏贤</title>
     <link rel="stylesheet" href="../css/tool.css">
+    <link rel="stylesheet" href="../css/studio.css">
+    <link rel="stylesheet" href="../css/tool-workbench.css">
 </head>
 <body>
-    <a href="../index.html" class="back-btn">← 返回首页</a>
-
-    <div class="container">
-        <h1>🛠️ 小工具</h1>
-        <p class="subtitle">实用工具集，点击卡片标题展开操作</p>
-
-        <div class="tools-grid">
-            <!-- 卡片1: 操作录制与回放 -->
-            <div class="tool-card" id="cardRecorder">
-                <div class="card-header" onclick="toggleCard('cardRecorder')">
-                    <div class="card-title">
-                        <span class="card-icon">📍</span>
-                        <span>操作录制与回放</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 0.75rem;">
-                        <span class="card-badge badge-idle" id="statusBadge">空闲中</span>
-                        <span class="card-toggle">▼</span>
+    <a class="studio-skip" href="#toolWorkspace">跳到工具操作区</a>
+    <header class="studio-header studio-wrap"><a class="studio-home" href="../index.html">↖ 返回首页</a><a class="studio-brand" href="tool.html"><span aria-hidden="true">✳</span> 柏贤的工具工作台</a><span class="studio-edition">SMALL TOOLS / EVERYDAY WORK</span></header>
+    <main class="studio-wrap">
+        <section class="studio-hero" aria-labelledby="toolsTitle"><div><p class="studio-eyebrow">LESS REPETITION · MORE CREATION</p><h1 id="toolsTitle">把琐碎的操作，<br><span>交给顺手的工具。</span></h1><p class="studio-description">写一段 Markdown，整理一份 JSON，画清一组关系。<br>日常开发里用得到的小工具，都放在这里。</p></div><div class="studio-stat"><strong>08</strong><span>一个工作台，八个工具</span></div></section>
+        <div class="tool-workbench">
+            <aside class="tool-sidebar" aria-label="工具选择" hidden>
+                <div class="sidebar-heading"><p class="studio-eyebrow">YOUR TOOLKIT</p><span class="studio-number" id="toolCount">08 TOOLS</span></div>
+                <label class="studio-search"><span aria-hidden="true">⌕</span><input id="toolSearch" type="search" placeholder="搜索工具，如 JSON" aria-label="搜索工具"><button id="clearToolSearch" type="button" hidden aria-label="清除搜索">清除</button></label>
+                <div class="tool-categories" role="group" aria-label="按类型筛选"><button type="button" data-category="全部" aria-pressed="true">全部</button><button type="button" data-category="文本" aria-pressed="false">文本</button><button type="button" data-category="数据" aria-pressed="false">数据</button><button type="button" data-category="图表" aria-pressed="false">图表</button><button type="button" data-category="自动化" aria-pressed="false">自动化</button></div>
+                <label class="tool-mobile-picker">当前工具<select id="toolSelect"><option value="cardJson">JSON 格式化</option><option value="cardMarkdown">Markdown 预览</option><option value="cardYaml">JSON ↔ YAML</option><option value="cardBase64">Base64 编解码</option><option value="cardUrl">URL 编解码</option><option value="cardEr">ER 图生成器</option><option value="cardTranslate">在线翻译</option><option value="cardRecorder">操作录制与回放</option></select></label>
+                <nav class="tool-nav" aria-label="可用工具"><button class="tool-nav-item" type="button" data-tool="cardJson" aria-controls="cardJson"><span class="tool-nav-icon" aria-hidden="true">{ }</span><span>JSON 格式化<small>数据 / 01</small></span><span class="tool-nav-arrow" aria-hidden="true">↗</span></button><button class="tool-nav-item" type="button" data-tool="cardMarkdown" aria-controls="cardMarkdown"><span class="tool-nav-icon" aria-hidden="true">M↓</span><span>Markdown 预览<small>文本 / 02</small></span><span class="tool-nav-arrow" aria-hidden="true">↗</span></button><button class="tool-nav-item" type="button" data-tool="cardYaml" aria-controls="cardYaml"><span class="tool-nav-icon" aria-hidden="true">⇄</span><span>JSON ↔ YAML<small>数据 / 03</small></span><span class="tool-nav-arrow" aria-hidden="true">↗</span></button><button class="tool-nav-item" type="button" data-tool="cardBase64" aria-controls="cardBase64"><span class="tool-nav-icon" aria-hidden="true">Aa</span><span>Base64 编解码<small>文本 / 04</small></span><span class="tool-nav-arrow" aria-hidden="true">↗</span></button><button class="tool-nav-item" type="button" data-tool="cardUrl" aria-controls="cardUrl"><span class="tool-nav-icon" aria-hidden="true">↗</span><span>URL 编解码<small>文本 / 05</small></span><span class="tool-nav-arrow" aria-hidden="true">↗</span></button><button class="tool-nav-item" type="button" data-tool="cardEr" aria-controls="cardEr"><span class="tool-nav-icon" aria-hidden="true">◇</span><span>ER 图生成器<small>图表 / 06</small></span><span class="tool-nav-arrow" aria-hidden="true">↗</span></button><button class="tool-nav-item" type="button" data-tool="cardTranslate" aria-controls="cardTranslate"><span class="tool-nav-icon" aria-hidden="true">文</span><span>在线翻译<small>文本 / 07</small></span><span class="tool-nav-arrow" aria-hidden="true">↗</span></button><button class="tool-nav-item" type="button" data-tool="cardRecorder" aria-controls="cardRecorder"><span class="tool-nav-icon" aria-hidden="true">↺</span><span>操作录制与回放<small>自动化 / 08</small></span><span class="tool-nav-arrow" aria-hidden="true">↗</span></button></nav>
+                <div class="studio-empty" id="toolEmpty" hidden>没有找到对应工具。<br><button class="studio-pill" type="button" id="resetToolFilters">查看全部工具</button></div>
+                <p class="tool-sidebar-note">选择工具即可开始，切换时保留本页输入。</p>
+            </aside>
+            <div class="tools-grid" id="toolWorkspace" tabindex="-1"><div class="tool-card expanded" id="cardJson" data-category="数据" role="region" aria-labelledby="cardJsonTitle">
+                <div class="tool-panel-heading"><div class="tool-heading-copy"><p class="studio-eyebrow">数据 / WORKSPACE</p><h2 id="cardJsonTitle">JSON 格式化 / 压缩</h2><p>让结构清晰，让数据紧凑。</p></div><span class="panel-symbol" aria-hidden="true">{ }</span></div>
+                <div class="card-content">
+                    <div class="card-content-inner">
+                        <p class="section-desc">输入 JSON 数据，一键美化格式或压缩成单行。</p>
+                        <div class="workspace-view-switch" hidden="" role="group" aria-label="切换JSON 格式化操作区域"><button type="button" data-view="0" aria-controls="cardJsonInputPanel" aria-pressed="true">输入</button><button type="button" data-view="1" aria-controls="cardJsonOutputPanel" aria-pressed="false">结果</button></div><div class="data-tool-container workspace-split" data-view="0">
+                            <div class="data-tool-panel split-first" id="cardJsonInputPanel">
+                                <div class="data-tool-header">
+                                    <span class="data-tool-title">📥 输入</span>
+                                </div>
+                                <textarea class="data-tool-textarea" id="jsonInput" placeholder="{&quot;name&quot;: &quot;示例&quot;, &quot;value&quot;: 123}" aria-label="JSON 格式化 / 压缩，输入文本"></textarea>
+                            </div>
+                            <div class="data-tool-panel split-second" id="cardJsonOutputPanel">
+                                <div class="data-tool-header">
+                                    <span class="data-tool-title">📤 输出</span>
+                                    <button class="data-tool-btn" onclick="jsonCopy()">📋 复制</button>
+                                </div>
+                                <div class="data-tool-textarea" id="jsonOutput" style="background:rgba(0,0,0,0.1);color:var(--text-secondary);white-space:pre-wrap;overflow-x:auto;">等待输入...</div>
+                            </div>
+                        </div>
+                        <div class="data-tool-actions">
+                            <button class="data-tool-btn primary" onclick="jsonFormat()">✨ 美化格式</button>
+                            <button class="data-tool-btn" onclick="jsonMinify()">🗜️ 压缩</button>
+                            <button class="data-tool-btn" onclick="jsonClear()">🧹 清空</button>
+                        </div>
                     </div>
                 </div>
+            </div>
+<div class="tool-card expanded" id="cardMarkdown" data-category="文本" role="region" aria-labelledby="cardMarkdownTitle">
+                <div class="tool-panel-heading"><div class="tool-heading-copy"><p class="studio-eyebrow">文本 / WORKSPACE</p><h2 id="cardMarkdownTitle">Markdown 在线预览</h2><p>一边写作，一边查看排版。</p></div><span class="panel-symbol" aria-hidden="true">M↓</span></div>
+                <div class="card-content">
+                    <div class="card-content-inner">
+                        <p class="section-desc">左侧输入 Markdown 语法，右侧实时预览渲染效果。支持标题、列表、代码块、表格等常用语法。</p>
+
+                        <div class="workspace-view-switch" hidden="" role="group" aria-label="切换Markdown 预览操作区域"><button type="button" data-view="0" aria-controls="cardMarkdownInputPanel" aria-pressed="true">编辑</button><button type="button" data-view="1" aria-controls="cardMarkdownOutputPanel" aria-pressed="false">预览</button></div><div class="md-editor-container workspace-split" data-view="0">
+                            <!-- 编辑区 -->
+                            <div class="md-editor-panel split-first" id="cardMarkdownInputPanel">
+                                <div class="md-editor-header">
+                                    <span class="md-editor-title">
+                                        <span>✏️</span>
+                                        <span>编辑器</span>
+                                    </span>
+                                    <div class="md-controls">
+                                        <button class="md-btn" onclick="mdInsertText('**粗体**')" title="粗体">B</button>
+                                        <button class="md-btn" onclick="mdInsertText('*斜体*')" title="斜体"><i>I</i></button>
+                                        <button class="md-btn" onclick="mdInsertText('`代码`')" title="行内代码">`</button>
+                                        <button class="md-btn" onclick="mdInsertText('\n```\n代码块\n```')" title="代码块">```</button>
+                                        <button class="md-btn" onclick="mdUploadFile()" title="上传 .md 文件">📁 上传</button>
+                                        <button class="md-btn" onclick="mdClear()">清空</button>
+                                    </div>
+                                </div>
+                                <input type="file" id="mdFileInput" accept=".md,.markdown,.txt" style="display:none">
+                                <textarea class="md-textarea" id="mdInput" placeholder="# 在此输入 Markdown...
+
+## 示例语法
+
+**粗体文本** 和 *斜体文本*
+
+- 列表项 1
+- 列表项 2
+
+&gt; 引用文本
+
+[链接文字](https://example.com)
+
+`行内代码`
+
+```
+代码块
+```
+
+| 表头1 | 表头2 |
+|-------|-------|
+| 单元格 | 单元格 |" aria-label="Markdown 在线预览，输入文本"></textarea>
+                            </div>
+
+                            <!-- 预览区 -->
+                            <div class="md-editor-panel split-second" id="cardMarkdownOutputPanel">
+                                <div class="md-editor-header">
+                                    <span class="md-editor-title">
+                                        <span>👁️</span>
+                                        <span>预览</span>
+                                    </span>
+                                    <div class="md-controls">
+                                        <button class="md-btn" onclick="mdToggleFullscreen()" title="全屏预览">⛶ 全屏</button>
+                                        <button class="md-btn" onclick="mdCopyHtml()">复制 HTML</button>
+                                    </div>
+                                </div>
+                                <div class="md-preview" id="mdPreview">
+                                    <div class="md-empty">👆 在左侧输入 Markdown 即可实时预览</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+<div class="tool-card expanded" id="cardYaml" data-category="数据" role="region" aria-labelledby="cardYamlTitle">
+                <div class="tool-panel-heading"><div class="tool-heading-copy"><p class="studio-eyebrow">数据 / WORKSPACE</p><h2 id="cardYamlTitle">JSON ↔ YAML 互转</h2><p>在两种数据格式之间切换。</p></div><span class="panel-symbol" aria-hidden="true">⇄</span></div>
+                <div class="card-content">
+                    <div class="card-content-inner">
+                        <p class="section-desc">在 JSON 和 YAML 格式之间相互转换。</p>
+                        <div class="workspace-view-switch" hidden="" role="group" aria-label="切换JSON ↔ YAML操作区域"><button type="button" data-view="0" aria-controls="cardYamlInputPanel" aria-pressed="true">JSON</button><button type="button" data-view="1" aria-controls="cardYamlOutputPanel" aria-pressed="false">YAML</button></div><div class="data-tool-container workspace-split" data-view="0">
+                            <div class="data-tool-panel split-first" id="cardYamlInputPanel">
+                                <div class="data-tool-header">
+                                    <span class="data-tool-title">JSON</span>
+                                    <button class="data-tool-btn" onclick="jsonToYaml()">JSON → YAML</button>
+                                </div>
+                                <textarea class="data-tool-textarea" id="yamlJsonInput" placeholder="{&quot;name&quot;: &quot;示例&quot;, &quot;list&quot;: [1, 2, 3]}" aria-label="JSON ↔ YAML 互转，输入文本"></textarea>
+                            </div>
+                            <div class="data-tool-panel split-second" id="cardYamlOutputPanel">
+                                <div class="data-tool-header">
+                                    <span class="data-tool-title">YAML</span>
+                                    <button class="data-tool-btn" onclick="yamlToJson()">YAML → JSON</button>
+                                </div>
+                                <textarea class="data-tool-textarea" id="yamlOutput" placeholder="name: 示例
+list:
+  - 1
+  - 2
+  - 3" aria-label="JSON ↔ YAML 互转，YAML 输入"></textarea>
+                            </div>
+                        </div>
+                        <div class="data-tool-actions">
+                            <button class="data-tool-btn primary" onclick="yamlSwap()">⇄ 交换</button>
+                            <button class="data-tool-btn" onclick="yamlClear()">🧹 清空</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+<div class="tool-card expanded" id="cardBase64" data-category="文本" role="region" aria-labelledby="cardBase64Title">
+                <div class="tool-panel-heading"><div class="tool-heading-copy"><p class="studio-eyebrow">文本 / WORKSPACE</p><h2 id="cardBase64Title">Base64 编解码</h2><p>文本编码与还原。</p></div><span class="panel-symbol" aria-hidden="true">Aa</span></div>
+                <div class="card-content">
+                    <div class="card-content-inner">
+                        <p class="section-desc">对字符串进行 Base64 编码或解码。</p>
+                        <div class="workspace-view-switch" hidden="" role="group" aria-label="切换Base64 编解码操作区域"><button type="button" data-view="0" aria-controls="cardBase64InputPanel" aria-pressed="true">输入</button><button type="button" data-view="1" aria-controls="cardBase64OutputPanel" aria-pressed="false">结果</button></div><div class="data-tool-container workspace-split" data-view="0">
+                            <div class="data-tool-panel split-first" id="cardBase64InputPanel">
+                                <div class="data-tool-header">
+                                    <span class="data-tool-title">📥 原文</span>
+                                </div>
+                                <textarea class="data-tool-textarea" id="base64Input" placeholder="输入要编码或解码的文本..." aria-label="Base64 编解码，输入文本"></textarea>
+                            </div>
+                            <div class="data-tool-panel split-second" id="cardBase64OutputPanel">
+                                <div class="data-tool-header">
+                                    <span class="data-tool-title">📤 结果</span>
+                                    <button class="data-tool-btn" onclick="base64Copy()">📋 复制</button>
+                                </div>
+                                <div class="data-tool-textarea" id="base64Output" style="background:rgba(0,0,0,0.1);color:var(--text-secondary);white-space:pre-wrap;">等待输入...</div>
+                            </div>
+                        </div>
+                        <div class="data-tool-actions">
+                            <button class="data-tool-btn primary" onclick="base64Encode()">🔐 编码</button>
+                            <button class="data-tool-btn primary" onclick="base64Decode()">🔓 解码</button>
+                            <button class="data-tool-btn" onclick="base64Clear()">🧹 清空</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+<div class="tool-card expanded" id="cardUrl" data-category="文本" role="region" aria-labelledby="cardUrlTitle">
+                <div class="tool-panel-heading"><div class="tool-heading-copy"><p class="studio-eyebrow">文本 / WORKSPACE</p><h2 id="cardUrlTitle">URL 编解码</h2><p>处理链接中的特殊字符。</p></div><span class="panel-symbol" aria-hidden="true">↗</span></div>
+                <div class="card-content">
+                    <div class="card-content-inner">
+                        <p class="section-desc">对 URL 进行编码或解码（encodeURIComponent / decodeURIComponent）。</p>
+                        <div class="workspace-view-switch" hidden="" role="group" aria-label="切换URL 编解码操作区域"><button type="button" data-view="0" aria-controls="cardUrlInputPanel" aria-pressed="true">输入</button><button type="button" data-view="1" aria-controls="cardUrlOutputPanel" aria-pressed="false">结果</button></div><div class="data-tool-container workspace-split" data-view="0">
+                            <div class="data-tool-panel split-first" id="cardUrlInputPanel">
+                                <div class="data-tool-header">
+                                    <span class="data-tool-title">📥 原文</span>
+                                </div>
+                                <textarea class="data-tool-textarea" id="urlInput" placeholder="输入 URL 或参数字符串..." aria-label="URL 编解码，输入文本"></textarea>
+                            </div>
+                            <div class="data-tool-panel split-second" id="cardUrlOutputPanel">
+                                <div class="data-tool-header">
+                                    <span class="data-tool-title">📤 结果</span>
+                                    <button class="data-tool-btn" onclick="urlCopy()">📋 复制</button>
+                                </div>
+                                <div class="data-tool-textarea" id="urlOutput" style="background:rgba(0,0,0,0.1);color:var(--text-secondary);white-space:pre-wrap;">等待输入...</div>
+                            </div>
+                        </div>
+                        <div class="data-tool-actions">
+                            <button class="data-tool-btn primary" onclick="urlEncode()">🔐 编码</button>
+                            <button class="data-tool-btn primary" onclick="urlDecode()">🔓 解码</button>
+                            <button class="data-tool-btn" onclick="urlClear()">🧹 清空</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+<div class="tool-card expanded" id="cardEr" data-category="图表" role="region" aria-labelledby="cardErTitle">
+                <div class="tool-panel-heading"><div class="tool-heading-copy"><p class="studio-eyebrow">图表 / WORKSPACE</p><h2 id="cardErTitle">ER 图生成器</h2><p>从实体关系，到一张清晰的图。</p></div><span class="panel-symbol" aria-hidden="true">◇</span></div>
+                <div class="card-content">
+                    <div class="card-content-inner">
+                        <p class="section-desc">设计数据库实体关系图，自动生成 Mermaid ER 图代码并实时预览。</p>
+
+                        <div class="workspace-view-switch" hidden="" role="group" aria-label="切换ER 图生成器操作区域"><button type="button" data-view="0" aria-controls="cardErInputPanel" aria-pressed="true">实体与关系</button><button type="button" data-view="1" aria-controls="cardErOutputPanel" aria-pressed="false">图表预览</button></div><div class="er-container workspace-split" data-view="0">
+                            <!-- 左侧：实体编辑器 -->
+                            <div class="er-editor-panel split-first" style="display:flex;flex-direction:column;overflow:hidden;max-height:500px;" id="cardErInputPanel">
+                                <div class="er-panel-header">
+                                    <span class="er-panel-title">📋 实体列表</span>
+                                    <div style="display:flex;gap:0.3rem;">
+                                        <button class="er-btn" onclick="erAddSampleData()">📥 示例</button>
+                                        <button class="er-btn" onclick="erClearAll()">🗑️ 清空</button>
+                                    </div>
+                                </div>
+                                <!-- 仅表列表滚动区域 -->
+                                <div class="er-entity-scroll-area" id="erEntityScrollArea">
+                                    <div class="er-entity-list" id="erEntityList">
+                                        <div class="er-empty-state">
+                                            点击下方"添加"创建表，或点击"示例"加载示例数据
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- 添加表输入框（固定在底部） -->
+                                <div class="er-add-entity">
+                                    <input type="text" id="erNewEntityName" placeholder="表名，如：users">
+                                    <button class="er-btn-add" onclick="erAddEntity()">添加</button>
+                                </div>
+
+                                <!-- 关系设置（固定在底部） -->
+                                <div class="er-relation-section">
+                                    <div class="er-relation-title">🔗 添加关系</div>
+                                    <div class="er-relation-form">
+                                        <select id="erRelFrom"></select>
+                                        <select id="erRelType">
+                                            <option value="||--||">1:1</option>
+                                            <option value="||--o{">1:N</option>
+                                            <option value="}o--||">N:1</option>
+                                            <option value="}o--o{">N:N</option>
+                                        </select>
+                                        <select id="erRelTo"></select>
+                                        <button class="er-btn" onclick="erAddRelation()">添加</button>
+                                    </div>
+                                    <div class="er-relation-list" id="erRelationList"></div>
+                                </div>
+                            </div>
+
+                            <!-- 右侧：预览 -->
+                            <div class="er-editor-panel split-second" id="cardErOutputPanel">
+                                <div class="er-panel-header">
+                                    <span class="er-panel-title">👁️ 预览</span>
+                                    <div style="display:flex;gap:0.3rem;">
+                                        <button class="er-btn" onclick="erToggleFullscreen()" title="全屏预览">⛶ 全屏</button>
+                                        <button class="er-btn" onclick="erRefreshPreview()">🔄 刷新</button>
+                                    </div>
+                                </div>
+                                <div class="er-preview-area" id="erPreviewArea">
+                                    <div class="er-preview-empty">👆 添加实体和关系后即可预览 ER 图</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Mermaid 代码 -->
+                        <div class="er-code-area">
+                            <div class="er-code-header">
+                                <span class="er-code-title">📄 Mermaid 代码</span>
+                                <div class="er-code-actions">
+                                    <button class="data-tool-btn" onclick="erCopyCode()">📋 复制</button>
+                                    <button class="data-tool-btn" onclick="erExportImage()">🖼️ 导出图片</button>
+                                </div>
+                            </div>
+                            <div class="er-code-content" id="erCodeContent">添加实体后将在此显示 Mermaid 代码...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+<div class="tool-card expanded" id="cardTranslate" data-category="文本" role="region" aria-labelledby="cardTranslateTitle">
+                <div class="tool-panel-heading"><div class="tool-heading-copy"><p class="studio-eyebrow">文本 / WORKSPACE</p><h2 id="cardTranslateTitle">在线翻译</h2><p>在不同语言之间表达想法。</p></div><span class="panel-symbol" aria-hidden="true">文</span></div>
+                <div class="card-content">
+                    <div class="card-content-inner">
+                        <p class="section-desc">通过 MyMemory 服务翻译文本，支持切换语言与复制结果。</p>
+                        <div class="translate-container">
+                            <!-- 语言选择 -->
+                            <div class="translate-lang-bar">
+                                <select id="translateSourceLang" class="translate-select">
+                                    <option value="auto">自动检测</option>
+                                    <option value="zh">中文</option>
+                                    <option value="en" selected="">英语</option>
+                                    <option value="ja">日语</option>
+                                    <option value="ko">韩语</option>
+                                    <option value="fr">法语</option>
+                                    <option value="de">德语</option>
+                                    <option value="es">西班牙语</option>
+                                    <option value="pt">葡萄牙语</option>
+                                    <option value="ru">俄语</option>
+                                    <option value="ar">阿拉伯语</option>
+                                    <option value="th">泰语</option>
+                                    <option value="vi">越南语</option>
+                                </select>
+                                <button class="translate-swap-btn" onclick="translateSwapLang()" title="交换语言">⇄</button>
+                                <select id="translateTargetLang" class="translate-select">
+                                    <option value="zh" selected="">中文</option>
+                                    <option value="en">英语</option>
+                                    <option value="ja">日语</option>
+                                    <option value="ko">韩语</option>
+                                    <option value="fr">法语</option>
+                                    <option value="de">德语</option>
+                                    <option value="es">西班牙语</option>
+                                    <option value="pt">葡萄牙语</option>
+                                    <option value="ru">俄语</option>
+                                    <option value="ar">阿拉伯语</option>
+                                    <option value="th">泰语</option>
+                                    <option value="vi">越南语</option>
+                                </select>
+                            </div>
+                            <!-- 输入/输出区域 -->
+                            <div class="workspace-view-switch" hidden="" role="group" aria-label="切换在线翻译操作区域"><button type="button" data-view="0" aria-controls="cardTranslateInputPanel" aria-pressed="true">输入</button><button type="button" data-view="1" aria-controls="cardTranslateOutputPanel" aria-pressed="false">结果</button></div><div class="translate-panels workspace-split" data-view="0">
+                                <div class="translate-panel split-first" id="cardTranslateInputPanel">
+                                    <div class="translate-panel-header">
+                                        <span class="translate-lang-label" id="translateSourceLabel">英语</span>
+                                        <button class="translate-panel-btn" onclick="translateClearInput()">清空</button>
+                                    </div>
+                                    <textarea id="translateInput" class="translate-textarea" placeholder="输入要翻译的文本..." aria-label="在线翻译，输入文本"></textarea>
+                                    <div class="translate-chars-count" id="translateCharsCount">0 字符</div>
+                                </div>
+                                <div class="translate-panel split-second" id="cardTranslateOutputPanel">
+                                    <div class="translate-panel-header">
+                                        <span class="translate-lang-label" id="translateTargetLabel">中文</span>
+                                        <button class="translate-panel-btn" onclick="translateCopy()" id="translateCopyBtn" disabled="">复制</button>
+                                    </div>
+                                    <div id="translateOutput" class="translate-output">翻译结果将显示在这里...</div>
+                                </div>
+                            </div>
+                            <!-- 操作按钮 -->
+                            <div class="translate-actions">
+                                <button class="translate-btn primary" onclick="translateText()" id="translateBtn">🌐 翻译</button>
+                            </div>
+                            <div class="translate-status" id="translateStatus"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+<div class="tool-card expanded" id="cardRecorder" data-category="自动化" role="region" aria-labelledby="cardRecorderTitle">
+                <div class="tool-panel-heading"><div class="tool-heading-copy"><p class="studio-eyebrow">自动化 / WORKSPACE</p><h2 id="cardRecorderTitle">操作录制与回放</h2><p>录下交互，重新走一遍流程。</p></div><span class="card-badge badge-idle" id="statusBadge" role="status">空闲中</span></div>
                 <div class="card-content">
                     <div class="card-content-inner">
                         <!-- 录制控制 -->
@@ -34,19 +361,19 @@
                             <button class="btn btn-danger" id="btnRecord">
                                 <span>⏺</span> 开始录制
                             </button>
-                            <button class="btn btn-secondary" id="btnStop" disabled>
+                            <button class="btn btn-secondary" id="btnStop" disabled="">
                                 <span>⏹</span> 停止录制
                             </button>
-                            <button class="btn btn-success" id="btnPlay" disabled>
+                            <button class="btn btn-success" id="btnPlay" disabled="">
                                 <span>▶</span> 回放
                             </button>
-                            <button class="btn btn-warning" id="btnPause" disabled>
+                            <button class="btn btn-warning" id="btnPause" disabled="">
                                 <span>⏸</span> 暂停
                             </button>
-                            <button class="btn btn-secondary" id="btnClear" disabled>
+                            <button class="btn btn-secondary" id="btnClear" disabled="">
                                 <span>🗑️</span> 清空
                             </button>
-                            <button class="btn btn-secondary" id="btnExport" disabled>
+                            <button class="btn btn-secondary" id="btnExport" disabled="">
                                 <span>💾</span> 导出
                             </button>
                             <button class="btn btn-secondary" id="btnImport">
@@ -125,417 +452,14 @@
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- 卡片2: Markdown 在线预览 -->
-            <div class="tool-card" id="cardMarkdown">
-                <div class="card-header" onclick="toggleCard('cardMarkdown')">
-                    <div class="card-title">
-                        <span class="card-icon">📝</span>
-                        <span>Markdown 在线预览</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 0.75rem;">
-                        <span class="card-badge badge-collapsed">点击展开</span>
-                        <span class="card-toggle">▼</span>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <div class="card-content-inner">
-                        <p class="section-desc">左侧输入 Markdown 语法，右侧实时预览渲染效果。支持标题、列表、代码块、表格等常用语法。</p>
-
-                        <div class="md-editor-container">
-                            <!-- 编辑区 -->
-                            <div class="md-editor-panel">
-                                <div class="md-editor-header">
-                                    <span class="md-editor-title">
-                                        <span>✏️</span>
-                                        <span>编辑器</span>
-                                    </span>
-                                    <div class="md-controls">
-                                        <button class="md-btn" onclick="mdInsertText('**粗体**')" title="粗体">B</button>
-                                        <button class="md-btn" onclick="mdInsertText('*斜体*')" title="斜体"><i>I</i></button>
-                                        <button class="md-btn" onclick="mdInsertText('`代码`')" title="行内代码">`</button>
-                                        <button class="md-btn" onclick="mdInsertText('\n```\n代码块\n```')" title="代码块">```</button>
-                                        <button class="md-btn" onclick="mdUploadFile()" title="上传 .md 文件">📁 上传</button>
-                                        <button class="md-btn" onclick="mdClear()">清空</button>
-                                    </div>
-                                </div>
-                                <input type="file" id="mdFileInput" accept=".md,.markdown,.txt" style="display:none">
-                                <textarea class="md-textarea" id="mdInput" placeholder="# 在此输入 Markdown...
-
-## 示例语法
-
-**粗体文本** 和 *斜体文本*
-
-- 列表项 1
-- 列表项 2
-
-> 引用文本
-
-[链接文字](https://example.com)
-
-`行内代码`
-
-```
-代码块
-```
-
-| 表头1 | 表头2 |
-|-------|-------|
-| 单元格 | 单元格 |"></textarea>
-                            </div>
-
-                            <!-- 预览区 -->
-                            <div class="md-editor-panel">
-                                <div class="md-editor-header">
-                                    <span class="md-editor-title">
-                                        <span>👁️</span>
-                                        <span>预览</span>
-                                    </span>
-                                    <div class="md-controls">
-                                        <button class="md-btn" onclick="mdToggleFullscreen()" title="全屏预览">⛶ 全屏</button>
-                                        <button class="md-btn" onclick="mdCopyHtml()">复制 HTML</button>
-                                    </div>
-                                </div>
-                                <div class="md-preview" id="mdPreview">
-                                    <div class="md-empty">👆 在左侧输入 Markdown 即可实时预览</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 卡片3: JSON 格式化/压缩 -->
-            <div class="tool-card" id="cardJson">
-                <div class="card-header" onclick="toggleCard('cardJson')">
-                    <div class="card-title">
-                        <span class="card-icon">{ }</span>
-                        <span>JSON 格式化/压缩</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 0.75rem;">
-                        <span class="card-badge badge-collapsed">点击展开</span>
-                        <span class="card-toggle">▼</span>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <div class="card-content-inner">
-                        <p class="section-desc">输入 JSON 数据，一键美化格式或压缩成单行。</p>
-                        <div class="data-tool-container">
-                            <div class="data-tool-panel">
-                                <div class="data-tool-header">
-                                    <span class="data-tool-title">📥 输入</span>
-                                </div>
-                                <textarea class="data-tool-textarea" id="jsonInput" placeholder='{"name": "示例", "value": 123}'></textarea>
-                            </div>
-                            <div class="data-tool-panel">
-                                <div class="data-tool-header">
-                                    <span class="data-tool-title">📤 输出</span>
-                                    <button class="data-tool-btn" onclick="jsonCopy()">📋 复制</button>
-                                </div>
-                                <div class="data-tool-textarea" id="jsonOutput" style="background:rgba(0,0,0,0.1);color:var(--text-secondary);white-space:pre-wrap;overflow-x:auto;">等待输入...</div>
-                            </div>
-                        </div>
-                        <div class="data-tool-actions">
-                            <button class="data-tool-btn primary" onclick="jsonFormat()">✨ 美化格式</button>
-                            <button class="data-tool-btn" onclick="jsonMinify()">🗜️ 压缩</button>
-                            <button class="data-tool-btn" onclick="jsonClear()">🧹 清空</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 卡片4: JSON ↔ YAML 互转 -->
-            <div class="tool-card" id="cardYaml">
-                <div class="card-header" onclick="toggleCard('cardYaml')">
-                    <div class="card-title">
-                        <span class="card-icon">📄</span>
-                        <span>JSON ↔ YAML 互转</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 0.75rem;">
-                        <span class="card-badge badge-collapsed">点击展开</span>
-                        <span class="card-toggle">▼</span>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <div class="card-content-inner">
-                        <p class="section-desc">在 JSON 和 YAML 格式之间相互转换。</p>
-                        <div class="data-tool-container">
-                            <div class="data-tool-panel">
-                                <div class="data-tool-header">
-                                    <span class="data-tool-title">JSON</span>
-                                    <button class="data-tool-btn" onclick="jsonToYaml()">JSON → YAML</button>
-                                </div>
-                                <textarea class="data-tool-textarea" id="yamlJsonInput" placeholder='{"name": "示例", "list": [1, 2, 3]}'></textarea>
-                            </div>
-                            <div class="data-tool-panel">
-                                <div class="data-tool-header">
-                                    <span class="data-tool-title">YAML</span>
-                                    <button class="data-tool-btn" onclick="yamlToJson()">YAML → JSON</button>
-                                </div>
-                                <textarea class="data-tool-textarea" id="yamlOutput" placeholder="name: 示例
-list:
-  - 1
-  - 2
-  - 3"></textarea>
-                            </div>
-                        </div>
-                        <div class="data-tool-actions">
-                            <button class="data-tool-btn primary" onclick="yamlSwap()">⇄ 交换</button>
-                            <button class="data-tool-btn" onclick="yamlClear()">🧹 清空</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 卡片5: Base64 编解码 -->
-            <div class="tool-card" id="cardBase64">
-                <div class="card-header" onclick="toggleCard('cardBase64')">
-                    <div class="card-title">
-                        <span class="card-icon">🔤</span>
-                        <span>Base64 编解码</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 0.75rem;">
-                        <span class="card-badge badge-collapsed">点击展开</span>
-                        <span class="card-toggle">▼</span>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <div class="card-content-inner">
-                        <p class="section-desc">对字符串进行 Base64 编码或解码。</p>
-                        <div class="data-tool-container">
-                            <div class="data-tool-panel">
-                                <div class="data-tool-header">
-                                    <span class="data-tool-title">📥 原文</span>
-                                </div>
-                                <textarea class="data-tool-textarea" id="base64Input" placeholder="输入要编码或解码的文本..."></textarea>
-                            </div>
-                            <div class="data-tool-panel">
-                                <div class="data-tool-header">
-                                    <span class="data-tool-title">📤 结果</span>
-                                    <button class="data-tool-btn" onclick="base64Copy()">📋 复制</button>
-                                </div>
-                                <div class="data-tool-textarea" id="base64Output" style="background:rgba(0,0,0,0.1);color:var(--text-secondary);white-space:pre-wrap;">等待输入...</div>
-                            </div>
-                        </div>
-                        <div class="data-tool-actions">
-                            <button class="data-tool-btn primary" onclick="base64Encode()">🔐 编码</button>
-                            <button class="data-tool-btn primary" onclick="base64Decode()">🔓 解码</button>
-                            <button class="data-tool-btn" onclick="base64Clear()">🧹 清空</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 卡片6: URL 编解码 -->
-            <div class="tool-card" id="cardUrl">
-                <div class="card-header" onclick="toggleCard('cardUrl')">
-                    <div class="card-title">
-                        <span class="card-icon">🔗</span>
-                        <span>URL 编解码</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 0.75rem;">
-                        <span class="card-badge badge-collapsed">点击展开</span>
-                        <span class="card-toggle">▼</span>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <div class="card-content-inner">
-                        <p class="section-desc">对 URL 进行编码或解码（encodeURIComponent / decodeURIComponent）。</p>
-                        <div class="data-tool-container">
-                            <div class="data-tool-panel">
-                                <div class="data-tool-header">
-                                    <span class="data-tool-title">📥 原文</span>
-                                </div>
-                                <textarea class="data-tool-textarea" id="urlInput" placeholder="输入 URL 或参数字符串..."></textarea>
-                            </div>
-                            <div class="data-tool-panel">
-                                <div class="data-tool-header">
-                                    <span class="data-tool-title">📤 结果</span>
-                                    <button class="data-tool-btn" onclick="urlCopy()">📋 复制</button>
-                                </div>
-                                <div class="data-tool-textarea" id="urlOutput" style="background:rgba(0,0,0,0.1);color:var(--text-secondary);white-space:pre-wrap;">等待输入...</div>
-                            </div>
-                        </div>
-                        <div class="data-tool-actions">
-                            <button class="data-tool-btn primary" onclick="urlEncode()">🔐 编码</button>
-                            <button class="data-tool-btn primary" onclick="urlDecode()">🔓 解码</button>
-                            <button class="data-tool-btn" onclick="urlClear()">🧹 清空</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 卡片7: ER 图生成器 -->
-            <div class="tool-card" id="cardEr">
-                <div class="card-header" onclick="toggleCard('cardEr')">
-                    <div class="card-title">
-                        <span class="card-icon">🔲</span>
-                        <span>ER 图生成器</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 0.75rem;">
-                        <span class="card-badge badge-collapsed">点击展开</span>
-                        <span class="card-toggle">▼</span>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <div class="card-content-inner">
-                        <p class="section-desc">设计数据库实体关系图，自动生成 Mermaid ER 图代码并实时预览。</p>
-
-                        <div class="er-container">
-                            <!-- 左侧：实体编辑器 -->
-                            <div class="er-editor-panel" style="display:flex;flex-direction:column;overflow:hidden;max-height:500px;">
-                                <div class="er-panel-header">
-                                    <span class="er-panel-title">📋 实体列表</span>
-                                    <div style="display:flex;gap:0.3rem;">
-                                        <button class="er-btn" onclick="erAddSampleData()">📥 示例</button>
-                                        <button class="er-btn" onclick="erClearAll()">🗑️ 清空</button>
-                                    </div>
-                                </div>
-                                <!-- 仅表列表滚动区域 -->
-                                <div class="er-entity-scroll-area" id="erEntityScrollArea">
-                                    <div class="er-entity-list" id="erEntityList">
-                                        <div class="er-empty-state">
-                                            点击下方"添加"创建表，或点击"示例"加载示例数据
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- 添加表输入框（固定在底部） -->
-                                <div class="er-add-entity">
-                                    <input type="text" id="erNewEntityName" placeholder="表名，如：users">
-                                    <button class="er-btn-add" onclick="erAddEntity()">添加</button>
-                                </div>
-
-                                <!-- 关系设置（固定在底部） -->
-                                <div class="er-relation-section">
-                                    <div class="er-relation-title">🔗 添加关系</div>
-                                    <div class="er-relation-form">
-                                        <select id="erRelFrom"></select>
-                                        <select id="erRelType">
-                                            <option value="||--||">1:1</option>
-                                            <option value="||--o{">1:N</option>
-                                            <option value="}o--||">N:1</option>
-                                            <option value="}o--o{">N:N</option>
-                                        </select>
-                                        <select id="erRelTo"></select>
-                                        <button class="er-btn" onclick="erAddRelation()">添加</button>
-                                    </div>
-                                    <div class="er-relation-list" id="erRelationList"></div>
-                                </div>
-                            </div>
-
-                            <!-- 右侧：预览 -->
-                            <div class="er-editor-panel">
-                                <div class="er-panel-header">
-                                    <span class="er-panel-title">👁️ 预览</span>
-                                    <div style="display:flex;gap:0.3rem;">
-                                        <button class="er-btn" onclick="erToggleFullscreen()" title="全屏预览">⛶ 全屏</button>
-                                        <button class="er-btn" onclick="erRefreshPreview()">🔄 刷新</button>
-                                    </div>
-                                </div>
-                                <div class="er-preview-area" id="erPreviewArea">
-                                    <div class="er-preview-empty">👆 添加实体和关系后即可预览 ER 图</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Mermaid 代码 -->
-                        <div class="er-code-area">
-                            <div class="er-code-header">
-                                <span class="er-code-title">📄 Mermaid 代码</span>
-                                <div class="er-code-actions">
-                                    <button class="data-tool-btn" onclick="erCopyCode()">📋 复制</button>
-                                    <button class="data-tool-btn" onclick="erExportImage()">🖼️ 导出图片</button>
-                                </div>
-                            </div>
-                            <div class="er-code-content" id="erCodeContent">添加实体后将在此显示 Mermaid 代码...</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 卡片8: 在线翻译 -->
-            <div class="tool-card" id="cardTranslate">
-                <div class="card-header" onclick="toggleCard('cardTranslate')">
-                    <div class="card-title">
-                        <span class="card-icon">🌐</span>
-                        <span>在线翻译</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 0.75rem;">
-                        <span class="card-badge badge-collapsed">点击展开</span>
-                        <span class="card-toggle">▼</span>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <div class="card-content-inner">
-                        <p class="section-desc">基于 LibreTranslate 免费翻译 API，支持 100+ 种语言互译。</p>
-                        <div class="translate-container">
-                            <!-- 语言选择 -->
-                            <div class="translate-lang-bar">
-                                <select id="translateSourceLang" class="translate-select">
-                                    <option value="auto">自动检测</option>
-                                    <option value="zh">中文</option>
-                                    <option value="en" selected>英语</option>
-                                    <option value="ja">日语</option>
-                                    <option value="ko">韩语</option>
-                                    <option value="fr">法语</option>
-                                    <option value="de">德语</option>
-                                    <option value="es">西班牙语</option>
-                                    <option value="pt">葡萄牙语</option>
-                                    <option value="ru">俄语</option>
-                                    <option value="ar">阿拉伯语</option>
-                                    <option value="th">泰语</option>
-                                    <option value="vi">越南语</option>
-                                </select>
-                                <button class="translate-swap-btn" onclick="translateSwapLang()" title="交换语言">⇄</button>
-                                <select id="translateTargetLang" class="translate-select">
-                                    <option value="zh" selected>中文</option>
-                                    <option value="en">英语</option>
-                                    <option value="ja">日语</option>
-                                    <option value="ko">韩语</option>
-                                    <option value="fr">法语</option>
-                                    <option value="de">德语</option>
-                                    <option value="es">西班牙语</option>
-                                    <option value="pt">葡萄牙语</option>
-                                    <option value="ru">俄语</option>
-                                    <option value="ar">阿拉伯语</option>
-                                    <option value="th">泰语</option>
-                                    <option value="vi">越南语</option>
-                                </select>
-                            </div>
-                            <!-- 输入/输出区域 -->
-                            <div class="translate-panels">
-                                <div class="translate-panel">
-                                    <div class="translate-panel-header">
-                                        <span class="translate-lang-label" id="translateSourceLabel">英语</span>
-                                        <button class="translate-panel-btn" onclick="translateClearInput()">清空</button>
-                                    </div>
-                                    <textarea id="translateInput" class="translate-textarea" placeholder="输入要翻译的文本..."></textarea>
-                                    <div class="translate-chars-count" id="translateCharsCount">0 字符</div>
-                                </div>
-                                <div class="translate-panel">
-                                    <div class="translate-panel-header">
-                                        <span class="translate-lang-label" id="translateTargetLabel">中文</span>
-                                        <button class="translate-panel-btn" onclick="translateCopy()" id="translateCopyBtn" disabled>复制</button>
-                                    </div>
-                                    <div id="translateOutput" class="translate-output">翻译结果将显示在这里...</div>
-                                </div>
-                            </div>
-                            <!-- 操作按钮 -->
-                            <div class="translate-actions">
-                                <button class="translate-btn primary" onclick="translateText()" id="translateBtn">🌐 翻译</button>
-                            </div>
-                            <div class="translate-status" id="translateStatus"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+            </div></div>
         </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    </main>
+    <footer class="studio-footer studio-wrap"><span>© 2026 gunian</span><span>把重复交给工具，把时间留给创造。</span><a href="AI.html">逛逛小技能 ↗</a></footer>
+    <script src="../script/studio.js"></script>
+    <script src="../js/vendor/marked.min.js"></script>
+    <script src="../js/mermaid-loader.js"></script>
     <script src="../js/tool.js"></script>
+    <script src="../js/tool-workbench.js"></script>
 </body>
 </html>

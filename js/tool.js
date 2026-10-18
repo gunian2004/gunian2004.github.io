@@ -560,11 +560,7 @@ function mdCopyHtml() {
         alert('没有可复制的内容，请先输入 Markdown');
         return;
     }
-    navigator.clipboard.writeText(html).then(() => {
-        alert('HTML 已复制到剪贴板！');
-    }).catch(() => {
-        alert('复制失败，请手动选择内容复制');
-    });
+    BlogStudio.copy(html);
 }
 
 // 上传 .md 文件
@@ -689,7 +685,7 @@ function jsonCopy() {
         alert('没有可复制的内容');
         return;
     }
-    navigator.clipboard.writeText(text).then(() => alert('已复制到剪贴板！')).catch(() => alert('复制失败'));
+    BlogStudio.copy(text);
 }
 
 function jsonClear() {
@@ -890,7 +886,7 @@ function base64Copy() {
         alert('没有可复制的内容');
         return;
     }
-    navigator.clipboard.writeText(text).then(() => alert('已复制到剪贴板！')).catch(() => alert('复制失败'));
+    BlogStudio.copy(text);
 }
 
 function base64Clear() {
@@ -947,7 +943,7 @@ function urlCopy() {
         alert('没有可复制的内容');
         return;
     }
-    navigator.clipboard.writeText(text).then(() => alert('已复制到剪贴板！')).catch(() => alert('复制失败'));
+    BlogStudio.copy(text);
 }
 
 function urlClear() {
@@ -959,17 +955,7 @@ function urlClear() {
 }
 
 // ========== ER 图生成器 ==========
-// 初始化 Mermaid
-if (window.mermaid) mermaid.initialize({
-    startOnLoad: false,
-    theme: 'dark',
-    er: {
-        diagramPadding: 20,
-        nodePadding: 15,
-        rankSpacing: 30,
-        edgePadding: 10
-    }
-});
+// 图库由 mermaid-loader.js 按需加载，避免阻塞其他工具。
 
 // ER 数据结构
 const erState = {
@@ -1253,7 +1239,9 @@ function erGenerateCode() {
 }
 
 // 刷新预览
+let erRenderSequence = 0;
 async function erRefreshPreview() {
+    const sequence = ++erRenderSequence;
     const previewArea = document.getElementById('erPreviewArea');
     if (erState.entities.length === 0) {
         previewArea.innerHTML = '<div class="er-preview-empty">👆 添加实体和关系后即可预览 ER 图</div>';
@@ -1264,9 +1252,12 @@ async function erRefreshPreview() {
     if (code.includes('添加实体后')) return;
 
     try {
-        const id = 'er-diagram-' + Date.now();
-        if (!window.mermaid) { throw new Error('mermaid 未加载'); }
-        const { svg } = await mermaid.render(id, code);
+        previewArea.innerHTML = '<div class="er-preview-empty" role="status">正在准备图表预览…</div>';
+        const renderer = await loadBlogMermaid();
+        if (sequence !== erRenderSequence) return;
+        const id = 'er-diagram-' + Date.now() + '-' + sequence;
+        const { svg } = await renderer.render(id, code);
+        if (sequence !== erRenderSequence) return;
         // 包装 SVG 并添加样式修复
         previewArea.innerHTML = `<div class="mermaid er-diagram-fix">${svg}</div>`;
         
@@ -1304,7 +1295,12 @@ async function erRefreshPreview() {
         `;
         previewArea.appendChild(styleEl);
     } catch (e) {
-        previewArea.innerHTML = `<div style="color:var(--danger);padding:1rem;">⚠️ 渲染错误: ${e.message}</div>`;
+        if (sequence !== erRenderSequence) return;
+        previewArea.innerHTML = '';
+        const error = document.createElement('div');
+        error.style.cssText = 'color:var(--danger);padding:1rem';
+        error.textContent = '⚠️ 图表未能显示：' + e.message + '。请点击刷新预览重试。';
+        previewArea.append(error);
     }
 }
 
@@ -1359,7 +1355,7 @@ function erCopyCode() {
         alert('没有可复制的内容');
         return;
     }
-    navigator.clipboard.writeText(code).then(() => alert('代码已复制到剪贴板！')).catch(() => alert('复制失败'));
+    BlogStudio.copy(code);
 }
 
 // 导出图片
@@ -1631,14 +1627,7 @@ async function translateText() {
 // 复制翻译结果
 function translateCopy() {
     if (!translateResult) return;
-    navigator.clipboard.writeText(translateResult).then(() => {
-        const status = document.getElementById('translateStatus');
-        status.textContent = '✅ 已复制到剪贴板！';
-        status.style.color = 'var(--success)';
-        setTimeout(() => { status.textContent = ''; }, 2000);
-    }).catch(() => {
-        alert('复制失败，请手动选择文字复制');
-    });
+    BlogStudio.copy(translateResult);
 }
 
 // 清空输入

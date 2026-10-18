@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
-<head>
+<html lang="zh-CN"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>前端设计规范库 · Financial & Enterprise UI</title>
+<title>前端设计规范库 · Financial &amp; Enterprise UI</title>
 <link rel="stylesheet" href="css/frontend-hub.css">
 </head>
 <body class="gate-locked">
@@ -12,7 +11,7 @@
     <div class="gate-icon">🔐</div>
     <h2 class="gate-title">前端设计规范库</h2>
     <p class="gate-desc">请输入访问密码以进入</p>
-    <input type="password" id="gatePw" class="gate-input" placeholder="访问密码" autocomplete="off" />
+    <input type="password" id="gatePw" class="gate-input" placeholder="访问密码" autocomplete="off">
     <button id="gateBtn" class="gate-btn" type="button">进入</button>
     <p class="gate-msg" id="gateMsg"></p>
   </div>
@@ -33,74 +32,75 @@
 </header>
 
 <main class="hub-main">
-  <p class="hub-intro">每个类目一个独立页面：金融类看卡片皮肤与票据风格；ERP / CRM / SOP / BI / OA / 财务 是六套完整后台，各自不同的外壳、主色与业务流程；系统级规范收录令牌、组件与页面范式。</p>
+  <section class="hub-hero"><p class="hub-eyebrow">DESIGN INDEX / PATTERNS &amp; SYSTEMS</p><h1>从一个组件，<br>找到一套界面思路。</h1><p class="hub-intro">每个类目一个独立页面：金融类看卡片皮肤与票据风格；ERP / CRM / SOP / BI / OA / 财务 是六套完整后台，各自不同的外壳、主色与业务流程；系统级规范收录令牌、组件与页面范式。</p></section><div class="hub-toolbar"><label class="hub-search"><span aria-hidden="true">⌕</span><input id="hubSearch" type="search" placeholder="搜索场景、组件，如：票据、审批、看板" aria-label="搜索设计规范"><button type="button" id="hubClear" hidden="">清除</button></label><div class="hub-filters" role="group" aria-label="设计类型"><button type="button" data-group="all" aria-pressed="true">全部 08</button><button type="button" data-group="skin" aria-pressed="false">卡片与皮肤</button><button type="button" data-group="system" aria-pressed="false">业务系统</button><button type="button" data-group="spec" aria-pressed="false">系统规范</button></div><p id="hubCount" role="status" aria-live="polite">共 8 个类目</p></div>
 
   <div class="hub-grid">
-    <a class="hub-card" href="frontend-finance.html" style="--c:#ff2442">
+    <a class="hub-card" href="frontend-finance.html" style="--c:#ff2442" data-group="skin"><span class="hub-preview preview-0" aria-hidden="true"><span class="preview-top"><i></i><i></i><i></i><small>布局示意</small></span><span class="preview-layout"><span class="preview-side"><i></i><i></i><i></i></span><span class="preview-content"><span class="preview-labels"><b>皮肤</b><b>卡片</b><b>票据</b></span><span class="preview-blocks"><i></i><i></i><i></i></span><span class="preview-lines"><i></i><i></i><i></i></span></span></span></span>
       <span class="hub-no">01</span>
       <span class="hub-name">金融类</span>
       <span class="hub-desc">5 套皮肤试验卡 + 票据存根卡，点开可在卡片内切换风格</span>
       <span class="hub-tags"><i>皮肤</i><i>票据</i><i>卡片</i></span>
-      <span class="hub-go">进入 →</span>
+      <span class="hub-go">打开示例 ↗</span>
     </a>
 
-    <a class="hub-card" href="frontend-ERP.html" style="--c:#2563eb">
+    <a class="hub-card" href="frontend-ERP.html" style="--c:#2563eb" data-group="system"><span class="hub-preview preview-1" aria-hidden="true"><span class="preview-top"><i></i><i></i><i></i><small>布局示意</small></span><span class="preview-layout"><span class="preview-side"><i></i><i></i><i></i></span><span class="preview-content"><span class="preview-labels"><b>采购</b><b>入库</b><b>库存</b></span><span class="preview-blocks"><i></i><i></i><i></i></span><span class="preview-lines"><i></i><i></i><i></i></span></span></span></span>
       <span class="hub-no">02</span>
       <span class="hub-name">ERP / 进销存</span>
       <span class="hub-desc">请购 → 采购 → 收货入库 → 质检 → 销售 → 库存，11 个页面</span>
       <span class="hub-tags"><i>单据链</i><i>批量</i><i>事实框</i></span>
-      <span class="hub-go">进入 →</span>
+      <span class="hub-go">打开示例 ↗</span>
     </a>
 
-    <a class="hub-card" href="frontend-CRM.html" style="--c:#7c3aed">
+    <a class="hub-card" href="frontend-CRM.html" style="--c:#7c3aed" data-group="system"><span class="hub-preview preview-2" aria-hidden="true"><span class="preview-top"><i></i><i></i><i></i><small>布局示意</small></span><span class="preview-layout"><span class="preview-side"><i></i><i></i><i></i></span><span class="preview-content"><span class="preview-labels"><b>线索</b><b>商机</b><b>客户</b></span><span class="preview-blocks"><i></i><i></i><i></i></span><span class="preview-lines"><i></i><i></i><i></i></span></span></span></span>
       <span class="hub-no">03</span>
       <span class="hub-name">CRM / 销售</span>
       <span class="hub-desc">线索池 → 商机管道 → 客户与联系人 → 跟进 → 业绩预测</span>
       <span class="hub-tags"><i>看板</i><i>阶段条</i><i>活动</i></span>
-      <span class="hub-go">进入 →</span>
+      <span class="hub-go">打开示例 ↗</span>
     </a>
 
-    <a class="hub-card" href="frontend-SOP.html" style="--c:#0d9488">
+    <a class="hub-card" href="frontend-SOP.html" style="--c:#0d9488" data-group="system"><span class="hub-preview preview-3" aria-hidden="true"><span class="preview-top"><i></i><i></i><i></i><small>布局示意</small></span><span class="preview-layout"><span class="preview-side"><i></i><i></i><i></i></span><span class="preview-content"><span class="preview-labels"><b>流程</b><b>执行</b><b>日志</b></span><span class="preview-blocks"><i></i><i></i><i></i></span><span class="preview-lines"><i></i><i></i><i></i></span></span></span></span>
       <span class="hub-no">04</span>
       <span class="hub-name">SOP / 流程</span>
       <span class="hub-desc">流程库 → 执行 → 我的任务 → 异常 → 检查项 → 执行分析</span>
       <span class="hub-tags"><i>步骤</i><i>检查项</i><i>日志</i></span>
-      <span class="hub-go">进入 →</span>
+      <span class="hub-go">打开示例 ↗</span>
     </a>
 
-    <a class="hub-card" href="frontend-BI.html" style="--c:#22d3ee">
+    <a class="hub-card" href="frontend-BI.html" style="--c:#22d3ee" data-group="system"><span class="hub-preview preview-4" aria-hidden="true"><span class="preview-top"><i></i><i></i><i></i><small>布局示意</small></span><span class="preview-layout"><span class="preview-side"><i></i><i></i><i></i></span><span class="preview-content"><span class="preview-labels"><b>指标</b><b>趋势</b><b>分析</b></span><span class="preview-blocks"><i></i><i></i><i></i></span><span class="preview-lines"><i></i><i></i><i></i></span></span></span></span>
       <span class="hub-no">05</span>
       <span class="hub-name">BI / 经营分析</span>
       <span class="hub-desc">经营 / 渠道 / 商品看板 → 指标明细 → 数据集 → 订阅</span>
       <span class="hub-tags"><i>KPI</i><i>下钻</i><i>深色</i></span>
-      <span class="hub-go">进入 →</span>
+      <span class="hub-go">打开示例 ↗</span>
     </a>
 
-    <a class="hub-card" href="frontend-OA.html" style="--c:#4f46e5">
+    <a class="hub-card" href="frontend-OA.html" style="--c:#4f46e5" data-group="system"><span class="hub-preview preview-5" aria-hidden="true"><span class="preview-top"><i></i><i></i><i></i><small>布局示意</small></span><span class="preview-layout"><span class="preview-side"><i></i><i></i><i></i></span><span class="preview-content"><span class="preview-labels"><b>待办</b><b>审批</b><b>记录</b></span><span class="preview-blocks"><i></i><i></i><i></i></span><span class="preview-lines"><i></i><i></i><i></i></span></span></span></span>
       <span class="hub-no">06</span>
       <span class="hub-name">HR / OA 审批</span>
       <span class="hub-desc">待办 → 请假 / 报销 / 付款 → 通讯录 → 审批流设置</span>
       <span class="hub-tags"><i>审批链</i><i>会签</i><i>模板</i></span>
-      <span class="hub-go">进入 →</span>
+      <span class="hub-go">打开示例 ↗</span>
     </a>
 
-    <a class="hub-card" href="frontend-FIN.html" style="--c:#047857">
+    <a class="hub-card" href="frontend-FIN.html" style="--c:#047857" data-group="system"><span class="hub-preview preview-6" aria-hidden="true"><span class="preview-top"><i></i><i></i><i></i><small>布局示意</small></span><span class="preview-layout"><span class="preview-side"><i></i><i></i><i></i></span><span class="preview-content"><span class="preview-labels"><b>票据</b><b>对账</b><b>报表</b></span><span class="preview-blocks"><i></i><i></i><i></i></span><span class="preview-lines"><i></i><i></i><i></i></span></span></span></span>
       <span class="hub-no">07</span>
       <span class="hub-name">财务 / 费控</span>
       <span class="hub-desc">资金概览 → 票据采集 → 对账 → 支付批次 → 汇率 → 报表</span>
       <span class="hub-tags"><i>票据</i><i>差异</i><i>多币种</i></span>
-      <span class="hub-go">进入 →</span>
+      <span class="hub-go">打开示例 ↗</span>
     </a>
 
-    <a class="hub-card" href="frontend-spec.html" style="--c:#64748b">
+    <a class="hub-card" href="frontend-spec.html" style="--c:#64748b" data-group="spec"><span class="hub-preview preview-7" aria-hidden="true"><span class="preview-top"><i></i><i></i><i></i><small>布局示意</small></span><span class="preview-layout"><span class="preview-side"><i></i><i></i><i></i></span><span class="preview-content"><span class="preview-labels"><b>令牌</b><b>组件</b><b>范式</b></span><span class="preview-blocks"><i></i><i></i><i></i></span><span class="preview-lines"><i></i><i></i><i></i></span></span></span></span>
       <span class="hub-no">08</span>
       <span class="hub-name">系统级规范</span>
       <span class="hub-desc">令牌、组件库与七类页面范式，13 节目录式文档</span>
       <span class="hub-tags"><i>令牌</i><i>组件</i><i>范式</i></span>
-      <span class="hub-go">进入 →</span>
+      <span class="hub-go">查阅规范 ↗</span>
     </a>
-  </div>
+  </div><div id="hubEmpty" class="hub-empty" hidden=""><strong>没有找到匹配的类目</strong><p>试试其他关键词，或查看所有设计示例。</p><button id="hubReset" type="button">查看全部</button></div>
 </main>
 <script src="js/frontend-hub.js"></script>
-</body>
-</html>
+
+
+<script src="js/frontend-library.js"></script></body></html>

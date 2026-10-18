@@ -172,7 +172,8 @@ footer a{color:var(--t2)}
   .src .sbody{display:block}
   body{font-size:11pt}
 }
-</style></head><body>
+</style><link rel="stylesheet" href="../css/life-reading.css">
+</head><body>
 <div id="gate" style="position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 30%,#1b1b2f,#0b0b14);font-family:system-ui,-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;">
   <div style="text-align:center;color:#e8e8f0;max-width:320px;padding:0 20px;">
     <div style="font-size:44px;margin-bottom:10px;">🔒</div>
@@ -258,7 +259,7 @@ function markAll(root,term){
     if(!n.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
     const p=n.parentElement;
     if(!p) return NodeFilter.FILTER_REJECT;
-    if(p.closest('script,style,mark,a')) return NodeFilter.FILTER_REJECT;
+    if(p.closest('script,style,mark,a,button')) return NodeFilter.FILTER_REJECT;
     return NodeFilter.FILTER_ACCEPT;
   }});
   const nodes=[]; while(w.nextNode()) nodes.push(w.currentNode);
@@ -285,6 +286,7 @@ function apply(){
   let shown=0;
   cards.forEach(c=>{
     let ok=true;
+    if(window.LifeReading && !window.LifeReading.includes(c.id)) ok=false;
     if(grade && c.dataset.grade!==grade) ok=false;
     if(ok && term && !c.textContent.toLowerCase().includes(term)) ok=false;
     c.classList.toggle('hidden',!ok);
@@ -305,6 +307,7 @@ function apply(){
     const el=document.getElementById(a.getAttribute('href').slice(1));
     a.classList.toggle('hidden',!el||el.classList.contains('hidden'));
   });
+  document.dispatchEvent(new CustomEvent('life:filtered'));
 }
 let timer=null;
 q.addEventListener('input',()=>{clearTimeout(timer);timer=setTimeout(apply,90);});
@@ -375,4 +378,5 @@ const io=new IntersectionObserver(es=>{
 cards.forEach(c=>io.observe(c));
 if(jump) secs.forEach(s=>io.observe(s));
 </script>
+<script src="../js/life-reading.js"></script>
 </body></html>
