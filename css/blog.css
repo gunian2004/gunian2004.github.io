@@ -1143,3 +1143,180 @@ body.egg-open { overflow: hidden; }
 @media (max-width: 700px) {
     #about .section-title { font-size: clamp(1.35rem, 5.5vw, 1.65rem); }
 }
+
+/* 首页后半段：经历、能力与联系保持不同的阅读节奏。 */
+.section-lead { max-width: 720px; margin: -10px 0 28px; color: var(--text-muted); font-size: .88rem; line-height: 1.8; }
+.career-timeline { position: relative; display: grid; gap: 22px; padding-left: 27px; }
+.career-timeline::before { content: ""; position: absolute; top: 25px; bottom: 25px; left: 6px; width: 1px; background: linear-gradient(var(--primary), #b2c3c0); }
+.career-card.experience-item { width: auto; margin: 0; padding: clamp(22px, 3vw, 34px); border: 1px solid var(--line-ink); border-radius: 22px; background: rgba(255,254,250,.85); box-shadow: var(--shadow-sm); }
+.career-card.experience-item::before { top: 32px; left: -27px; width: 13px; height: 13px; border: 3px solid #f2f1eb; background: var(--primary); box-shadow: 0 0 0 1px rgba(49,92,232,.25); }
+.career-card.experience-item:hover { border-color: rgba(49,92,232,.3); }
+.career-eyebrow { display: block; margin-bottom: 15px; color: var(--primary); font: 650 .62rem/1.3 ui-monospace, monospace; letter-spacing: .13em; }
+.career-card .exp-header { justify-content: space-between; gap: 10px 20px; }
+.career-card .exp-title { font-size: clamp(1.05rem, 2vw, 1.4rem); color: var(--text-main); }
+.career-card .exp-period { font-size: .73rem; color: var(--text-muted); white-space: nowrap; }
+.career-card .exp-company { margin-bottom: 20px; color: var(--text-muted); font-size: .86rem; }
+.career-metrics { display: flex; flex-wrap: wrap; gap: 16px 35px; padding: 19px 0; border-top: 1px solid var(--line-ink); border-bottom: 1px solid var(--line-ink); }
+.career-metrics > div { display: grid; gap: 7px; }
+.career-metrics strong { color: var(--text-main); font: 700 clamp(1.1rem, 2vw, 1.6rem)/1.35 ui-monospace, monospace; }
+.career-metrics span { color: var(--text-muted); font-size: .71rem; }
+.career-projects { display: flex; flex-wrap: wrap; gap: 10px 22px; margin: 17px 0 6px; }
+.career-projects a, .skill-case-link { display: inline-flex; align-items: center; gap: 10px; color: var(--primary); text-decoration: none; font-size: .77rem; font-weight: 600; min-height: 32px; }
+.career-projects a:hover, .skill-case-link:hover { text-decoration: underline; text-underline-offset: 4px; }
+.career-card .exp-box { border: 0; border-radius: 0; background: transparent; overflow: visible; }
+.career-card .exp-desc { font-size: .85rem; line-height: 1.9; }
+.career-card .exp-box-detail { max-height: none; opacity: 1; background: transparent; }
+.career-card .exp-box-detail[hidden] { display: none; }
+.career-card .exp-box-detail-inner { margin-top: 22px; padding-top: 22px; border-top: 1px solid var(--line-ink); }
+.career-card .exp-box-actions { flex-wrap: wrap; }
+.career-card .exp-box-toggle, .career-card .exp-box-fullscreen { width: auto; height: auto; min-height: 40px; padding: 9px 17px; white-space: nowrap; }
+.career-early-heading { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin: 32px 0 16px; }
+.career-early-heading h3 { margin: 0; font-size: 1.05rem; }
+.career-early-heading > span { color: var(--text-muted); font-size: .73rem; }
+.career-early-list { position: relative; display: grid; gap: 10px; }
+.career-early { padding: 0 23px; border: 1px solid var(--line-ink); border-radius: 16px; background: rgba(255,254,250,.7); transition: border-color .25s ease, background .25s ease; }
+.career-early:hover, .career-early[open] { border-color: rgba(49,92,232,.3); background: #fffefa; }
+.career-early summary { display: grid; grid-template-columns: 145px minmax(0,1fr) 24px; align-items: start; gap: 20px; padding: 22px 0; cursor: pointer; list-style: none; }
+.career-early summary::-webkit-details-marker { display: none; }
+.career-early-time { padding-top: 3px; color: var(--text-muted); font: 600 .68rem/1.6 ui-monospace, monospace; }
+.career-early-main { display: grid; gap: 6px; }
+.career-early-main strong { font-size: .95rem; font-weight: 650; }
+.career-early-main > span { color: var(--text-muted); font-size: .76rem; line-height: 1.65; }
+.career-early-main .career-early-tags { color: #587f85; font-size: .67rem; }
+.career-disclosure { color: var(--primary); font-size: 1.1rem; transition: transform .25s ease; }
+.career-early[open] .career-disclosure { transform: rotate(45deg); }
+.career-early-detail { margin-left: 165px; padding: 0 0 20px; border-top: 1px solid var(--line-ink); }
+.career-early-detail .exp-desc { padding-top: 16px; }
+.career-early-detail .exp-desc, .career-early-detail li { font-size: .81rem; line-height: 1.85; }
+.exp-fullscreen-modal { inset: 0; width: 100%; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; }
+.exp-fullscreen-modal:not([open]) { display: none; }
+.exp-fullscreen-modal[open] { display: flex; opacity: 1; visibility: visible; transform: none; pointer-events: auto; }
+.exp-fullscreen-modal::backdrop { background: rgba(14,25,37,.45); }
+.exp-fullscreen-modal .exp-fullscreen-body { min-height: 0; }
+.exp-fullscreen-modal .exp-fullscreen-title { min-width: 0; overflow-wrap: anywhere; font-size: clamp(.95rem, 2vw, 1.3rem); }
+.exp-fullscreen-modal .exp-fullscreen-close { flex: 0 0 auto; }
+.exp-fullscreen-modal .exp-fullscreen-title { background: none; -webkit-text-fill-color: currentColor; color: var(--text-main); }
+.exp-fullscreen-modal .exp-fullscreen-close, .exp-fullscreen-modal .exp-fullscreen-exit { width: auto; height: auto; border-color: var(--line-ink); color: var(--text-main); background: #eef2f8; white-space: nowrap; }
+.exp-fullscreen-modal .exp-fullscreen-close:hover, .exp-fullscreen-modal .exp-fullscreen-exit:hover { border-color: rgba(49,92,232,.35); background: #e4ebf8; box-shadow: var(--shadow-sm); }
+.exp-fullscreen-modal button:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+.skill-workbench { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; }
+.skill-workbench-card { display: flex; flex-direction: column; min-width: 0; padding: 27px; border: 1px solid var(--line-ink); border-radius: 20px; background: rgba(255,254,250,.8); transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease; }
+.skill-workbench-card:hover { transform: translateY(-3px); border-color: rgba(49,92,232,.28); box-shadow: var(--shadow-sm); }
+.skill-workbench-head { display: flex; gap: 13px; align-items: center; }
+.skill-workbench-head > span { display: grid; place-items: center; width: 35px; height: 35px; border-radius: 10px; background: #eaf0f8; color: var(--primary); font: 600 .69rem/1 ui-monospace, monospace; }
+.skill-workbench-card:nth-child(3) .skill-workbench-head > span { background: #e8f3ee; color: #287e79; }
+.skill-workbench-head h3 { margin: 0; font-size: 1.05rem; }
+.skill-intro { margin: 17px 0 14px; color: var(--text-muted); font-size: .83rem; line-height: 1.7; }
+.skill-tools, .education-courses { display: flex; flex-wrap: wrap; gap: 7px; padding: 0; margin: 0; list-style: none; }
+.skill-tools li, .education-courses li { padding: 6px 10px; border: 1px solid var(--line-ink); border-radius: 8px; color: var(--text-main); background: rgba(232,237,240,.35); font-size: .72rem; line-height: 1.5; }
+.skill-practice { margin: 20px 0 9px; padding-top: 16px; border-top: 1px solid var(--line-ink); color: var(--text-muted); font-size: .78rem; line-height: 1.8; }
+.skill-case-link, .skill-practice-note { margin-top: auto; align-self: flex-start; }
+.skill-practice-note { display: inline-flex; min-height: 32px; align-items: center; color: var(--text-muted); font-size: .74rem; }
+.education-pass { position: relative; display: flex; align-items: center; gap: 30px; overflow: hidden; padding: 30px; border: 1px solid var(--line-ink); border-radius: 20px; background: rgba(255,254,250,.75); }
+.education-stamp { display: grid; justify-items: center; align-content: center; gap: 9px; flex: 0 0 114px; height: 132px; border: 1px solid #b5c9c1; border-radius: 55px 55px 14px 14px; background: #eaf0e8; color: #376158; transform: rotate(-4deg); }
+.education-stamp > span { font: 650 .9rem/1 ui-monospace, monospace; letter-spacing: .16em; }
+.education-stamp small { font: 600 .47rem/1 ui-monospace, monospace; letter-spacing: .12em; }
+.education-stamp b { font: 700 1.7rem/1 ui-monospace, monospace; }
+.education-pass-copy { min-width: 0; }
+.education-degree { color: var(--text-muted); font-size: .7rem; }
+.education-pass-copy h3 { margin: 7px 0; font-size: 1.35rem; }
+.education-pass-copy p { margin: 0 0 15px; color: var(--text-muted); font-size: .87rem; }
+.education-pass-mark { margin-left: auto; align-self: flex-start; color: #bbc4c0; font: 700 .66rem/1.6 ui-monospace, monospace; letter-spacing: .05em; }
+.honor-gallery { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 15px; }
+.honor-secondary { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 13px; margin-top: 15px; }
+.honor-card { position: relative; min-width: 0; padding: 23px; overflow: hidden; border: 1px solid var(--line-ink); border-radius: 18px; background: rgba(255,254,250,.8); transition: border-color .3s ease, box-shadow .3s ease; }
+.honor-card-featured { padding: 28px 24px; background: linear-gradient(135deg,#faf6eb,#fffefa 70%); border-color: #dfd4bb; }
+.honor-card-featured:nth-child(2) { background: linear-gradient(135deg,#edf1f6,#fffefa 70%); border-color: #cfd7e0; }
+.honor-card-featured:nth-child(3) { background: linear-gradient(135deg,#eaf2ee,#fffefa 70%); border-color: #ccddd5; }
+.honor-card::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; box-shadow: inset 0 0 24px rgba(173,144,80,.12); transition: opacity .3s ease; }
+.honor-card:hover { border-color: #b7aa87; box-shadow: var(--shadow-sm); }
+.honor-card:hover::after { opacity: 1; }
+.honor-card-top { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+.honor-seal { color: #a37c38; font-size: 1.55rem; line-height: 1; }
+.honor-card-featured:nth-child(2) .honor-seal { color: #748aa3; }
+.honor-card-featured:nth-child(3) .honor-seal { color: #5c8c79; }
+.honor-category { color: var(--text-muted); font-size: .63rem; line-height: 1.6; }
+.honor-card h3 { margin: 0 0 9px; font-size: .93rem; line-height: 1.6; }
+.honor-card p { margin: 0; color: var(--text-muted); font-size: .77rem; line-height: 1.8; }
+.honor-card-featured p { color: #806633; font-weight: 650; }
+.honor-card-featured:nth-child(2) p { color: #5b708a; }
+.honor-card-featured:nth-child(3) p { color: #497966; }
+.campus-roles { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 18px; }
+.campus-card { display: flex; flex-direction: column; padding: 30px; border: 1px solid var(--line-ink); border-radius: 20px; background: rgba(255,254,250,.8); }
+.campus-role-index { color: #538678; font: 650 .61rem/1.4 ui-monospace, monospace; letter-spacing: .1em; }
+.campus-card h3 { margin: 16px 0 12px; font-size: 1.2rem; }
+.campus-card > p { margin: 0 0 24px; color: var(--text-muted); font-size: .83rem; line-height: 1.9; }
+.campus-metrics { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; margin: auto 0 25px; }
+.campus-metrics > div { display: flex; flex-direction: column-reverse; gap: 7px; }
+.campus-metrics dt { color: var(--text-muted); font-size: .69rem; }
+.campus-metrics dd { margin: 0; color: #284d45; font: 700 2.2rem/1.3 ui-monospace, monospace; }
+.campus-metrics dd span { margin-left: 3px; font-size: .7rem; }
+.campus-leadership { display: grid; gap: 12px; margin: auto 0 25px; color: var(--text-muted); font-size: .78rem; }
+.campus-leadership strong { color: #284d45; font: 700 3rem/1.2 ui-monospace, monospace; }
+.campus-leadership strong span { margin-left: 10px; font: 600 .9rem/1.5 system-ui,sans-serif; }
+.campus-card-foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; padding-top: 18px; border-top: 1px solid var(--line-ink); color: #426f62; font-size: .71rem; line-height: 1.7; }
+.campus-card-foot > span { color: var(--text-muted); font-size: .65rem; }
+.contact-invitation { display: grid; grid-template-columns: minmax(0,1.35fr) minmax(0,1fr); gap: 35px; padding: clamp(25px,4vw,48px); border: 1px solid rgba(255,255,255,.1); border-radius: 25px; background: radial-gradient(ellipse at 100% 0%,rgba(58,105,157,.25),transparent 65%), #142332; box-shadow: var(--shadow-md); }
+.contact-invitation .section-kicker { color: #a9bdcd; font-size: .61rem; }
+.contact-invitation .section-kicker > span { color: #88acfa; }
+.contact-invitation h2 { margin: 4px 0 20px; color: #fffefa; font-size: clamp(1.4rem,2.8vw,2.15rem); line-height: 1.6; letter-spacing: -.03em; }
+.contact-invitation-copy > p:last-child { margin: 0; color: #adbfcc; font-size: .85rem; line-height: 1.9; }
+.contact-invitation-actions { display: flex; flex-direction: column; justify-content: center; align-items: stretch; min-width: 0; }
+.contact-github, .contact-copy { display: inline-flex; align-items: center; justify-content: space-between; gap: 15px; width: auto; height: auto; min-height: 47px; padding: 12px 19px; border: 1px solid rgba(184,207,224,.3); border-radius: 999px; font: 600 .84rem/1.5 system-ui,sans-serif; text-decoration: none; cursor: pointer; transition: background .25s ease, transform .25s ease; }
+.contact-github { color: #172a3b; background: #f4f6ef; }
+.contact-copy { margin-top: 12px; color: #d8e7f2; background: rgba(255,255,255,.04); }
+.contact-copy[hidden] { display: none; }
+.contact-github:hover { color: #172a3b; background: #fff; transform: translateY(-2px); }
+.contact-copy:hover { color: white; background: rgba(255,255,255,.1); transform: translateY(-2px); }
+.contact-copy-status { min-height: 21px; margin: 10px 0 0; color: #a6d7c6; font-size: .73rem; line-height: 1.6; }
+.contact-channel-note { margin: 10px 0; color: #a9bdcd; font-size: .71rem; line-height: 1.8; }
+.contact-address { align-self: flex-start; color: #c6daef; text-decoration: none; font: 500 .68rem/1.6 ui-monospace,monospace; overflow-wrap: anywhere; }
+.contact-copy-manual { width: 100%; margin: 10px 0 0; padding: 10px; border: 1px solid #91b3d3; border-radius: 8px; color: #f1f5f8; background: #1c344a; font: 400 .76rem/1.5 system-ui,sans-serif; }
+.career-projects a:focus-visible, .skill-case-link:focus-visible, .career-early summary:focus-visible { outline: 2px solid var(--primary); outline-offset: 5px; border-radius: 5px; }
+.contact-invitation a:focus-visible, .contact-copy:focus-visible, .contact-copy-manual:focus-visible { outline: 2px solid #a9ccfa; outline-offset: 4px; }
+[data-footer-reveal].is-footer-pending { opacity: 0; transform: translateY(16px); }
+[data-footer-reveal].is-footer-visible { animation: footerCardIn .5s cubic-bezier(.2,.7,.2,1) var(--footer-delay,0ms) backwards; }
+@keyframes footerCardIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+@media (max-width: 980px) {
+    .honor-secondary { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    .contact-invitation { grid-template-columns: minmax(0,1.2fr) minmax(0,1fr); gap: 25px; }
+    .education-pass-mark { display: none; }
+}
+@media (max-width: 700px) {
+    .career-timeline { padding-left: 17px; }
+    .career-timeline::before { left: 0; }
+    .career-card.experience-item::before { left: -23px; }
+    .career-card.experience-item { padding: 22px 18px; }
+    .career-metrics { gap: 18px 23px; }
+    .career-metrics strong { font-size: 1.05rem; }
+    .career-early { padding: 0 18px; }
+    .career-early summary { grid-template-columns: minmax(0,1fr) 24px; gap: 9px; }
+    .career-early-time { grid-column: 1; }
+    .career-early-main { grid-column: 1; grid-row: 2; }
+    .career-disclosure { grid-column: 2; grid-row: 1 / 3; align-self: center; }
+    .career-early-detail { margin-left: 0; }
+    .skill-workbench, .campus-roles, .contact-invitation { grid-template-columns: minmax(0,1fr); }
+    .honor-gallery { grid-template-columns: minmax(0,1fr); }
+    .honor-card-top { margin-bottom: 12px; }
+    .education-pass { gap: 20px; padding: 24px; align-items: flex-start; }
+    .education-stamp { flex-basis: 78px; height: 105px; }
+    .education-stamp b { font-size: 1.35rem; }
+    .education-pass-copy h3 { font-size: 1.15rem; }
+    .campus-card { padding: 25px; }
+    .contact-invitation { gap: 28px; }
+    .career-section .section-title, #skills .section-title, #school .section-title { font-size: clamp(1.35rem,5vw,1.65rem); }
+    .exp-fullscreen-modal .exp-fullscreen-header { gap: 12px; padding: 17px; }
+    .exp-fullscreen-modal .exp-fullscreen-close { padding: 9px 12px; font-size: .73rem; }
+}
+@media (max-width: 420px) {
+    .skill-workbench-card { padding: 23px; }
+    .honor-secondary { grid-template-columns: minmax(0,1fr); }
+    .education-pass { gap: 14px; padding: 22px 18px; }
+    .education-stamp { flex-basis: 64px; height: 96px; }
+    .education-stamp > span { font-size: .74rem; }
+    .campus-metrics dd { font-size: 1.9rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+    [data-footer-reveal].is-footer-pending { opacity: 1; transform: none; }
+    .skill-workbench-card:hover, .contact-github:hover, .contact-copy:hover { transform: none; }
+}

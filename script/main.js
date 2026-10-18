@@ -187,71 +187,59 @@ if (motionPreference.matches || !('IntersectionObserver' in window)) {
     });
 }
 
-// ========== 实习经历折叠盒子交互 ==========
-function toggleExpBox(boxId) {
-    const box = document.getElementById(boxId);
+// ========== 工作经历展开与全屏阅读 ==========
+function syncExpButtons(box, expanded) {
     const detail = box.querySelector('.exp-box-detail');
-    const previewActions = box.querySelector('.exp-box-preview .exp-box-actions');
-    const isExpanded = detail.classList.contains('expanded');
-
-    if (isExpanded) {
-        detail.classList.remove('expanded');
-        // 滚动到盒子位置
-        box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    } else {
-        detail.classList.add('expanded');
-    }
-}
-
-function openExpFullscreen(boxId) {
-    const box = document.getElementById(boxId);
-    const detailInner = box.querySelector('.exp-box-detail-inner');
-    const modal = document.getElementById('expFullscreenModal');
-    const body = document.getElementById('expFullscreenBody');
-    const title = document.getElementById('expFullscreenTitle');
-
-    // 获取经历标题
-    const expItem = box.closest('.experience-item');
-    const expTitle = expItem.querySelector('.exp-title').textContent;
-    const expCompany = expItem.querySelector('.exp-company').textContent;
-    title.textContent = expTitle + ' — ' + expCompany;
-
-    // 克隆内容到模态框
-    body.innerHTML = detailInner.innerHTML;
-
-    // 显示模态框 + 隐藏导航按钮
-    modal.classList.add('active');
-    document.body.classList.add('exp-fullscreen-open');
-    document.body.style.overflow = 'hidden';
-
-    // 滚动到顶部
-    body.scrollTop = 0;
-}
-
-function closeExpFullscreen() {
-    if (!document.getElementById('expFullscreenModal')) return;
-    const modal = document.getElementById('expFullscreenModal');
-    modal.classList.remove('active');
-    document.body.classList.remove('exp-fullscreen-open');
-    document.body.style.overflow = '';
-}
-
-// ESC 关闭全屏
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-        closeExpFullscreen();
-    }
-});
-
-// 点击遮罩关闭全屏
-const expFullscreenModalEl = document.getElementById('expFullscreenModal');
-if (expFullscreenModalEl) {
-    expFullscreenModalEl.addEventListener('click', (e) => {
-        if (e.target === e.currentTarget) {
-            closeExpFullscreen();
-        }
+    box.querySelectorAll('.exp-box-toggle').forEach(button => {
+        button.type = 'button';
+        button.setAttribute('aria-expanded', String(expanded));
+        if (detail?.id) button.setAttribute('aria-controls', detail.id);
+        button.innerHTML = '<span class="toggle-icon" aria-hidden="true">' + (expanded ? '▲' : '▼') + '</span> ' + (expanded ? '收起详情' : '展开详情');
     });
 }
+document.querySelectorAll('.career-card .exp-box').forEach(box => syncExpButtons(box, false));
+function toggleExpBox(boxId) {
+    const box = document.getElementById(boxId);
+    const detail = box?.querySelector('.exp-box-detail');
+    if (!detail) return;
+    const expanded = !detail.classList.contains('expanded');
+    const focusWasInDetail = detail.contains(document.activeElement);
+    detail.classList.toggle('expanded', expanded);
+    detail.hidden = !expanded;
+    syncExpButtons(box, expanded);
+    if (!expanded) {
+        if (focusWasInDetail) box.querySelector('.exp-box-toggle')?.focus({ preventScroll: true });
+        box.closest('.career-card')?.scrollIntoView({ behavior: motionPreference.matches ? 'instant' : 'smooth', block: 'start' });
+    }
+}
+const expFullscreenModalEl = document.getElementById('expFullscreenModal');
+let experienceOpener = null;
+let experiencePreviousOverflow = '';
+function openExpFullscreen(boxId) {
+    const box = document.getElementById(boxId);
+    const detailInner = box?.querySelector('.exp-box-detail-inner');
+    if (!detailInner || !expFullscreenModalEl || typeof expFullscreenModalEl.showModal !== 'function' || expFullscreenModalEl.open) return;
+    const item = box.closest('.experience-item');
+    const body = document.getElementById('expFullscreenBody');
+    document.getElementById('expFullscreenTitle').textContent = item.querySelector('.exp-title').textContent + ' — ' + item.querySelector('.exp-company').textContent;
+    body.replaceChildren(...Array.from(detailInner.childNodes, node => node.cloneNode(true)));
+    experienceOpener = document.activeElement;
+    experiencePreviousOverflow = document.body.style.overflow;
+    expFullscreenModalEl.showModal();
+    document.body.classList.add('exp-fullscreen-open');
+    document.body.style.overflow = 'hidden';
+    body.scrollTop = 0;
+    expFullscreenModalEl.querySelector('.exp-fullscreen-close').focus({ preventScroll: true });
+}
+function closeExpFullscreen() {
+    if (expFullscreenModalEl?.open) expFullscreenModalEl.close();
+}
+expFullscreenModalEl?.addEventListener('close', () => {
+    document.body.classList.remove('exp-fullscreen-open');
+    document.body.style.overflow = experiencePreviousOverflow;
+    if (experienceOpener?.isConnected) experienceOpener.focus({ preventScroll: true });
+    experienceOpener = null;
+});
 
 // ========== 项目卡片展开/收起 ==========
 function toggleProject(projId) {
@@ -440,4 +428,57 @@ if (aboutLayout && !motionPreference.matches && 'IntersectionObserver' in window
     }, { threshold: 0.08 });
     aboutLayout.classList.add('is-about-pending');
     aboutObserver.observe(aboutLayout);
+}
+
+// 后半页卡片依次出现；减少动态效果或无观察器时直接展示。
+const footerRevealCards = document.querySelectorAll('[data-footer-reveal]');
+if (!motionPreference.matches && 'IntersectionObserver' in window) {
+    const footerObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.remove('is-footer-pending');
+            entry.target.classList.add('is-footer-visible');
+            observer.unobserve(entry.target);
+        });
+    }, { threshold: 0.05 });
+    footerRevealCards.forEach((card, index) => {
+        card.style.setProperty('--footer-delay', ((index % 3) * 55) + 'ms');
+        card.classList.add('is-footer-pending');
+        footerObserver.observe(card);
+    });
+}
+
+// 复制仅在访客点击时执行；失败时展示可手动复制的地址。
+const copyGithubButton = document.getElementById('copyGithub');
+const contactCopyStatus = document.getElementById('contactCopyStatus');
+if (copyGithubButton && contactCopyStatus) {
+    const githubAddress = 'https://github.com/gunian2004';
+    let copying = false;
+    copyGithubButton.hidden = false;
+    copyGithubButton.addEventListener('click', async () => {
+        if (copying) return;
+        copying = true;
+        try {
+            if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable');
+            await navigator.clipboard.writeText(githubAddress);
+            contactCopyStatus.textContent = 'GitHub 地址已复制。';
+            document.querySelector('.contact-copy-manual')?.remove();
+        } catch {
+            let manualAddress = document.querySelector('.contact-copy-manual');
+            if (!manualAddress) {
+                manualAddress = document.createElement('input');
+                manualAddress.className = 'contact-copy-manual';
+                manualAddress.type = 'text';
+                manualAddress.readOnly = true;
+                manualAddress.value = githubAddress;
+                manualAddress.setAttribute('aria-label', '请手动复制 GitHub 地址');
+                contactCopyStatus.after(manualAddress);
+            }
+            contactCopyStatus.textContent = '请手动复制下方已选中的地址。';
+            manualAddress.focus({ preventScroll: true });
+            manualAddress.select();
+        } finally {
+            copying = false;
+        }
+    });
 }
