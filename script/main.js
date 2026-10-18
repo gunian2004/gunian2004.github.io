@@ -428,3 +428,16 @@ if (initialProjectCase) {
     // 等待首次布局与浏览器的原生锚点定位后再校正位置。
     window.addEventListener('load', () => requestAnimationFrame(() => revealProjectCase(initialProjectCase)), { once: true });
 }
+
+// 关于我：观察器就绪后才启用依次入场，无 JS 时内容保持可读。
+const aboutLayout = document.querySelector('.about-layout');
+if (aboutLayout && !motionPreference.matches && 'IntersectionObserver' in window) {
+    const aboutObserver = new IntersectionObserver((entries, observer) => {
+        if (!entries.some(entry => entry.isIntersecting)) return;
+        aboutLayout.classList.remove('is-about-pending');
+        aboutLayout.classList.add('is-about-visible');
+        observer.disconnect();
+    }, { threshold: 0.08 });
+    aboutLayout.classList.add('is-about-pending');
+    aboutObserver.observe(aboutLayout);
+}
