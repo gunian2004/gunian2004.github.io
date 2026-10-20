@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#101821">
-  <meta name="description" content="个人工作经验备忘：境外节点资源 clone 解决方法。">
+  <meta name="description" content="个人工作经验备忘：Git 代理排查、项目开发规范与 AI 协作约束。">
   <title>工作经验库 · Work Notes</title>
   <style>
     :root{color-scheme:dark;--bg:#101821;--panel:#18232e;--panel2:#1c2a35;--text:#edf3f4;--muted:#9aadb3;--line:rgba(197,222,220,.12);--mint:#80e0c1;--lime:#d4f178;--amber:#ffbd78;--mono:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace}
@@ -17,6 +17,7 @@
     @media(max-width:640px){.topbar{width:calc(100% - 32px);padding:20px 0}.brand-mark{width:38px;height:38px}.back{padding:7px 11px;font-size:12px}main{width:calc(100% - 32px);padding:42px 0 64px}.hero{margin-bottom:25px}.card-head{padding:23px 20px 20px;align-items:center;gap:12px}.card-title{gap:12px}.card-head h2{font-size:19px}.card-head:after{width:28px;height:28px}.tag{display:none}.card-body{padding:21px 20px 24px}.steps{grid-template-columns:1fr}.step{min-height:unset}.command{padding:15px}.command-head{align-items:flex-start;flex-direction:column;gap:4px}}
 
     .command-tools{display:flex;gap:8px;align-items:center}.copy-command{flex:none;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;min-height:30px;padding:6px 13px;border:1px solid #80e0c140;border-radius:999px;background:#80e0c110;color:var(--mint);font:600 11px var(--mono);cursor:pointer}.copy-command:hover{background:#80e0c125}.copy-command:focus-visible{outline:2px solid var(--mint);outline-offset:3px}.verification{margin-top:22px;border-top:1px solid var(--line);padding-top:20px}.verification h3{font-size:14px;margin:0 0 8px}.verification>p{color:var(--muted);font-size:12px;line-height:1.8;margin:0 0 14px}.verification .command{margin-top:12px}.verification .command-head{flex-wrap:wrap}.verification .command-head strong{color:var(--mint)}.command .command-head{flex-wrap:wrap}.command-head>button{margin-left:auto}.cleanup{margin-top:16px;color:var(--muted);font-size:12px}.cleanup>summary{cursor:pointer;color:var(--mint)}.cleanup .command-head strong{font-size:12px}.studio-toast{position:fixed;left:50%;bottom:25px;transform:translate(-50%,12px);max-width:calc(100vw - 32px);padding:12px 22px;border:1px solid #80e0c140;border-radius:999px;background:#172832;color:var(--text);font-size:12px;opacity:0;pointer-events:none;z-index:100;transition:opacity .2s,transform .2s}.studio-toast.is-visible{opacity:1;transform:translate(-50%,0)}@media(prefers-reduced-motion:reduce){.studio-toast{transition:none}}@media(max-width:640px){.command .command-head{flex-direction:row;align-items:center}.command-head>span{flex-basis:100%;order:3}.command-head>button{font-size:10px}}
+.hub-links{width:min(1080px,calc(100% - 40px));margin:16px auto 0;display:flex;gap:8px;flex-wrap:wrap}.hub-links a{font-size:12px;color:var(--muted);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:7px 13px;transition:.2s}.hub-links a:hover{color:var(--mint);border-color:#80e0c166}@media(max-width:640px){.hub-links{width:calc(100% - 32px)}}
   </style>
 </head>
 <body>
@@ -34,8 +35,9 @@
     <div class="brand"><div class="brand-mark">W</div><div><strong>个人工作经验库</strong><small>WORK NOTES · FIELD LOG</small></div></div>
     <a class="back" href="../index.html">← 返回首页</a>
   </header>
+  <nav class="hub-links" aria-label="工作工具"><a href="troubleshooting.html">问题排查库</a><a href="doc-templates.html">开发文档模板台</a><a href="snippets.html">常用命令与代码片段</a></nav>
   <main>
-    <section class="hero"><div class="eyebrow">A growing collection</div><h1>把踩过的坑，<br>变成下次的捷径。</h1><p>记录真实遇到的问题、有效的解决路径，以及值得复用的小经验。</p><div class="count"><i></i> 当前收录 01 条工作经验</div></section>
+    <section class="hero"><div class="eyebrow">A growing collection</div><h1>把踩过的坑，<br>变成下次的捷径。</h1><p>记录真实遇到的问题、有效的解决路径，以及值得复用的小经验。</p><div class="count"><i></i> 当前收录 02 条工作经验</div></section>
     <details class="experience">
       <summary class="card-head"><div class="card-title"><div class="card-number">01</div><div><h2>境外节点资源 clone 解决方法</h2><p>Git · 代理配置 · 网络排查</p></div></div><span class="tag">点击展开</span></summary>
       <div class="card-body">
@@ -56,6 +58,40 @@ git config --global --get https.proxy</code></pre><p class="command-note">预期
         <details class="cleanup"><summary>不再使用代理时，撤销本次全局配置</summary><div class="command"><div class="command-head"><strong>清除 Git 全局代理</strong></div><pre><code>git config --global --unset-all http.proxy
 git config --global --unset-all https.proxy</code></pre><p class="command-note">这会移除上述全局代理项。执行前确认其他仓库不再依赖它们。</p></div></details>
         <p class="footnote">经验记录：境外节点资源 clone 连接失败时的处理顺序。</p>
+      </div>
+    </details>
+    <details class="experience" id="development-standards" style="margin-top:24px">
+      <summary class="card-head"><div class="card-title"><div class="card-number">02</div><div><h2>项目启动前：开发规范与 AI 协作约束</h2><p>规范先行 · 全系统设计 · Superpowers · AGENTS.md</p></div></div><span class="tag">点击展开</span></summary>
+      <div class="card-body">
+        <p class="summary">开始项目前，先调用 Superpowers 插件或技能，参照已有开发文档标准，梳理系统边界并形成可执行的开发规范，再进入编码阶段。将需求、设计、工程流程与 AI 执行约束一并明确，让后续开发与变更有据可依。</p>
+        <div class="steps" aria-label="开发规范覆盖清单">
+          <div class="step"><div class="step-num"></div><div><strong>模块、字段与校验规则</strong><span>逐一列出模块、页面、角色、业务流程与状态流转；为每个字段明确名称、类型、必填条件、默认值、长度、取值范围、格式、联动校验、错误提示与读写权限。</span></div></div>
+          <div class="step"><div class="step-num"></div><div><strong>前台与后台管理端设计</strong><span>统一样式、配色、字体、间距、图标和组件；明确表单、表格、弹窗、导航及加载、空数据、错误、禁用等状态，并定义组件复用规则。</span></div></div>
+          <div class="step"><div class="step-num"></div><div><strong>移动端与桌面端适配</strong><span>分别约定布局、断点、触摸与鼠标交互、键盘操作、表格与表单展示、安全区域、浏览器兼容及无障碍要求，覆盖不同屏幕下的使用体验。</span></div></div>
+          <div class="step"><div class="step-num"></div><div><strong>技术栈与编码规范</strong><span>明确前后端技术栈及版本、目录结构、命名、类型、格式化与依赖管理；统一接口契约、错误码、数据模型、日志、配置和环境隔离规则。</span></div></div>
+          <div class="step"><div class="step-num"></div><div><strong>安全、测试与交付标准</strong><span>约定身份认证、权限校验、敏感信息保护、文件上传与审计要求；明确正常、异常、边界场景的测试范围，以及性能目标、验收标准、部署和回滚流程。</span></div></div>
+          <div class="step"><div class="step-num"></div><div><strong>后续改动与变更流程</strong><span>按变更提出、影响分析、方案确认、文档更新、编码、测试、审查和发布的顺序推进；记录架构决策，处理接口兼容与数据迁移，确保文档和实现同步。</span></div></div>
+          <div class="step"><div class="step-num"></div><div><strong>版本管理策略</strong><span>明确分支用途与命名、提交格式、合并审查、冲突处理、版本编号、发布标签和变更日志；约定紧急修复与回退方式，保留可追溯的交付记录。</span></div></div>
+          <div class="step"><div class="step-num"></div><div><strong>AI 生成代码与执行约束</strong><span>通过 AGENTS.md 明确必读文档、指令优先级、允许修改的范围、编码及验证要求；禁止臆造需求、泄露密钥或擅自执行破坏性操作，对不确定项先标注并确认。</span></div></div>
+        </div>
+        <div class="command" data-copy-label="复制提示词"><div class="command-head"><strong>可复用提示词 / 项目启动前使用</strong><span>将已有文档作为参考上下文提供给 AI</span></div><pre><code>在开始项目前，先调用 Superpowers 插件或技能，参照已有开发文档标准，产出一套覆盖整个系统的详尽开发规范文档，并为项目生成 AGENTS.md，用于约束和规范 AI 的执行行为。
+
+开发规范至少覆盖：
+1. 系统边界、模块清单、角色权限、页面、业务流程及状态机。
+2. 各模块的每一个字段及其类型、必填条件、默认值、长度、格式、范围、联动关系、校验规则和错误提示。
+3. 前台与后台管理端的样式、配色、字体、间距、组件和交互状态；前端与后端的接口契约及数据校验一致性。
+4. 移动端与桌面端的布局、响应式断点、交互、兼容性及无障碍设计规范。
+5. 技术栈及版本、架构、目录结构、编码、命名、类型、依赖、配置、日志和错误处理规范。
+6. 安全、隐私、认证授权、审计、测试、性能、验收、部署与回滚要求。
+7. 后续系统改动的提出、影响分析、确认、文档同步、开发、验证、审查和发布流程。
+8. 分支、提交、合并、版本编号、发布标签、变更日志和紧急修复策略。
+9. AI 生成代码的范围、约束、复核与验证要求；AGENTS.md 中的必读文档、指令优先级、执行边界和交付检查清单。
+
+不限于上述维度。逐模块、逐页面、逐字段检查覆盖情况，为每项规则给出明确、可验证的标准。区分已确认要求、建议方案与待确认问题；不得将假设写成既定事实。发现冲突或缺失时，先列出并确认。
+
+交付文档索引、模块规范、字段字典、设计规范、技术与编码规范、变更与版本管理规范、测试验收规范，以及 AGENTS.md，并建立相互引用，便于后续维护。若 Superpowers 不可用，明确说明，不得声称已调用。</code></pre><p class="command-note">使用时替换项目背景与参考资料；先确认规范基线，再按规范实施。提示词用于检查覆盖范围，具体规则仍需结合项目逐项确定。</p></div>
+        <div class="verification"><h3>落地检查</h3><p>检查模块清单是否与页面、接口和字段字典对应；每项规则是否有验证方式；待确认问题是否已明确记录；AGENTS.md 是否引用有效规范，并写清 AI 的执行边界和交付要求。后续变更同时更新相关文档与实现。</p></div>
+        <p class="footnote">经验记录：规范先行，将开发标准与 AI 协作约束纳入项目启动流程。</p>
       </div>
     </details>
     <div class="footer">WORK NOTES · 持续积累，随时复用</div>

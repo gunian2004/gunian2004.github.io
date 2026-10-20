@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101821">
+  <meta name="robots" content="noindex">
+  <meta name="description" content="可搜索、收藏、参数化的常用命令与代码片段库，支持浏览器本地管理和 JSON 备份。">
+  <title>命令与代码片段 · 工作台</title>
+  <link rel="stylesheet" href="../css/work-hub.css">
+  <style>
+    .snippet-tools{display:flex;flex-wrap:wrap;gap:12px;align-items:end}.snippet-tools .search-field{flex:1 1 240px}.snippet-tools label{display:flex;flex-direction:column;gap:6px}.snippet-tools .favorite-filter{flex-direction:row;align-items:center;min-height:44px}.snippet-tools input[type=checkbox]{width:18px;height:18px}.snippet-summary{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:20px 0}.snippet-card{display:flex;flex-direction:column;gap:12px;min-width:0}.snippet-card h3,.snippet-card p{margin:0}.snippet-card .code-block{max-height:180px;overflow:auto;white-space:pre;min-height:76px}.snippet-card .card-actions{margin-top:auto;display:flex;flex-wrap:wrap;gap:8px}.snippet-note{font-size:.85rem;color:var(--muted,#9aadb3)}.snippet-card .chip[aria-pressed=true]{color:var(--mint,#80e0c1);border-color:currentColor}.snippet-dialog{width:min(780px,calc(100% - 28px));max-height:90vh;overflow:auto;background:var(--panel,#18232e);color:var(--text,#edf3f4);border:1px solid var(--line,#41535a);border-radius:20px;padding:26px}.snippet-dialog::backdrop{background:#000a;backdrop-filter:blur(5px)}.snippet-dialog h2{margin-top:0}.snippet-dialog form{display:grid;gap:16px}.snippet-dialog label{display:grid;gap:6px}.snippet-dialog input:not([type=radio]),.snippet-dialog select,.snippet-dialog textarea{width:100%;box-sizing:border-box}.snippet-dialog textarea{min-height:100px;resize:vertical}.snippet-dialog .code-input{min-height:230px;font-family:ui-monospace,Consolas,monospace;tab-size:2}.snippet-dialog .dialog-actions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}.snippet-dialog .code-block{white-space:pre;overflow:auto;max-height:320px}.snippet-dialog .parameter-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}.snippet-dialog .import-option{display:flex;align-items:flex-start;gap:10px}.snippet-dialog .import-option input{margin-top:6px}.snippet-dialog details summary{cursor:pointer}.snippet-dialog .status:empty{display:none}.snippet-file{max-width:100%}[hidden]{display:none!important}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid var(--mint,#80e0c1);outline-offset:3px}
+  </style>
+</head>
+<body class="gate-locked">
+  <div class="gate" id="gate" data-pw-field="work-hub-PW">
+    <div class="gate-card">
+      <h2>进入工作台</h2>
+      <p>把常用的方法，收进随手可取的工具箱。</p>
+      <label for="gatePw">访问密码</label>
+      <input id="gatePw" type="password" autocomplete="current-password" placeholder="请输入访问密码">
+      <button id="gateBtn" type="button">解锁工作台</button>
+      <p id="gateMsg" role="status" aria-live="polite"></p>
+    </div>
+  </div>
+  <header class="hub-header hub-wrap">
+    <a href="work.html" class="hub-brand">WORK / 工作台</a>
+    <a href="../index.html">返回主页 ↗</a>
+  </header>
+  <main class="hub-wrap">
+    <nav class="hub-nav" aria-label="工作台导航">
+      <a href="work.html">工作经验</a>
+      <a href="troubleshooting.html">问题排查</a>
+      <a href="doc-templates.html">文档模板</a>
+      <a href="snippets.html" aria-current="page">命令片段</a>
+      <a href="../index.html">主页</a>
+    </nav>
+    <section class="hub-hero">
+      <p class="eyebrow">04 / SNIPPET LIBRARY</p>
+      <h1>少查一次，多专注一点。</h1>
+      <p>收好那些反复用到的命令与代码。按场景查找，填入参数，核对后复制。</p>
+      <div class="chips"><span class="chip">六类常用工具</span><span class="chip">本地收藏与备份</span><span class="chip">仅复制，不执行</span></div>
+    </section>
+    <section class="panel" aria-label="片段筛选与管理">
+      <div class="toolbar snippet-tools">
+        <label class="search-field" for="snippetSearch">全文搜索<input class="field" id="snippetSearch" type="search" maxlength="200" placeholder="搜索标题、说明、标签或代码…"></label>
+        <label for="snippetCategory">分类<select class="field" id="snippetCategory"><option value="all">全部分类</option><option>Git</option><option>Docker</option><option>PowerShell</option><option>SQL</option><option>JavaScript</option><option>Python</option><option>其他</option></select></label>
+        <label class="favorite-filter"><input id="snippetFavorites" type="checkbox">只看收藏</label>
+        <button class="btn" id="snippetAdd" type="button">＋ 新增片段</button>
+      </div>
+      <div class="snippet-summary">
+        <span class="snippet-note">自定义片段和收藏保存在当前浏览器；请定期导出。不要保存密码、令牌或个人敏感信息。</span>
+        <div class="card-actions"><button class="btn secondary" id="snippetExport" type="button">导出 JSON</button> <button class="btn secondary" id="snippetImport" type="button">导入 JSON</button><input hidden id="snippetFile" class="snippet-file" type="file" accept=".json,application/json"></div>
+      </div>
+      <p class="status" id="snippetStatus" role="status" aria-live="polite"></p>
+    </section>
+    <div class="snippet-summary"><p id="snippetCount" class="card-meta" aria-live="polite"></p><span class="snippet-note">内置片段只读 · 自定义片段可编辑、删除</span></div>
+    <section id="snippetGrid" class="library-grid" aria-label="代码片段列表"></section>
+    <div id="snippetEmpty" class="empty" hidden><h2>没有匹配的片段</h2><p>换个关键词，或清除分类与收藏筛选。</p><button id="snippetReset" class="btn secondary" type="button">重置筛选</button></div>
+    <p class="snippet-note">使用前请检查运行环境、路径、权限与影响范围。占位参数只做文本替换，不提供通用 Shell / SQL 转义；数据库中的外部输入请使用参数化查询。</p>
+    <noscript><p class="panel">请启用 JavaScript，以使用密码门、搜索和本地片段库。</p></noscript>
+  </main>
+  <dialog id="snippetEditor" class="snippet-dialog" aria-labelledby="snippetEditorTitle">
+    <form id="snippetEditorForm">
+      <h2 id="snippetEditorTitle">新增片段</h2>
+      <label>标题<input class="field" id="editTitle" required maxlength="100"></label>
+      <label>分类<select class="field" id="editCategory"><option>Git</option><option>Docker</option><option>PowerShell</option><option>SQL</option><option>JavaScript</option><option>Python</option><option>其他</option></select></label>
+      <label>用途说明<textarea class="field" id="editDescription" required maxlength="1000"></textarea></label>
+      <label>标签（英文逗号分隔，最多 10 个，每个 30 字）<input class="field" id="editTags" maxlength="309" placeholder="只读, 日常排查"></label>
+      <label>代码模板<textarea class="field code-input" id="editCode" required maxlength="20000" spellcheck="false" placeholder="可用 {{variable}} 标记参数，如 {{branch}}"></textarea></label>
+      <p class="snippet-note">参数名使用英文字母、数字、下划线，且以字母开头，最多 40 字。模板和预览会同时保留。</p>
+      <p id="editorStatus" class="status" role="alert"></p>
+      <div class="dialog-actions"><button class="btn secondary" type="button" data-close="snippetEditor">取消</button><button class="btn" type="submit">保存到本地</button></div>
+    </form>
+  </dialog>
+  <dialog id="snippetPreview" class="snippet-dialog" aria-labelledby="previewTitle">
+    <h2 id="previewTitle">片段预览</h2><p id="previewDescription"></p>
+    <div id="parameterFields" class="parameter-fields"></div>
+    <p class="snippet-note">参数仅按原文替换，不提供通用 Shell / SQL 转义。请核对引号、特殊字符和权限；未填参数会保留占位符。复制内容不会执行。</p>
+    <h3>生成预览</h3><pre class="code-block"><code id="previewCode"></code></pre>
+    <details open><summary>原始模板（始终保留）</summary><pre class="code-block"><code id="previewOriginal"></code></pre></details>
+    <p id="previewStatus" class="status" role="status" aria-live="polite"></p>
+    <div class="dialog-actions"><button class="btn secondary" type="button" data-close="snippetPreview">关闭</button><button class="btn secondary" id="copyOriginal" type="button">复制原始模板</button><button class="btn" id="copyPreview" type="button">复制预览</button></div>
+  </dialog>
+  <dialog id="snippetImportDialog" class="snippet-dialog" aria-labelledby="importTitle">
+    <form id="snippetImportForm"><h2 id="importTitle">确认导入备份</h2><p id="importSummary"></p>
+      <label class="import-option"><input type="radio" name="importMode" value="merge" checked><span>合并：保留已有片段与收藏；相同 ID 的自定义片段使用导入版本。</span></label>
+      <label class="import-option"><input type="radio" name="importMode" value="replace"><span>覆盖：用备份替换全部自定义片段与收藏。内置片段始终保留，建议先导出备份。</span></label>
+      <p id="importStatus" class="status" role="alert"></p><div class="dialog-actions"><button class="btn secondary" type="button" data-close="snippetImportDialog">取消</button><button class="btn" type="submit">确认导入</button></div>
+    </form>
+  </dialog>
+  <script>window['work-hub-PW']='work2026';</script>
+  <script src="../script/studio.js"></script>
+  <script src="../js/snippets.js"></script>
+  <script src="../js/gate.js"></script>
+</body>
+</html>

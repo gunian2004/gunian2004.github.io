@@ -908,6 +908,9 @@
                     <option value="life">人生指南</option>
                     <option value="work">工作</option>
                     <option value="design">前端设计规范库</option>
+                    <option value="troubleshooting">问题排查库</option>
+                    <option value="docs">开发文档模板台</option>
+                    <option value="snippets">常用命令与代码片段库</option>
                 </select>
             </div>
         </div>
@@ -930,7 +933,14 @@
   var msg = document.getElementById('eggMsg');
   var confirmBtn = document.getElementById('eggConfirm');
   // 目标页路由；密码验证完全由各目标页内置的密码门负责，首页只做跳转
-  var ROUTES = { life: 'pages/life-guide.html?requirePassword=1', work: 'pages/work.html?requirePassword=1', design: 'pages/frontend-style.html?requirePassword=1' };
+  var ROUTES = {
+    life: 'pages/life-guide.html?requirePassword=1',
+    work: 'pages/work.html?requirePassword=1',
+    design: 'pages/frontend-style.html?requirePassword=1',
+    troubleshooting: 'pages/troubleshooting.html?requirePassword=1',
+    docs: 'pages/doc-templates.html?requirePassword=1',
+    snippets: 'pages/snippets.html?requirePassword=1'
+  };
   function openModal(){
     if(!modal){ window.location.href = 'pages/life-guide.html'; return; }
     if(msg) msg.textContent = '';

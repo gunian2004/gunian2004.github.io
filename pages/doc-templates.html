@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101821"><meta name="robots" content="noindex">
+  <meta name="description" content="开发文档模板台：七类工程文档，实时填充、独立草稿与 Markdown 导出。">
+  <title>开发文档模板台 · 工作台</title>
+  <link rel="stylesheet" href="../css/work-hub.css">
+  <style>
+    .template-layout{display:grid;grid-template-columns:260px minmax(0,1fr);gap:22px;align-items:start}.template-list{display:grid;gap:8px}.template-choice{width:100%;text-align:left;padding:14px 16px;border:1px solid var(--line, #34464d);border-radius:12px;color:inherit;background:transparent;cursor:pointer;font:inherit}.template-choice strong,.template-choice small{display:block}.template-choice small{font-size:12px;opacity:.65;margin-top:4px}.template-choice[aria-pressed="true"]{border-color:var(--mint,#80e0c1);background:#80e0c112}.template-choice:hover{background:#80e0c10c}.template-fields{display:grid;grid-template-columns:1fr 1fr;gap:14px}.template-fields .wide{grid-column:1/-1}.template-fields label{display:grid;gap:7px;font-size:13px}.template-fields input,.template-fields textarea{width:100%;box-sizing:border-box}.template-editor{width:100%;min-height:610px;resize:vertical;box-sizing:border-box;font:13px/1.85 ui-monospace,Consolas,monospace;tab-size:2}.template-top{display:flex;justify-content:space-between;gap:12px;align-items:start;margin-bottom:18px}.template-top h2{margin:0}.template-help{font-size:12px;opacity:.7;line-height:1.8}.template-section{margin-top:20px}.template-editor-label{display:flex;justify-content:space-between;gap:12px;margin:18px 0 8px;font-size:13px}.template-backup{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}.template-file{display:none}.template-storage{margin:12px 0 0;font-size:12px;overflow-wrap:anywhere}.template-storage[data-error="true"]{color:#ffbd78}.template-aside-title{margin:0 0 15px;font-size:14px}.template-shortcut{font:11px ui-monospace,Consolas,monospace;opacity:.6}.template-empty{padding:24px;border:1px dashed currentColor}button:focus-visible,textarea:focus-visible,input:focus-visible{outline:2px solid #80e0c1;outline-offset:3px}@media(max-width:800px){.template-layout{grid-template-columns:1fr}.template-list{grid-template-columns:repeat(2,minmax(0,1fr))}.template-fields{grid-template-columns:1fr}.template-fields .wide{grid-column:auto}.template-editor{min-height:480px}.template-top{flex-wrap:wrap}}@media(max-width:420px){.template-list{grid-template-columns:1fr}}
+  </style>
+</head>
+<body class="gate-locked">
+  <div class="gate" id="gate" data-pw-field="work-hub-PW">
+    <div class="gate-card">
+      <h2>进入工作台</h2><p>输入访问密码，打开开发文档模板台。</p>
+      <label for="gatePw">访问密码</label><input id="gatePw" type="password" autocomplete="current-password" placeholder="请输入密码">
+      <button id="gateBtn" type="button">解锁工作台</button><p id="gateMsg" role="alert" aria-live="polite"></p>
+    </div>
+  </div>
+  <header class="hub-header hub-wrap"><a href="work.html" class="hub-brand">WORK / 工作台</a><a href="../index.html">返回主页 ↗</a></header>
+  <main class="hub-wrap">
+    <nav class="hub-nav" aria-label="工作台导航"><a href="work.html">工作经验</a><a href="troubleshooting.html">问题排查</a><a href="doc-templates.html" aria-current="page">文档模板</a><a href="snippets.html">命令片段</a><a href="../index.html">主页</a></nav>
+    <section class="hub-hero"><p class="eyebrow">DOCUMENT STUDIO / 03</p><h1>让文档，跟上开发。</h1><p>从团队约定到版本发布，把关键决策写清楚。选择模板、填入项目资料，再打磨属于你的工程文档。</p><div class="chips"><span class="chip">7 类工程模板</span><span class="chip">Markdown 可编辑</span><span class="chip">当前浏览器草稿</span></div></section>
+    <div class="template-layout">
+      <aside class="panel"><h2 class="template-aside-title">选择文档起点</h2><div id="templateList" class="template-list" aria-label="模板列表"></div><p class="template-help">切换模板自动保留当前内容。草稿仅保存在当前浏览器、当前站点，不会跨设备同步；清理站点数据会删除草稿。</p><div class="template-backup"><button class="btn secondary" id="exportDrafts" type="button">导出全部草稿 JSON</button><button class="btn secondary" id="importDrafts" type="button">导入草稿 JSON</button></div><input class="template-file" id="draftFile" type="file" accept="application/json,.json" aria-label="选择草稿 JSON 文件"><p class="template-help">导入上限 2 MB，仅接受本工具的版本 1 草稿格式。覆盖前会再次确认。</p></aside>
+      <section class="panel" aria-labelledby="templateTitle">
+        <div class="template-top"><div><p class="eyebrow" id="templateNumber">TEMPLATE 01</p><h2 id="templateTitle">AGENTS.md</h2><p class="template-help" id="templateDescription"></p></div><button class="btn secondary danger" id="resetTemplate" type="button">恢复当前模板默认</button></div>
+        <div class="template-fields" id="projectFields">
+          <label>项目名称<input class="field" id="projectName" maxlength="2000" placeholder="如：客户服务平台" autocomplete="off"></label>
+          <label>技术栈<input class="field" id="techStack" maxlength="2000" placeholder="语言、框架、数据库及版本" autocomplete="off"></label>
+          <label>所属模块<input class="field" id="moduleName" maxlength="2000" placeholder="如：订单管理 / 用户认证" autocomplete="off"></label>
+          <label>负责人 / 团队<input class="field" id="ownerName" maxlength="2000" placeholder="填写实际负责人或团队" autocomplete="off"></label>
+          <label class="wide">项目背景与目标<textarea class="field" id="projectBackground" rows="3" maxlength="2000" placeholder="服务谁、解决什么问题，以及本次工作边界"></textarea></label>
+        </div>
+        <p class="template-help">填写资料即实时替换正文中的变量。直接修改某处变量文字后，该处成为自定义内容；其他未修改位置仍会跟随资料更新。</p>
+        <div class="template-editor-label"><label for="documentOutput">Markdown 正文 · 可直接编辑</label><span id="characterCount" class="template-shortcut">0 字符</span></div>
+        <textarea class="field code-block template-editor" id="documentOutput" spellcheck="false" maxlength="150000" aria-describedby="storageStatus" placeholder="模板正在加载…"></textarea>
+        <div class="toolbar template-section"><button class="btn" id="copyDocument" type="button">复制 Markdown</button><button class="btn secondary" id="downloadDocument" type="button">下载 .md</button><span class="status" id="editStatus" role="status" aria-live="polite">就绪</span></div>
+        <p id="storageStatus" class="template-storage" role="status" aria-live="polite">正在读取当前浏览器草稿…</p>
+        <noscript><p class="template-empty">此工具需要启用 JavaScript 才能解锁、生成模板并保存草稿。</p></noscript>
+      </section>
+    </div>
+  </main>
+  <script>window['work-hub-PW']='work2026';</script>
+  <script src="../script/studio.js"></script>
+  <script src="../js/doc-templates.js"></script>
+  <script src="../js/gate.js"></script>
+</body>
+</html>
