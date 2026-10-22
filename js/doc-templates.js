@@ -4,10 +4,55 @@
   const STORAGE_KEY = 'work-hub.doc-templates.v1';
   const MAX_BYTES = 2 * 1024 * 1024;
   const MAX_BODY = 150000;
-  const fieldNames = ['projectName', 'techStack', 'moduleName', 'ownerName', 'projectBackground'];
-  const labels = { projectName: '项目名称', techStack: '技术栈', moduleName: '所属模块', ownerName: '负责人', projectBackground: '背景与目标' };
+  const fieldRegistry = {
+    projectName: '项目名称', techStack: '技术栈', moduleName: '所属模块', ownerName: '负责人 / 团队', projectBackground: '项目背景与目标',
+    targetUser: '目标用户', acceptanceOwner: '验收负责人',
+    pageCount: '页面 / 弹层数量', userRoles: '角色与权限',
+    cadence: '迭代节奏', taskOwner: '执行人',
+    dbEngine: '数据库与版本', mainEntities: '核心实体', txRequirement: '事务与并发要求',
+    repoPath: '仓库 / 目录', runCommand: '启动命令',
+    forbidden: '禁止操作', ciCommand: 'CI 命令',
+    languageVersion: '语言 / 框架版本', lintTool: '检查工具',
+    branchModel: '分支模型', releaseCycle: '发布节奏',
+    fieldScope: '字段来源范围',
+    apiStyle: '接口风格', authScheme: '鉴权方式',
+    changeOwner: '记录人', archiveRoot: '归档目录', testEnv: '测试环境', releaseWindow: '发布窗口'
+  };
+  const baseFields = ['projectName', 'techStack', 'moduleName', 'ownerName', 'projectBackground'];
+  const extraFields = {
+    spec: ['targetUser', 'acceptanceOwner'],
+    design: ['pageCount', 'userRoles'],
+    tasks: ['cadence', 'taskOwner'],
+    database: ['dbEngine', 'mainEntities', 'txRequirement'],
+    readme: ['repoPath', 'runCommand'],
+    agents: ['forbidden', 'ciCommand'],
+    standards: ['languageVersion', 'lintTool'],
+    version: ['branchModel', 'releaseCycle'],
+    dictionary: ['fieldScope'],
+    api: ['apiStyle', 'authScheme'],
+    change: ['changeOwner'],
+    archive: ['archiveRoot'],
+    acceptance: ['testEnv'],
+    release: ['releaseWindow']
+  };
+  const fieldHints = {
+    projectName: '如：客户服务平台', techStack: '语言、框架、数据库及版本', moduleName: '如：订单管理 / 用户认证', ownerName: '填写实际负责人或团队', projectBackground: '服务谁、解决什么问题，以及本次工作边界',
+    targetUser: '如：一线客服、门店店长', acceptanceOwner: '验收由谁签字确认',
+    pageCount: '如：8 个页面 + 3 个弹层', userRoles: '如：游客 / 会员 / 运营 / 管理员',
+    cadence: '如：2 周一个迭代', taskOwner: '默认执行人，可在任务表内覆盖',
+    dbEngine: '如：MySQL 8.0 / PostgreSQL 16', mainEntities: '如：订单、支付、退款', txRequirement: '如：下单扣库存同一事务，峰值 200 QPS',
+    repoPath: '如：仓库根目录 / apps/web', runCommand: '如：pnpm dev',
+    forbidden: '如：不改生产配置、不直连生产库', ciCommand: '如：pnpm lint && pnpm test',
+    languageVersion: '如：Java 21 + Spring Boot 3.3', lintTool: '如：ESLint + Prettier / Checkstyle',
+    branchModel: '如：main + feature/*，发布用 release/*', releaseCycle: '如：每周二灰度、周四全量',
+    fieldScope: '字段来源：design 的 PAGE 清单 / 现有表单',
+    apiStyle: '如：REST + JSON，统一 /api/v1', authScheme: '如：Bearer JWT，按角色 + 资源鉴权',
+    changeOwner: '负责回写变更记录的人', archiveRoot: '如：docs/archive', testEnv: '如：staging（数据脱敏）', releaseWindow: '如：周四 22:00–23:00'
+  };
+  const fieldNames = [...baseFields, ...Object.keys(fieldRegistry).filter(key => !baseFields.includes(key))];
+  const labels = fieldRegistry;
   const common = '# {{projectName}} · ';
-  const templates = [
+  const legacyTemplates = [
     { id: 'agents', name: 'AGENTS.md', brief: 'AI 协作边界与仓库工作约定', filename: 'AGENTS.md', text: common + `Agent 协作说明
 
 ## 1. 项目上下文
@@ -324,16 +369,23 @@
 - 复盘时间与行动项：待填写
 ` }
   ];
+  const withOwnFields = template => {
+    const extra = extraFields[template.id] || [];
+    const line = extra.length ? `> 本文档专用资料：${extra.map(key => `${fieldRegistry[key]}={{${key}}}`).join('；')}\n\n` : '';
+    return { ...template, extra, text: line + template.text };
+  };
+  const templates = [...window.ProjectDocTemplates, ...legacyTemplates.filter(t => ['acceptance', 'release'].includes(t.id)), { ...legacyTemplates.find(t => t.id === 'change'), id: 'legacy-change', name: '变更申请（旧版）' }].map(withOwnFields);
+  const selectedTemplates = () => (levels[activeLevel] ? levelItems(activeLevel) : []);
   const $ = id => document.getElementById(id);
-  const inputs = Object.fromEntries(fieldNames.map(key => [key, $(key)]));
+  const inputs = {};
   const output = $('documentOutput');
   let drafts = {};
-  let activeId = templates[0].id;
+  let activeId = templates.some(t => t.id === 'spec') ? 'spec' : templates[0].id;
   let storageFailed = false;
   const notify = message => { window.BlogStudio?.notify(message); $('editStatus').textContent = message; };
   const valueFor = (fields, key) => fields[key].trim() || `待填写（${labels[key]}）`;
-  function makeDefault(template) {
-    const fields = Object.fromEntries(fieldNames.map(key => [key, '']));
+  function makeDefault(template, projectFields = {}) {
+    const fields = Object.fromEntries(fieldNames.map(key => [key, projectFields[key] || '']));
     const ranges = [];
     let content = '';
     let end = 0;
@@ -355,16 +407,17 @@
     if (!entries.length || entries.length > templates.length) throw new Error('草稿数量不正确。');
     for (const [id, draft] of entries) {
       if (!templates.some(t => t.id === id) || !draft || typeof draft !== 'object' || typeof draft.content !== 'string' || draft.content.length > MAX_BODY) throw new Error('模板标识或正文长度不符合要求。');
-      if (!draft.fields || !fieldNames.every(key => typeof draft.fields[key] === 'string' && draft.fields[key].length <= 2000)) throw new Error('项目资料字段缺失或超过 2000 字符。');
-      if (!Array.isArray(draft.ranges) || draft.ranges.length > 100) throw new Error('变量区间格式错误。');
+      if (!draft.fields || typeof draft.fields !== 'object' || !fieldNames.every(key => draft.fields[key] === undefined || (typeof draft.fields[key] === 'string' && draft.fields[key].length <= 2000))) throw new Error('项目资料字段类型错误或超过 2000 字符。');
+      if (!Array.isArray(draft.ranges) || draft.ranges.length > 200) throw new Error('变量区间格式错误。');
       let end = 0;
-      const fields = Object.fromEntries(fieldNames.map(key => [key, draft.fields[key]]));
+      const fields = Object.fromEntries(fieldNames.map(key => [key, draft.fields[key] || '']));
       const ranges = draft.ranges.map(range => {
         if (!range || !fieldNames.includes(range.key) || !Number.isInteger(range.start) || !Number.isInteger(range.end) || range.start < end || range.end <= range.start || range.end > draft.content.length || draft.content.slice(range.start, range.end) !== valueFor(fields, range.key)) throw new Error('变量区间校验失败，文件可能已被修改。');
         end = range.end;
         return { key: range.key, start: range.start, end: range.end };
       });
-      clean[id] = { fields, content: draft.content, ranges, updatedAt: typeof draft.updatedAt === 'string' && draft.updatedAt.length < 80 ? draft.updatedAt : new Date().toISOString() };
+      const targetId = data.templateSet !== 'project-kit' && id === 'change' ? 'legacy-change' : id;
+      clean[targetId] = { fields, content: draft.content, ranges, updatedAt: typeof draft.updatedAt === 'string' && draft.updatedAt.length < 80 ? draft.updatedAt : new Date().toISOString() };
     }
     return clean;
   }
@@ -375,7 +428,7 @@
   function save() {
     drafts[activeId].updatedAt = new Date().toISOString();
     try {
-      const data = JSON.stringify({ version: 1, activeId, drafts });
+      const data = JSON.stringify({ version: 1, templateSet: 'project-kit', activeId, drafts });
       if (new Blob([data]).size > MAX_BYTES) throw new Error('草稿总量超过 2 MB');
       localStorage.setItem(STORAGE_KEY, data);
       storageFailed = false;
@@ -386,31 +439,118 @@
     }
   }
   function updateCount() { $('characterCount').textContent = `${output.value.length.toLocaleString('zh-CN')} 字符`; }
+  function renderFields(template, draft) {
+    const wrap = $('projectFields');
+    wrap.innerHTML = '';
+    Object.keys(inputs).forEach(key => { delete inputs[key]; });
+    [...baseFields, ...template.extra].forEach(key => {
+      const label = document.createElement('label');
+      if (key === 'projectBackground') label.className = 'wide';
+      label.append(document.createTextNode(labels[key]));
+      const input = key === 'projectBackground' ? document.createElement('textarea') : document.createElement('input');
+      input.className = 'field'; input.maxLength = 2000;
+      if (key === 'projectBackground') { input.rows = 3; } else { input.autocomplete = 'off'; }
+      if (fieldHints[key]) input.placeholder = fieldHints[key];
+      input.value = draft.fields[key] || '';
+      input.addEventListener('input', () => updateField(key, input.value));
+      label.append(input);
+      inputs[key] = input;
+      wrap.append(label);
+    });
+    const note = document.createElement('p');
+    note.className = 'template-help wide';
+    note.textContent = template.extra.length
+      ? `本文档专用资料：${template.extra.map(key => labels[key]).join('、')}。留空时正文显示“待填写”，并原样写入导出文件。`
+      : '本文档只使用通用资料，没有额外专用字段。';
+    wrap.append(note);
+  }
   function render() {
     const template = templates.find(t => t.id === activeId);
-    if (!drafts[activeId]) drafts[activeId] = makeDefault(template);
+    const seed = Object.fromEntries(fieldNames.map(key => [key, inputs[key] ? inputs[key].value : '']));
+    if (!drafts[activeId]) drafts[activeId] = makeDefault(template, seed);
     const draft = drafts[activeId];
-    fieldNames.forEach(key => { inputs[key].value = draft.fields[key]; });
+    renderFields(template, draft);
     output.value = draft.content;
     $('templateTitle').textContent = template.name;
-    $('templateDescription').textContent = template.brief;
-    $('templateNumber').textContent = `TEMPLATE ${String(templates.indexOf(template) + 1).padStart(2, '0')}`;
+    $('templateDescription').textContent = `${template.brief} · 导出文件：${template.filename}`;
+    $('templateNumber').textContent = `TEMPLATE ${numbers.get(template.id) || ''}`.trim();
     document.querySelectorAll('.template-choice').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.id === activeId)));
+    if (!levels[activeLevel].ids.includes(activeId)) {
+      const levelIndex = levels.findIndex(level => level.ids.includes(activeId));
+      if (levelIndex !== -1) showLevel(levelIndex);
+    }
     $('editStatus').textContent = '可编辑 · 资料实时填充';
     updateCount();
   }
-  templates.forEach((template, index) => {
-    const button = document.createElement('button');
-    button.type = 'button'; button.className = 'template-choice'; button.dataset.id = template.id;
-    const title = document.createElement('strong'); title.textContent = `${String(index + 1).padStart(2, '0')}  ${template.name}`;
-    const brief = document.createElement('small'); brief.textContent = template.brief;
-    button.append(title, brief);
-    button.addEventListener('click', () => { save(); activeId = template.id; render(); save(); });
-    $('templateList').append(button);
+  const levels = [
+    { tab: '精简版', title: '精简版 · 3 份文档', hint: '只够开工：需求、设计、任务。没有数据库与规范文件。', ids: ['spec', 'design', 'tasks'] },
+    { tab: '进阶版', title: '进阶版 · 5 份文档', hint: '精简版 + 数据库设计与项目导航 README。', ids: ['spec', 'design', 'tasks', 'database', 'readme'] },
+    { tab: '专业版', title: '专业版 · 8 份文档', hint: '进阶版 + AI 协作规范、技术栈编码规范、版本与发布管理。', ids: ['spec', 'design', 'tasks', 'database', 'readme', 'agents', 'standards', 'version'] },
+    { tab: '完整版', title: '完整版 · 10 份文档', hint: '专业版 + 把 design 里的字段与接口抽成独立文件，适合长期多人维护。', ids: ['spec', 'design', 'tasks', 'database', 'readme', 'agents', 'standards', 'version', 'dictionary', 'api'] },
+    { tab: '附加文档', title: '附加文档 · 不随层级变化', hint: '变更记录、旧档快照与发布类模板，任何层级都可单独取用。', ids: ['change', 'archive', 'acceptance', 'release', 'legacy-change'] }
+  ];
+  const fullOrder = ['spec', 'design', 'tasks', 'database', 'readme', 'agents', 'standards', 'version', 'dictionary', 'api', 'change', 'archive', 'acceptance', 'release', 'legacy-change'];
+  const numbers = new Map(fullOrder.map((id, index) => [id, String(index + 1).padStart(2, '0')]));
+  const tabButtons = [];
+  const panels = [];
+  let activeLevel = 0;
+  const levelItems = index => levels[index].ids.map(id => templates.find(template => template.id === id)).filter(Boolean);
+  function showLevel(index, focus) {
+    activeLevel = index;
+    tabButtons.forEach((button, i) => {
+      const selected = i === index;
+      button.setAttribute('aria-selected', String(selected));
+      button.tabIndex = selected ? 0 : -1;
+    });
+    panels.forEach((panel, i) => { panel.hidden = i !== index; });
+    if (focus && tabButtons[index]) tabButtons[index].focus();
+    refreshPackage();
+  }
+  levels.forEach((level, levelIndex) => {
+    const items = levelItems(levelIndex);
+    const tab = document.createElement('button');
+    tab.type = 'button'; tab.className = 'template-tab'; tab.id = `templateTab${levelIndex}`;
+    tab.setAttribute('role', 'tab'); tab.setAttribute('aria-controls', `templatePanel${levelIndex}`);
+    tab.textContent = level.tab;
+    tab.addEventListener('click', () => showLevel(levelIndex));
+    tab.addEventListener('keydown', event => {
+      const last = levels.length - 1;
+      const next = { ArrowRight: levelIndex === last ? 0 : levelIndex + 1, ArrowLeft: levelIndex === 0 ? last : levelIndex - 1, Home: 0, End: last }[event.key];
+      if (next === undefined) return;
+      event.preventDefault(); showLevel(next, true);
+    });
+    tabButtons.push(tab);
+    $('templateTabs').append(tab);
+
+    const section = document.createElement('section');
+    section.className = 'template-group'; section.id = `templatePanel${levelIndex}`;
+    section.setAttribute('role', 'tabpanel'); section.setAttribute('aria-labelledby', `templateTab${levelIndex}`);
+    const heading = document.createElement('h3');
+    heading.className = 'template-group-title';
+    heading.textContent = level.title.split(' · ')[0];
+    const count = document.createElement('span'); count.textContent = `${items.length} 份`;
+    heading.append(count);
+    const hint = document.createElement('p'); hint.className = 'template-group-hint'; hint.textContent = level.hint;
+    section.append(heading, hint);
+    items.forEach(template => {
+      const button = document.createElement('button');
+      button.type = 'button'; button.className = 'template-choice'; button.dataset.id = template.id;
+      const title = document.createElement('strong');
+      title.textContent = `${numbers.get(template.id)}  ${template.name}`;
+      const meta = document.createElement('small');
+      const file = document.createElement('span'); file.className = 'template-file-name'; file.textContent = template.filename;
+      meta.append(file, document.createTextNode(` · ${template.brief}`));
+      button.append(title, meta);
+      button.addEventListener('click', () => { save(); activeId = template.id; render(); save(); });
+      section.append(button);
+    });
+    panels.push(section);
+    $('templateList').append(section);
   });
-  fieldNames.forEach(key => inputs[key].addEventListener('input', () => {
+  showLevel(0);
+  function updateField(key, value) {
     const draft = { ...drafts[activeId], fields: { ...drafts[activeId].fields }, ranges: drafts[activeId].ranges.map(range => ({ ...range })) };
-    draft.fields[key] = inputs[key].value;
+    draft.fields[key] = value;
     let shift = 0;
     const content = draft.content;
     let next = '';
@@ -419,24 +559,24 @@
       const start = range.start;
       const end = range.end;
       if (range.key === key) {
-        const value = valueFor(draft.fields, key);
-        next += content.slice(cursor, start) + value;
+        const nextValue = valueFor(draft.fields, key);
+        next += content.slice(cursor, start) + nextValue;
         cursor = end;
         range.start = start + shift;
-        range.end = range.start + value.length;
-        shift += value.length - (end - start);
+        range.end = range.start + nextValue.length;
+        shift += nextValue.length - (end - start);
       } else { range.start += shift; range.end += shift; }
     }
     draft.content = next + content.slice(cursor);
     if (draft.content.length > MAX_BODY) {
-      inputs[key].value = drafts[activeId].fields[key];
+      if (inputs[key]) inputs[key].value = drafts[activeId].fields[key];
       notify('替换后正文超过 150,000 字符，请先精简正文。');
       return;
     }
     drafts[activeId] = draft;
     output.value = draft.content;
     updateCount(); save();
-  }));
+  }
   output.addEventListener('input', () => {
     const draft = drafts[activeId];
     const before = draft.content;
@@ -464,6 +604,91 @@
     const anchor = document.createElement('a'); anchor.href = url; anchor.download = filename;
     document.body.append(anchor); anchor.click(); anchor.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
+  function promptText() {
+    const fields = drafts[activeId].fields;
+    const detailed = levels[activeLevel].ids.includes('dictionary');
+    const extraLines = selectedTemplates().filter(t => (drafts[t.id]?.fields) && t.extra.some(key => (drafts[t.id].fields[key] || '').trim())).map(t => `- ${t.filename}：${t.extra.filter(key => (drafts[t.id].fields[key] || '').trim()).map(key => `${labels[key]}=${drafts[t.id].fields[key].trim()}`).join('；')}`);
+    const extraBlock = extraLines.length ? `\n### 各文档专用资料\n${extraLines.join('\n')}` : '';
+    return `# 项目文档生成指令（${levels[activeLevel].tab}）\n\n请按附件模板为我的项目生成实际开发文档。本批共 ${selectedTemplates().length} 份文件。\n\n## 项目资料\n${baseFields.map(key => `- ${labels[key]}：${valueFor(fields, key)}`).join('\n')}${extraBlock}\n\n## 输出范围\n${selectedTemplates().map(t => `- ${t.filename}：${t.brief}`).join('\n')}\n\n## 生成要求\n1. 先阅读全部模板及已有项目资料，再按 spec → design / database → tasks 的顺序规划，最后同步 README、Agent 与开发、版本规范。\n2. 保留模板的章节、表格列和文件路径，每份文档单独输出完整 Markdown 文件。项目整体规划简洁实用，不堆砌无关流程；页面、字段、按钮、数据和事务必须具体到可实现。\n3. 缺失事实标注“待确认”，明确建议与已确认事实；优先集中询问会影响方案的关键问题。不要擅自发明技术版本、业务规则、性能指标或审批结果。不适用章节注明原因。\n4. spec 使用 REQ / AC 编号，design 使用 PAGE / FIELD / ACTION 编号，接口使用 API 编号，tasks 使用 TASK 编号；跨文件引用一致，任务覆盖设计和验收标准。\n5. 每个页面逐项定义内容、字段类型、必填、默认值、校验与错误文案、布局样式；按钮写清样式、权限、可用条件、加载态、触发行为、成功与失败结果、防重复提交和跳转。\n6. database 写清每张表每个字段、主外键、索引、唯一性、关系、事务范围、隔离、并发、幂等、迁移与回滚。按实际技术栈生成函数、变量、类命名及代码质量规则，给出正反例与可执行检查命令；未知命令不得伪造为已验证。\n7. ${detailed ? 'fields.md 为页面字段明细的唯一维护来源，api.md 为接口契约与接口开发规范的唯一维护来源；design 保留页面结构、交互和对应编号链接，避免重复维护。' : '字段明细保留在 design.md；接口清单和关键契约保留在 design.md，不新增 fields.md 或 api.md。'}\n8. change 仅记录真实的模块变更，archive 仅索引真实存在的旧版本；新项目保留空记录格式，不伪造历史。所有任务初始为未完成，未实施、未测试、未发布的事项不得写成已完成。\n9. 本轮只生成规划与规范文档，不自动实施、提交代码或部署。输出末尾列出待确认项和文档一致性检查结果。\n`;
+  }
+  // ZIP store format: UTF-8 filenames, CRC32, no external dependencies.
+  function zipFiles(files) {
+    const encoder = new TextEncoder();
+    const parts = [], central = [];
+    let offset = 0, centralSize = 0;
+    function header(size) { const bytes = new Uint8Array(size); return { bytes, view: new DataView(bytes.buffer) }; }
+    function crc32(bytes) {
+      let crc = 0xffffffff;
+      for (const byte of bytes) { crc ^= byte; for (let bit = 0; bit < 8; bit++) crc = (crc >>> 1) ^ ((crc & 1) ? 0xedb88320 : 0); }
+      return (crc ^ 0xffffffff) >>> 0;
+    }
+    for (const file of files) {
+      const name = encoder.encode(file.name), data = encoder.encode(file.text), crc = crc32(data);
+      const local = header(30);
+      local.view.setUint32(0, 0x04034b50, true); local.view.setUint16(4, 20, true); local.view.setUint16(6, 0x800, true);
+      local.view.setUint16(12, 33, true); local.view.setUint32(14, crc, true); local.view.setUint32(18, data.length, true); local.view.setUint32(22, data.length, true); local.view.setUint16(26, name.length, true);
+      parts.push(local.bytes, name, data);
+      const entry = header(46);
+      entry.view.setUint32(0, 0x02014b50, true); entry.view.setUint16(4, 20, true); entry.view.setUint16(6, 20, true); entry.view.setUint16(8, 0x800, true);
+      entry.view.setUint16(14, 33, true); entry.view.setUint32(16, crc, true); entry.view.setUint32(20, data.length, true); entry.view.setUint32(24, data.length, true); entry.view.setUint16(28, name.length, true); entry.view.setUint32(42, offset, true);
+      central.push(entry.bytes, name); centralSize += 46 + name.length; offset += 30 + name.length + data.length;
+    }
+    const end = header(22);
+    end.view.setUint32(0, 0x06054b50, true); end.view.setUint16(8, files.length, true); end.view.setUint16(10, files.length, true); end.view.setUint32(12, centralSize, true); end.view.setUint32(16, offset, true);
+    return new Blob([...parts, ...central, end.bytes], { type: 'application/zip' });
+  }
+  function refreshPackage() {
+    const list = ids => ids.map(id => templates.find(template => template.id === id)?.filename).filter(Boolean).join('、');
+    $('packageSummary').innerHTML = '';
+    levels.slice(0, 4).forEach((level, index) => {
+      const row = document.createElement('p');
+      row.className = 'package-list';
+      if (index === activeLevel) row.dataset.current = 'true';
+      row.innerHTML = `<b>${level.tab} · ${level.ids.length} 份${index === activeLevel ? '（当前）' : ''}</b>${list(level.ids)}`;
+      $('packageSummary').append(row);
+    });
+    const note = document.createElement('p');
+    note.className = 'package-list';
+    note.innerHTML = `<b>附加文档 · 不随层级变化</b>${list(levels[4].ids)}<span class="package-current">当前层级：${levels[activeLevel].tab}，导出 ${selectedTemplates().length} 份文档 + AI-PROMPT.md</span>`;
+    $('packageSummary').append(note);
+  }
+  refreshPackage();
+  $('copyPrompt').addEventListener('click', async () => {
+    const text = promptText();
+    if (window.BlogStudio) await window.BlogStudio.copy(text, $('copyPrompt'));
+    else if (navigator.clipboard?.writeText) { try { await navigator.clipboard.writeText(text); notify('AI 生成提示词已复制'); } catch { download(text, 'AI-PROMPT.md', 'text/markdown;charset=utf-8'); notify('剪贴板不可用，已下载提示词'); } }
+    else { download(text, 'AI-PROMPT.md', 'text/markdown;charset=utf-8'); notify('已下载 AI 生成提示词'); }
+  });
+  $('applyProject').addEventListener('click', () => {
+    const source = drafts[activeId].fields;
+    if (!window.confirm('把当前模板的通用资料（项目名称、技术栈、模块、负责人、背景）应用到全部模板？各文档的专用资料与手写正文保留。')) return;
+    for (const template of templates) {
+      const fields = { ...(drafts[template.id]?.fields || {}), ...Object.fromEntries(baseFields.map(key => [key, source[key]])) };
+      if (!drafts[template.id]) { drafts[template.id] = makeDefault(template, fields); continue; }
+      const draft = drafts[template.id];
+      let content = '', cursor = 0;
+      const ranges = draft.ranges.map(range => {
+        content += draft.content.slice(cursor, range.start);
+        const start = content.length; content += valueFor(fields, range.key); cursor = range.end;
+        return { key: range.key, start, end: content.length };
+      });
+      content += draft.content.slice(cursor);
+      if (content.length > MAX_BODY) { notify(`批量应用在 ${template.name} 停止：正文超过长度限制，之前更新已保留`); render(); save(); return; }
+      drafts[template.id] = { fields: { ...fields }, content, ranges, updatedAt: new Date().toISOString() };
+    }
+    render(); save(); notify('已将当前项目资料应用到整包，手写正文保留');
+  });
+  $('downloadPackage').addEventListener('click', () => {
+    try {
+      const fields = drafts[activeId].fields;
+      const files = selectedTemplates().map(template => ({ name: template.filename, text: (drafts[template.id] || makeDefault(template, fields)).content }));
+      files.push({ name: 'AI-PROMPT.md', text: promptText() });
+      const blob = zipFiles(files);
+      const name = (fields.projectName.trim() || 'project').replace(/[<>:"/\\|?*\x00-\x1f]/g, '-').slice(0, 60);
+      download(blob, `${name}-${levels[activeLevel].tab}-templates.zip`, 'application/zip');
+      notify(`已导出 ${files.length - 1} 份文档模板和 AI 生成提示词`);
+    } catch (error) { notify(`模板包导出失败：${error.message}`); }
+  });
   $('copyDocument').addEventListener('click', async () => {
     if (window.BlogStudio) await window.BlogStudio.copy(output.value, $('copyDocument'));
     else { output.focus(); output.select(); notify('请按 Ctrl/Cmd + C 复制正文'); }
@@ -473,7 +698,7 @@
     download(output.value, template.filename, 'text/markdown;charset=utf-8'); notify('Markdown 下载已发起');
   });
   $('exportDrafts').addEventListener('click', () => {
-    const data = JSON.stringify({ version: 1, activeId, drafts });
+    const data = JSON.stringify({ version: 1, templateSet: 'project-kit', activeId, drafts });
     download(data, 'work-hub-document-drafts.json', 'application/json;charset=utf-8'); notify('全部草稿备份下载已发起');
   });
   $('importDrafts').addEventListener('click', () => $('draftFile').click());
@@ -502,7 +727,8 @@
       if (new Blob([raw]).size > MAX_BYTES) throw new Error('已存草稿超过大小限制');
       const data = JSON.parse(raw);
       drafts = validateDrafts(data);
-      if (templates.some(t => t.id === data.activeId)) activeId = data.activeId;
+      const restoredId = data.templateSet !== 'project-kit' && data.activeId === 'change' ? 'legacy-change' : data.activeId;
+      if (templates.some(t => t.id === restoredId)) activeId = restoredId;
     }
     render();
     storageMessage(raw ? '已恢复当前浏览器草稿 · 修改将自动保存' : '草稿仅保存在当前浏览器 · 修改后自动保存');

@@ -4,11 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#101821"><meta name="robots" content="noindex">
-  <meta name="description" content="开发文档模板台：七类工程文档，实时填充、独立草稿与 Markdown 导出。">
+  <meta name="description" content="开发文档模板台：面向 AI Agent 的项目文档模板包：需求、设计、任务、数据库与开发规范，一键导出 Markdown 文件。">
   <title>开发文档模板台 · 工作台</title>
   <link rel="stylesheet" href="../css/work-hub.css">
   <style>
     .template-layout{display:grid;grid-template-columns:260px minmax(0,1fr);gap:22px;align-items:start}.template-list{display:grid;gap:8px}.template-choice{width:100%;text-align:left;padding:14px 16px;border:1px solid var(--line, #34464d);border-radius:12px;color:inherit;background:transparent;cursor:pointer;font:inherit}.template-choice strong,.template-choice small{display:block}.template-choice small{font-size:12px;opacity:.65;margin-top:4px}.template-choice[aria-pressed="true"]{border-color:var(--mint,#80e0c1);background:#80e0c112}.template-choice:hover{background:#80e0c10c}.template-fields{display:grid;grid-template-columns:1fr 1fr;gap:14px}.template-fields .wide{grid-column:1/-1}.template-fields label{display:grid;gap:7px;font-size:13px}.template-fields input,.template-fields textarea{width:100%;box-sizing:border-box}.template-editor{width:100%;min-height:610px;resize:vertical;box-sizing:border-box;font:13px/1.85 ui-monospace,Consolas,monospace;tab-size:2}.template-top{display:flex;justify-content:space-between;gap:12px;align-items:start;margin-bottom:18px}.template-top h2{margin:0}.template-help{font-size:12px;opacity:.7;line-height:1.8}.template-section{margin-top:20px}.template-editor-label{display:flex;justify-content:space-between;gap:12px;margin:18px 0 8px;font-size:13px}.template-backup{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}.template-file{display:none}.template-storage{margin:12px 0 0;font-size:12px;overflow-wrap:anywhere}.template-storage[data-error="true"]{color:#ffbd78}.template-aside-title{margin:0 0 15px;font-size:14px}.template-shortcut{font:11px ui-monospace,Consolas,monospace;opacity:.6}.template-empty{padding:24px;border:1px dashed currentColor}button:focus-visible,textarea:focus-visible,input:focus-visible{outline:2px solid #80e0c1;outline-offset:3px}@media(max-width:800px){.template-layout{grid-template-columns:1fr}.template-list{grid-template-columns:repeat(2,minmax(0,1fr))}.template-fields{grid-template-columns:1fr}.template-fields .wide{grid-column:auto}.template-editor{min-height:480px}.template-top{flex-wrap:wrap}}@media(max-width:420px){.template-list{grid-template-columns:1fr}}
+    .package-panel{margin-bottom:24px}.package-options{display:grid;grid-template-columns:minmax(230px,320px) 1fr;gap:20px;align-items:start;margin-bottom:18px}.package-options label{display:grid;gap:8px;font-size:13px}.package-options p{margin:0 0 8px}.package-list b{display:block;color:var(--mint);font-size:12px;margin-bottom:2px}.package-list[data-current="true"] b{color:var(--lime,#d4f178)}.package-current{display:block;margin-top:6px;opacity:.75;font:11px var(--mono)}.level-scale{display:grid;gap:6px;align-content:start}.level-scale span{font:11px var(--mono);color:var(--muted);border:1px solid var(--line);border-radius:8px;padding:6px 8px;text-align:center}.template-group{margin:0}.template-group[hidden]{display:none}.template-group-title{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:0 0 3px;font-size:12.5px;font-weight:600;color:var(--mint);letter-spacing:.02em}.template-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:0 0 14px}.template-tab{padding:8px 6px;border:1px solid var(--line,#34464d);border-radius:9px;background:transparent;color:var(--muted,#a0b2ba);font-size:12px;line-height:1.3;cursor:pointer}.template-tab:hover{color:var(--text,#edf3f4);background:#80e0c10c}.template-tab[aria-selected="true"]{border-color:var(--mint,#80e0c1);color:var(--mint,#80e0c1);background:#80e0c112;font-weight:600}.template-group-title span{font:11px var(--mono);opacity:.6;color:var(--muted);font-weight:400}.template-group-hint{margin:0 0 8px;font-size:11px;line-height:1.6;opacity:.55}.template-group .template-choice{display:block}.template-group .template-choice+.template-choice{margin-top:8px}.template-file-name{font-family:var(--mono);opacity:.75}@media(max-width:600px){.package-options{grid-template-columns:1fr}.template-top{flex-wrap:wrap}}
   </style>
 </head>
 <body class="gate-locked">
@@ -22,19 +23,19 @@
   <header class="hub-header hub-wrap"><a href="work.html" class="hub-brand">WORK / 工作台</a><a href="../index.html">返回主页 ↗</a></header>
   <main class="hub-wrap">
     <nav class="hub-nav" aria-label="工作台导航"><a href="work.html">工作经验</a><a href="troubleshooting.html">问题排查</a><a href="doc-templates.html" aria-current="page">文档模板</a><a href="snippets.html">命令片段</a><a href="../index.html">主页</a></nav>
-    <section class="hub-hero"><p class="eyebrow">DOCUMENT STUDIO / 03</p><h1>让文档，跟上开发。</h1><p>从团队约定到版本发布，把关键决策写清楚。选择模板、填入项目资料，再打磨属于你的工程文档。</p><div class="chips"><span class="chip">7 类工程模板</span><span class="chip">Markdown 可编辑</span><span class="chip">当前浏览器草稿</span></div></section>
+    <section class="hub-hero"><p class="eyebrow">DOCUMENT STUDIO / 03</p><h1>把预期写成模板，交给 AI。</h1><p>按项目规模选层级：精简版只给需求、设计、任务，往后逐级加上数据库、规范与字段文件。填好资料、下载整包，再交给 AI Agent 按格式产出。</p><div class="chips"><span class="chip">4 个层级</span><span class="chip">10 份核心文档</span><span class="chip">ZIP 整包下载</span></div></section>
+    <section class="panel package-panel" aria-labelledby="packageTitle">
+      <div class="template-top"><div><p class="eyebrow">PROJECT KIT</p><h2 id="packageTitle">按层级打包的文档模板</h2><p class="template-help">每个层级都包含上一层的全部文件，只增不减。左侧标签决定当前层级，下载与提示词都按当前层级输出。</p></div></div>
+      <div class="package-options"><div class="level-scale" aria-hidden="true"><span>精简 3</span><span>进阶 5</span><span>专业 8</span><span>完整 10</span></div><div><div id="packageSummary" class="template-help"></div><p class="template-help">推荐顺序：spec → design / database → tasks → 开发实施；README 与规范贯穿全程，change / archive 记录后续变更。</p></div></div>
+      <div class="toolbar"><button class="btn" id="downloadPackage" type="button">下载当前层级 .zip</button><button class="btn secondary" id="copyPrompt" type="button">复制 AI 生成提示词</button><button class="btn secondary" id="applyProject" type="button">将当前资料应用到全部模板</button></div>
+      <p class="template-help">整包优先使用各文档已保存的编辑内容，未编辑的文档沿用当前项目资料。批量应用只更新仍关联的变量，保留手写正文。ZIP 内附 AI-PROMPT.md，可一次上传给其他 AI；不会调用在线 AI 服务。</p>
+    </section>
     <div class="template-layout">
-      <aside class="panel"><h2 class="template-aside-title">选择文档起点</h2><div id="templateList" class="template-list" aria-label="模板列表"></div><p class="template-help">切换模板自动保留当前内容。草稿仅保存在当前浏览器、当前站点，不会跨设备同步；清理站点数据会删除草稿。</p><div class="template-backup"><button class="btn secondary" id="exportDrafts" type="button">导出全部草稿 JSON</button><button class="btn secondary" id="importDrafts" type="button">导入草稿 JSON</button></div><input class="template-file" id="draftFile" type="file" accept="application/json,.json" aria-label="选择草稿 JSON 文件"><p class="template-help">导入上限 2 MB，仅接受本工具的版本 1 草稿格式。覆盖前会再次确认。</p></aside>
+      <aside class="panel"><h2 class="template-aside-title">文档模板 · 按层级切换</h2><div id="templateTabs" class="template-tabs" role="tablist" aria-label="模板层级"></div><div id="templateList" class="template-list" aria-label="模板列表"></div><p class="template-help">每个标签是一套递增的文档范围，越往后包含越多。同一模板只维护一份内容，在哪个层级编辑都一样。草稿仅保存在当前浏览器、当前站点，不会跨设备同步；清理站点数据会删除草稿。</p><div class="template-backup"><button class="btn secondary" id="exportDrafts" type="button">导出全部草稿 JSON</button><button class="btn secondary" id="importDrafts" type="button">导入草稿 JSON</button></div><input class="template-file" id="draftFile" type="file" accept="application/json,.json" aria-label="选择草稿 JSON 文件"><p class="template-help">导入上限 2 MB，仅接受本工具的版本 1 草稿格式。覆盖前会再次确认。</p></aside>
       <section class="panel" aria-labelledby="templateTitle">
         <div class="template-top"><div><p class="eyebrow" id="templateNumber">TEMPLATE 01</p><h2 id="templateTitle">AGENTS.md</h2><p class="template-help" id="templateDescription"></p></div><button class="btn secondary danger" id="resetTemplate" type="button">恢复当前模板默认</button></div>
-        <div class="template-fields" id="projectFields">
-          <label>项目名称<input class="field" id="projectName" maxlength="2000" placeholder="如：客户服务平台" autocomplete="off"></label>
-          <label>技术栈<input class="field" id="techStack" maxlength="2000" placeholder="语言、框架、数据库及版本" autocomplete="off"></label>
-          <label>所属模块<input class="field" id="moduleName" maxlength="2000" placeholder="如：订单管理 / 用户认证" autocomplete="off"></label>
-          <label>负责人 / 团队<input class="field" id="ownerName" maxlength="2000" placeholder="填写实际负责人或团队" autocomplete="off"></label>
-          <label class="wide">项目背景与目标<textarea class="field" id="projectBackground" rows="3" maxlength="2000" placeholder="服务谁、解决什么问题，以及本次工作边界"></textarea></label>
-        </div>
-        <p class="template-help">填写资料即实时替换正文中的变量。直接修改某处变量文字后，该处成为自定义内容；其他未修改位置仍会跟随资料更新。</p>
+        <div class="template-fields" id="projectFields"></div>
+        <p class="template-help">上方资料按当前文档变化：通用资料写入正文，专用资料写入本文档顶部的“专用资料”行。直接修改某处变量文字后，该处成为自定义内容；其他未修改位置仍会跟随资料更新。</p>
         <div class="template-editor-label"><label for="documentOutput">Markdown 正文 · 可直接编辑</label><span id="characterCount" class="template-shortcut">0 字符</span></div>
         <textarea class="field code-block template-editor" id="documentOutput" spellcheck="false" maxlength="150000" aria-describedby="storageStatus" placeholder="模板正在加载…"></textarea>
         <div class="toolbar template-section"><button class="btn" id="copyDocument" type="button">复制 Markdown</button><button class="btn secondary" id="downloadDocument" type="button">下载 .md</button><span class="status" id="editStatus" role="status" aria-live="polite">就绪</span></div>
@@ -45,6 +46,7 @@
   </main>
   <script>window['work-hub-PW']='work2026';</script>
   <script src="../script/studio.js"></script>
+  <script src="../js/project-doc-templates.js"></script>
   <script src="../js/doc-templates.js"></script>
   <script src="../js/gate.js"></script>
 </body>

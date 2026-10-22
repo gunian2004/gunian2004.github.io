@@ -55,6 +55,9 @@ git config --global https.proxy http://127.0.0.1:&lt;Clash代理端口&gt;</code
         <div class="command"><div class="command-head"><strong>01 / 查看代理配置</strong></div><pre><code>git config --global --get http.proxy
 git config --global --get https.proxy</code></pre><p class="command-note">预期：两项都输出你配置的本机代理地址和端口。没有输出时，回到上一步检查配置。</p></div>
         <div class="command"><div class="command-head"><strong>02 / 检查仓库连通性</strong></div><pre><code>git ls-remote &lt;仓库HTTPS地址&gt;</code></pre><p class="command-note">将占位符替换为实际地址。正常时会列出可见的远程引用；认证错误需要检查仓库权限，连接超时则继续排查代理端口与节点。</p></div></div>
+        <div class="verification"><h3>遇到 Connection reset by peer / early EOF 怎么办</h3><p>如果从境外节点拉取仓库时出现 <code>Connection reset by peer</code>，通常表示网络连接被对端或链路中的设备中途强制断开；<code>early EOF</code> 表示 Git 在收到完整数据之前就遇到了数据流结束。两者同时出现时，通常需要排查传输中断。</p><p>这与拉取速度过慢可能是网络链路不稳定的不同表现。优先检查 Clash 代理是否正常，切换更稳定的节点后重新执行 clone；如果仍然报错，也需要检查远端服务或代理的连接限制。</p>
+        <div class="command"><div class="command-head"><strong>可尝试的 Git HTTP 缓冲配置</strong><span>全局配置，会影响当前用户的其他仓库</span></div><pre><code>git config --global http.postBuffer 524288000
+git config --global http.maxRequestBuffer 100M</code></pre><p class="command-note">适用范围：<code>http.postBuffer</code> 主要控制 HTTP 请求发送缓冲，<code>http.maxRequestBuffer</code> 控制引用协商请求的缓冲上限，并非 clone 数据包的接收缓冲。特定请求受缓冲限制时可尝试调整，但增大缓冲区不能修复网络链路，也不能保证减少断连；若仍出现上述报错，应继续排查节点、代理和远端服务。</p></div></div>
         <details class="cleanup"><summary>不再使用代理时，撤销本次全局配置</summary><div class="command"><div class="command-head"><strong>清除 Git 全局代理</strong></div><pre><code>git config --global --unset-all http.proxy
 git config --global --unset-all https.proxy</code></pre><p class="command-note">这会移除上述全局代理项。执行前确认其他仓库不再依赖它们。</p></div></details>
         <p class="footnote">经验记录：境外节点资源 clone 连接失败时的处理顺序。</p>
