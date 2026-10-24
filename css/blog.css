@@ -839,6 +839,21 @@ body.egg-open { overflow: hidden; }
 .project-impact strong { color: var(--text-main); font-size: 1.62rem; line-height: 1; letter-spacing: -0.06em; }
 .project-impact strong > span, .project-impact em { color: var(--primary); font-size: 0.68em; font-style: normal; }
 .project-impact small { color: var(--text-muted); font-size: 0.67rem; }
+/* Featured case: three outcome figures, then a problem → approach → result story. */
+.project-card-featured .project-impact { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.project-case { display: grid; margin: 0 0 14px; }
+.project-case-step { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 12px; padding: 11px 0; border-top: 1px solid var(--line-ink); }
+.project-case-step:first-child { padding-top: 0; border-top: 0; }
+.project-case-step:last-child { padding-bottom: 2px; }
+.project-case-label { color: var(--primary); font: 650 0.58rem/1.9 ui-monospace, SFMono-Regular, Consolas, monospace; letter-spacing: 0.08em; }
+.project-case-step p { margin: 0; color: #4f5c67; font-size: 0.79rem; line-height: 1.75; }
+.project-demo-link { position: relative; z-index: 3; display: flex; width: fit-content; align-items: center; gap: 7px; margin-top: 14px; color: var(--primary); font-size: 0.77rem; font-weight: 650; text-decoration: none; }
+.project-demo-link:hover { text-decoration: underline; text-underline-offset: 4px; }
+@media (max-width: 560px) {
+    .project-card-featured .project-impact { gap: 10px; }
+    .project-card-featured .project-impact strong { font-size: 1.28rem; }
+    .project-case-step { grid-template-columns: 1fr; gap: 2px; }
+}
 .project-highlights { position: relative; z-index: 1; margin: 0; padding-left: 18px; color: #4f5c67; font-size: 0.81rem; line-height: 1.75; }
 .project-highlights li { padding-left: 2px; }
 .project-highlights li + li { margin-top: 5px; }
