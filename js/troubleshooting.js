@@ -10,25 +10,114 @@ const builtins = [
 {id:'builtin-storage',title:'浏览器中的个人记录消失或无法保存',category:'本地环境',symptom:'更换浏览器后找不到记录，或保存时提示存储不可用。',environment:'使用 localStorage / IndexedDB 的静态工具。',steps:'确认使用同一浏览器、配置文件和站点来源。\n检查是否在无痕模式，或清理过网站数据。\n检查存储限制与浏览器隐私设置。\n查找之前导出的 JSON 备份。',solution:'使用备份恢复。浏览器本地记录不会自动同步，域名、协议和端口变化也可能进入不同存储空间。定期导出并妥善保存。',verification:'新增测试记录并刷新后仍保留；导出文件包含预期记录。',command:''},
 {id:'builtin-git-conflict',title:'Git 合并产生冲突',category:'Git / 网络',symptom:'合并过程中出现 CONFLICT，文件包含冲突标记。',environment:'有未完成合并的 Git 仓库；遵循项目分支策略。',steps:'用 git status 确认当前分支与冲突文件。\n阅读双方修改及业务意图。\n逐文件解决冲突，检查是否遗漏逻辑。\n运行相关验证后暂存并完成合并。',solution:'不要仅按 ours/theirs 批量覆盖。遇到无法判断的业务差异先确认；保留本地工作，避免随意执行 reset --hard。',verification:'冲突标记已清除，git status 符合预期，相关测试或页面验证通过。',command:'git status\ngit diff --name-only --diff-filter=U\ngit diff --check'}
 ];
-const key='work-hub.troubleshooting.v1';
-const fields=['title','category','symptom','environment','steps','solution','verification','command'];
-const limits={title:100,category:30,symptom:6000,environment:300,steps:10000,solution:10000,verification:6000,command:10000};
-const $=id=>document.getElementById(id);
-let state={schemaVersion:1,records:[],favorites:[]},category='全部',editing=null;
-function validRecord(r){return r&&typeof r==='object'&&typeof r.id==='string'&&/^custom-[a-zA-Z0-9-]{1,80}$/.test(r.id)&&fields.every(f=>typeof r[f]==='string'&&r[f].length<=limits[f]&&(f==='command'||r[f].trim()));}
-function validate(data){if(!data||data.schemaVersion!==1||!Array.isArray(data.records)||data.records.length>300||!data.records.every(validRecord)||new Set(data.records.map(r=>r.id)).size!==data.records.length||!Array.isArray(data.favorites)||data.favorites.length>1000||!data.favorites.every(id=>typeof id==='string'&&id.length<=100))throw Error('备份格式不正确或超出限制。');return {schemaVersion:1,records:data.records.map(r=>Object.fromEntries(['id',...fields].map(f=>[f,r[f]]))),favorites:[...new Set(data.favorites)]};}
-try{const saved=localStorage.getItem(key);if(saved)state=validate(JSON.parse(saved));}catch(e){$('storageStatus').textContent='未能读取本地记录，原始存储未清除。可导入有效备份后继续。';}
-function save(){try{localStorage.setItem(key,JSON.stringify(state));$('storageStatus').textContent='已保存到当前浏览器。';}catch(e){$('storageStatus').textContent='保存失败：当前更改仅在本次页面中，请立即导出备份。';}}
-function el(tag,text,className){const node=document.createElement(tag);if(text!==undefined)node.textContent=text;if(className)node.className=className;return node;}
-function button(text,fn,extra=''){const b=el('button',text,'btn secondary '+extra);b.type='button';b.addEventListener('click',fn);return b;}
-function all(){return [...builtins,...state.records];}
-function renderCategories(){const box=$('categories');box.replaceChildren();const names=['全部',...new Set(all().map(r=>r.category))];if(!names.includes(category))category='全部';names.forEach(name=>{const b=button(name,()=>{category=name;render();});b.className='chip';b.setAttribute('aria-pressed',String(category===name));box.append(b);});}
-function text(r){return `${r.title}\n\n现象与报错\n${r.symptom}\n\n适用环境\n${r.environment}\n\n排查步骤\n${r.steps}\n\n解决办法\n${r.solution}\n\n验证方式\n${r.verification}${r.command?'\n\n参考命令\n'+r.command:''}`;}
-function render(){renderCategories();const q=$('search').value.toLowerCase().trim();const rows=all().filter(r=>(category==='全部'||r.category===category)&&(!$('favoritesOnly').checked||state.favorites.includes(r.id))&&fields.some(f=>r[f].toLowerCase().includes(q)));$('resultStatus').textContent=`找到 ${rows.length} 条 · 内置 ${builtins.length} 条 / 个人 ${state.records.length} 条`;$('empty').hidden=rows.length>0;const box=$('results');box.replaceChildren();rows.forEach(r=>{const card=el('article',undefined,'card');card.append(el('div',r.category+' · '+(r.id.startsWith('builtin-')?'内置示例':'个人记录'),'card-meta'),el('h2',r.title),el('p',r.symptom));const detail=el('details');detail.append(el('summary','查看排查步骤与验证方法'));[['适用环境','environment'],['排查步骤','steps'],['解决办法','solution'],['验证方式','verification']].forEach(([label,f])=>{detail.append(el('h3',label));const p=el('p',r[f]);p.style.whiteSpace='pre-wrap';detail.append(p);});if(r.command){detail.append(el('h3','参考命令'),el('pre',r.command,'code-block'));detail.append(button('复制命令',e=>BlogStudio.copy(r.command,e.currentTarget)));}card.append(detail);const actions=el('div',undefined,'card-actions');const starred=state.favorites.includes(r.id);actions.append(button(starred?'★ 已收藏':'☆ 收藏',()=>{state.favorites=starred?state.favorites.filter(id=>id!==r.id):[...state.favorites,r.id];save();render();}),button('复制完整记录',e=>BlogStudio.copy(text(r),e.currentTarget)));if(r.id.startsWith('custom-'))actions.append(button('编辑',()=>openEditor(r)),button('删除',()=>{if(confirm('删除这条个人记录？建议先导出备份。')){state.records=state.records.filter(x=>x.id!==r.id);state.favorites=state.favorites.filter(id=>id!==r.id);save();render();}},'danger'));card.append(actions);box.append(card);});}
-function openEditor(r){editing=r?.id||null;$('editForm').reset();$('editorTitle').textContent=r?'编辑问题':'记录问题';fields.forEach(f=>$('editForm').elements.namedItem(f).value=r?r[f]:'');$('editor').showModal();}
-$('add').addEventListener('click',()=>openEditor());$('cancel').addEventListener('click',()=>$('editor').close());$('editForm').addEventListener('submit',e=>{e.preventDefault();if(!editing&&state.records.length>=300){BlogStudio.notify('最多保存 300 条个人记录，请先导出整理。');return;}const r={id:editing||'custom-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,9)};fields.forEach(f=>r[f]=$('editForm').elements.namedItem(f).value.trim());if(!validRecord(r)){BlogStudio.notify('请完整填写记录并检查长度。');return;}state.records=editing?state.records.map(x=>x.id===editing?r:x):[r,...state.records];save();$('editor').close();render();});
-$('search').addEventListener('input',render);$('favoritesOnly').addEventListener('change',render);
-$('export').addEventListener('click',()=>{const url=URL.createObjectURL(new Blob([JSON.stringify(state,null,2)],{type:'application/json'}));const a=el('a');a.href=url;a.download='troubleshooting-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
-$('import').addEventListener('click',()=>$('importFile').click());$('importFile').addEventListener('change',async e=>{const file=e.target.files[0];if(!file)return;try{if(file.size>5*1024*1024)throw Error('备份不能超过 5 MB。');const incoming=validate(JSON.parse(await file.text()));if(!confirm(`导入 ${incoming.records.length} 条个人记录？将与现有记录合并，同 ID 记录以导入内容为准。`))return;const merged=new Map(state.records.map(r=>[r.id,r]));incoming.records.forEach(r=>merged.set(r.id,r));if(merged.size>300)throw Error('合并后超过 300 条，请先整理备份。');state=validate({schemaVersion:1,records:[...merged.values()],favorites:[...new Set([...state.favorites,...incoming.favorites])]});save();render();BlogStudio.notify('备份已合并。');}catch(err){BlogStudio.notify(err.message||'导入失败，备份格式不正确。');}finally{e.target.value='';}});
+const key = 'work-hub.troubleshooting.favorites.v1';
+const legacyKey = 'work-hub.troubleshooting.v1';
+const fields = ['title', 'category', 'symptom', 'environment', 'steps', 'solution', 'verification', 'command'];
+const $ = id => document.getElementById(id);
+let category = '全部';
+let favorites = [];
+
+function readStoredFavorites() {
+  try {
+    const raw = localStorage.getItem(key);
+    if (raw) {
+      const list = JSON.parse(raw);
+      if (Array.isArray(list)) return list.filter(id => typeof id === 'string');
+    }
+  } catch (e) {}
+  try {
+    const raw = localStorage.getItem(legacyKey);
+    if (raw) {
+      const data = JSON.parse(raw);
+      if (data && Array.isArray(data.favorites)) return data.favorites.filter(id => typeof id === 'string');
+    }
+  } catch (e) {}
+  return [];
+}
+
+favorites = readStoredFavorites().filter(id => builtins.some(r => r.id === id));
+
+function saveFavorites() {
+  try {
+    localStorage.setItem(key, JSON.stringify(favorites));
+    $('storageStatus').textContent = '收藏已保存到当前浏览器。';
+  } catch (e) {
+    $('storageStatus').textContent = '当前浏览器无法保存收藏，本次标记仅在页面内有效。';
+  }
+}
+
+function el(tag, text, className) {
+  const node = document.createElement(tag);
+  if (text !== undefined) node.textContent = text;
+  if (className) node.className = className;
+  return node;
+}
+
+function button(label, fn, extra = '') {
+  const b = el('button', label, 'btn secondary ' + extra);
+  b.type = 'button';
+  b.addEventListener('click', fn);
+  return b;
+}
+
+function plainText(r) {
+  return `${r.title}\n\n现象与报错\n${r.symptom}\n\n适用环境\n${r.environment}\n\n排查步骤\n${r.steps}\n\n解决办法\n${r.solution}\n\n验证方式\n${r.verification}${r.command ? '\n\n参考命令\n' + r.command : ''}`;
+}
+
+function renderCategories() {
+  const box = $('categories');
+  box.replaceChildren();
+  const names = ['全部', ...new Set(builtins.map(r => r.category))];
+  if (!names.includes(category)) category = '全部';
+  names.forEach(name => {
+    const b = button(name, () => { category = name; render(); });
+    b.className = 'chip';
+    b.setAttribute('aria-pressed', String(category === name));
+    box.append(b);
+  });
+}
+
+function render() {
+  renderCategories();
+  const q = $('search').value.toLowerCase().trim();
+  const only = $('favoritesOnly').checked;
+  const rows = builtins.filter(r => (category === '全部' || r.category === category) && (!only || favorites.includes(r.id)) && fields.some(f => r[f].toLowerCase().includes(q)));
+  $('resultStatus').textContent = `找到 ${rows.length} 条 · 共 ${builtins.length} 条`;
+  $('empty').hidden = rows.length > 0;
+  const box = $('results');
+  box.replaceChildren();
+  rows.forEach(r => {
+    const card = el('article', undefined, 'card');
+    card.append(el('div', r.category, 'card-meta'), el('h2', r.title), el('p', r.symptom));
+    const detail = el('details');
+    detail.append(el('summary', '查看排查步骤与验证方法'));
+    [['适用环境', 'environment'], ['排查步骤', 'steps'], ['解决办法', 'solution'], ['验证方式', 'verification']].forEach(([label, f]) => {
+      detail.append(el('h3', label));
+      const p = el('p', r[f]);
+      p.style.whiteSpace = 'pre-wrap';
+      detail.append(p);
+    });
+    if (r.command) {
+      detail.append(el('h3', '参考命令'), el('pre', r.command, 'code-block'));
+      detail.append(button('复制命令', e => BlogStudio.copy(r.command, e.currentTarget)));
+    }
+    card.append(detail);
+    const actions = el('div', undefined, 'card-actions');
+    const starred = favorites.includes(r.id);
+    actions.append(
+      button(starred ? '★ 已收藏' : '☆ 收藏', () => {
+        favorites = starred ? favorites.filter(id => id !== r.id) : [...favorites, r.id];
+        saveFavorites();
+        render();
+      }),
+      button('复制完整记录', e => BlogStudio.copy(plainText(r), e.currentTarget))
+    );
+    card.append(actions);
+    box.append(card);
+  });
+}
+
+$('search').addEventListener('input', render);
+$('favoritesOnly').addEventListener('change', render);
 render();
 })();
