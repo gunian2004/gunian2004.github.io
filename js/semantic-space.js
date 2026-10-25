@@ -1,7 +1,7 @@
 /* ============================================================
-   语义空间 / semantic-space.js
-   依赖：window.THREE（本地 vendor）、window.SS_DATA（离线管线产出）
-   职责：点云渲染、自写轨道相机、双模式召回、上下文装配、2D 降级
+   内容书架 / semantic-space.js
+   职责：数据索引、分词与 BM25、召回、右侧面板、上下文装配
+   三维部分在 semantic-engine.js，通过回调与这里通信
    ============================================================ */
 (function () {
     'use strict';
@@ -32,94 +32,153 @@
         project: '../index.html#projects'
     };
 
-    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-    var TOKEN_RATIO = 1.6; // 1 token ≈ 1.6 汉字，仅作估算
+    var PART_META = {
+        shelf: {
+            name: '书架',
+            desc: '承托七本书的木质书架。侧板和背板把书固定成一排，前缘铭牌上刻着这排书总的范围。',
+            specs: [['尺寸', '2.5 × 0.86'], ['层数', '1 排 7 本'], ['材质', '深色 hardwood + 金属包边']]
+        },
+        rail: {
+            name: '顶横梁',
+            desc: '压在书架顶部的横梁，底面 78 道刻度对应 78 个片段——它不参与装载，只负责把「一共有多少段」摊开给你看。',
+            specs: [['刻度', '78 道'], ['长度', '2.5'], ['含义', '1 刻度 = 1 个片段']]
+        }
+    };
+
+    var TOKEN_RATIO = 1.6;   // 1 token ≈ 1.6 汉字，仅作估算
+    var LIMIT = 24;
 
     var state = {
         hits: [],
-        hitMap: null,
-        query: '',
-        queryPos: null,
+        hitMap: {},
         mode: 'vector',
         preset: null,
-        selected: null,
-        hovered: null,
-        budget: 240,
-        view: '3d',
-        spin: true,
-        lastInput: 0
+        selectedChunk: null,
+        selectedPart: null,
+        budget: 240
     };
 
-    /* ---------------- 数据索引 ---------------- */
-
     var CHUNKS = [];
-    var DOC_BY_ID = {};
     var CHUNK_BY_ID = {};
+    var DOC_BY_ID = {};
+    var CAT_LABEL = {};
+    var engine = null;
+
+    /* ---------------- 启动 ---------------- */
 
     function boot() {
         if (!DATA || !DATA.chunks || !DATA.chunks.length) {
-            fail('数据没有加载成功', 'space.js 未载入或为空，请重跑 <code>python script/build-semantic-space.py</code>。');
+            fail('数据没有加载成功', 'space.js 未载入或为空，请重跑 build-semantic-space.py。');
             return;
         }
-        DATA.docs.forEach(function (d) { DOC_BY_ID[d.id] = d; });
+
+        (DATA.docs || []).forEach(function (d) { DOC_BY_ID[d.id] = d; });
+        (DATA.categories || []).forEach(function (c) { CAT_LABEL[c.key] = c.label; });
         DATA.chunks.forEach(function (c) {
             CHUNKS.push(c);
             CHUNK_BY_ID[c.i] = c;
         });
 
         paintStats();
-        renderLegend();
         renderPresets();
         renderEmptyResults();
         renderWindow();
-
-        var ok = initThree();
-        buildFlat();
-        setView(ok ? '3d' : '2d', true);
-
-        if (!ok) {
-            showNotice('当前环境不支持 WebGL，已切到平面视图，功能一致。');
-        }
-
         bindUI();
-        $('#ssLoading').hidden = true;
+        initEngine();
 
-        // 首次进入直接跑一个问题，让空间立刻有意义
+        maybeShowGuide();
+
         var first = DATA.queries && DATA.queries[0];
-        if (first) {
-            window.setTimeout(function () { runPreset(first); }, 420);
-        }
+        if (first) window.setTimeout(function () { runPreset(first); }, 520);
     }
 
     function fail(title, detail) {
         var box = $('#ssLoading');
-        if (box) {
-            box.innerHTML = '';
-            var b = document.createElement('b');
-            b.textContent = title;
-            var p = document.createElement('p');
-            p.innerHTML = detail;
-            p.style.maxWidth = '30ch';
-            p.style.textAlign = 'center';
-            p.style.letterSpacing = '0';
-            box.appendChild(b);
-            box.appendChild(p);
-        }
+        if (!box) return;
+        box.innerHTML = '';
+        var b = document.createElement('b');
+        b.textContent = title;
+        var p = document.createElement('p');
+        p.textContent = detail;
+        p.style.maxWidth = '30ch';
+        p.style.textAlign = 'center';
+        p.style.letterSpacing = '0';
+        box.appendChild(b);
+        box.appendChild(p);
     }
 
     function paintStats() {
         var m = DATA.meta || {};
-        var map = {
-            docs: m.docs,
-            chunks: m.chunks,
-            vocab: m.vocab
-        };
+        var map = { docs: m.docs, chunks: m.chunks, vocab: m.vocab };
         $$('[data-stat]').forEach(function (node) {
-            var k = node.getAttribute('data-stat');
-            if (map[k]) node.textContent = map[k];
+            var v = map[node.getAttribute('data-stat')];
+            if (v) node.textContent = v;
         });
-        $('#ssSpaceSub').textContent = (m.chunks || CHUNKS.length) + ' chunks · ' +
-            (DATA.categories ? DATA.categories.length : 7) + ' topics';
+    }
+
+    /* ---------------- 三维书架 ---------------- */
+
+    function initEngine() {
+        var stage = $('#ssStage');
+        var canvas = $('#ssCanvas');
+        if (!window.SSEngine) {
+            fallback('三维书架没有加载，下面是同一份数据的结构剖面。');
+            return;
+        }
+        engine = window.SSEngine.create({
+            canvas: canvas,
+            stage: stage,
+            labelLayer: $('#ssLabels'),
+            data: DATA,
+            colors: COLORS,
+            onSelectPart: function (key) {
+                if (key) showPart(key);
+                else showResults();
+            },
+            onSelectChunk: function (idx) {
+                showChunk(idx);
+            },
+            onHoverPart: function () {}
+        });
+
+        if (!engine) {
+            fallback('当前环境不支持 WebGL，下面是同一份数据的结构剖面。');
+            return;
+        }
+        $('#ssLoading').hidden = true;
+    }
+
+    function fallback(message) {
+        var stage = $('#ssStage');
+        var loading = $('#ssLoading');
+        if (loading) loading.hidden = true;
+        var cv = $('#ssCanvas');
+        if (cv) cv.style.display = 'none';
+        if ($('#ssLabels')) $('#ssLabels').style.display = 'none';
+
+        var box = document.createElement('div');
+        box.className = 'ss-fallback';
+        var parts = (DATA.categories || []).map(function (cat) {
+            var items = CHUNKS.filter(function (c) { return c.c === cat.key; });
+            return { key: cat.key, label: cat.label, n: items.length };
+        }).sort(function (a, b) { return b.n - a.n; });
+
+        var maxN = Math.max.apply(null, parts.map(function (p) { return p.n; }));
+        var rows = parts.map(function (p, i) {
+            var w = 150 + 300 * Math.sqrt(p.n / maxN);
+            var y = 20 + i * 46;
+            return '<g transform="translate(' + (300 - w / 2) + ',' + y + ')">' +
+                '<rect width="' + w + '" height="30" rx="7" fill="#161d29" stroke="' + COLORS[p.key] + '" stroke-width="1.4"/>' +
+                '<rect x="10" y="12" width="' + Math.min(52, w - 20) + '" height="4" rx="2" fill="' + COLORS[p.key] + '" opacity=".9"/>' +
+                '<text x="' + (w - 10) + '" y="20" text-anchor="end" font-family="Consolas, monospace" font-size="11" fill="#e8eef6">' +
+                p.label + ' · ' + p.n + '</text></g>';
+        }).join('');
+
+        box.innerHTML = '<svg viewBox="0 0 600 360" role="img" aria-label="7 本书的结构剖面">' +
+            '<text x="300" y="12" text-anchor="middle" font-family="Consolas, monospace" font-size="10" fill="#8f979f">STRUCTURE SECTION</text>' +
+            rows + '</svg>' +
+            '<p class="ss-fallback-note">' + message + '</p>';
+        stage.appendChild(box);
     }
 
     /* ---------------- 分词 / BM25 ---------------- */
@@ -128,21 +187,17 @@
     var ASCIIW = /[a-z0-9][a-z0-9+#._-]*/g;
 
     function tokenize(text) {
-        var t = String(text || '').toLowerCase();
+        var s = String(text || '').toLowerCase();
         var out = [];
-        var runs = t.match(CJK) || [];
-        for (var r = 0; r < runs.length; r++) {
-            var run = runs[r];
-            if (run.length === 1) {
-                out.push(run);
-            } else {
-                for (var i = 0; i < run.length - 1; i++) out.push(run.slice(i, i + 2));
-            }
+        var m;
+        CJK.lastIndex = 0;
+        while ((m = CJK.exec(s))) {
+            var seg = m[0];
+            for (var i = 0; i < seg.length - 1; i++) out.push(seg.slice(i, i + 2));
+            if (seg.length === 1) out.push(seg);
         }
-        var words = t.match(ASCIIW) || [];
-        for (var w = 0; w < words.length; w++) {
-            if (words[w].length >= 2) out.push(words[w]);
-        }
+        ASCIIW.lastIndex = 0;
+        while ((m = ASCIIW.exec(s))) out.push(m[0]);
         return out;
     }
 
@@ -150,855 +205,315 @@
 
     function buildBM25() {
         var docs = CHUNKS.map(function (c) { return tokenize(c.t + ' ' + c.x); });
-        var df = Object.create(null);
-        var tfs = [];
+        var df = {}, tfs = [], lens = [];
         var total = 0;
-
         docs.forEach(function (toks) {
-            total += toks.length;
-            var tf = Object.create(null);
+            var tf = {};
             toks.forEach(function (t) { tf[t] = (tf[t] || 0) + 1; });
-            tfs.push(tf);
             Object.keys(tf).forEach(function (t) { df[t] = (df[t] || 0) + 1; });
+            tfs.push(tf);
+            lens.push(toks.length);
+            total += toks.length;
         });
-
-        BM25 = { n: docs.length, avgdl: total / Math.max(1, docs.length), df: df, tfs: tfs, lens: docs.map(function (d) { return d.length; }) };
+        BM25 = {
+            n: docs.length,
+            avgdl: total / Math.max(1, docs.length),
+            df: df, tfs: tfs, lens: lens
+        };
     }
 
     function bm25Search(query, limit) {
         if (!BM25) buildBM25();
-        var terms = Object.keys(tokenize(query).reduce(function (acc, t) { acc[t] = 1; return acc; }, {}));
-        var k1 = 1.2;
-        var b = 0.62;
-        var scores = new Array(BM25.n).fill(0);
+        var k1 = 1.2, b = 0.62;
+        var terms = [];
+        var seen = {};
+        tokenize(query).forEach(function (t) {
+            if (seen[t]) return;
+            seen[t] = 1;
+            terms.push(t);
+        });
 
+        var scored = [];
         terms.forEach(function (term) {
             var df = BM25.df[term] || 0;
             if (!df) return;
             var idf = Math.log(1 + (BM25.n - df + 0.5) / (df + 0.5));
-            for (var i = 0; i < BM25.n; i++) {
-                var f = BM25.tfs[i][term];
-                if (!f) continue;
-                var dl = BM25.lens[i] || 1;
-                scores[i] += idf * (f * (k1 + 1)) / (f + k1 * (1 - b + b * dl / BM25.avgdl));
-            }
+            BM25.tfs.forEach(function (tf, i) {
+                var f = tf[term];
+                if (!f) return;
+                var dl = BM25.lens[i];
+                var s = idf * (f * (k1 + 1)) / (f + k1 * (1 - b + b * dl / BM25.avgdl));
+                scored.push({ i: i, s: s });
+            });
         });
 
-        var ranked = [];
-        for (var i = 0; i < scores.length; i++) if (scores[i] > 0) ranked.push({ i: i, s: scores[i] });
-        ranked.sort(function (a, b2) { return b2.s - a.s; });
+        scored.sort(function (a, b2) { return b2.s - a.s; });
+        var top = scored.slice(0, limit);
+        var max = top.length ? top[0].s : 0;
+        var matched = terms.filter(function (t) { return BM25.df[t]; }).length;
 
-        var hitTerms = terms.filter(function (t) { return BM25.df[t]; }).length;
-        ranked = ranked.slice(0, limit || 24);
-        var max = ranked.length ? ranked[0].s : 1;
         return {
-            hits: ranked.map(function (r) { return { i: r.i, score: Math.max(0.01, r.s / max) }; }),
-            terms: terms.length,
-            hitTerms: hitTerms
+            hits: top.map(function (r) {
+                return { i: r.i, score: Math.max(0.01, r.s / (max || 1)) };
+            }),
+            matched: matched,
+            total: terms.length
         };
     }
 
     /* ---------------- 召回 ---------------- */
 
     function runPreset(preset) {
-        state.preset = preset.q;
-        state.query = preset.q;
+        state.preset = preset;
         state.mode = 'vector';
-        syncModeButtons();
-        $('#ssInput').value = preset.q;
-        var hits = (preset.hits || []).map(function (h) { return { i: h[0], score: h[1] }; });
-        state.hits = hits;
-        state.queryPos = preset.p ? { x: preset.p[0], y: preset.p[1], z: preset.p[2] } : centroid(hits);
-        state.selected = null;
-        state.source = 'preset';
-        state.notice = '';
-        apply();
-        renderResults('本题的问题向量已离线算好');
-        highlightPreset();
+        setMode('vector', true);
+        var input = $('#ssInput');
+        if (input) input.value = preset.q;
+        $$('.ss-chip').forEach(function (c) {
+            c.setAttribute('aria-pressed', String(c.dataset.q === preset.q));
+        });
+        hideNotice();
+        applyHits((preset.hits || []).slice(0, LIMIT).map(function (h) {
+            return { i: h[0], score: h[1] };
+        }), preset.q);
     }
 
     function runFree(text) {
-        text = String(text || '').trim();
-        if (!text) return;
-
-        // 输入正好等于某个预设问题时，直接用离线向量，避免降级成关键词
         var matched = (DATA.queries || []).filter(function (q) { return q.q === text; })[0];
         if (matched) { runPreset(matched); return; }
 
-        state.query = text;
+        var res = bm25Search(text, LIMIT);
         state.preset = null;
-        highlightPreset();
+        state.mode = 'keyword';
+        setMode('keyword', true);
+        $$('.ss-chip').forEach(function (c) { c.setAttribute('aria-pressed', 'false'); });
 
-        var res = bm25Search(text, 24);
-        var hits = res.hits;
-
-        if (state.mode === 'vector') {
-            state.notice = '自由输入没有预计算的问题向量，已用关键词召回近似；上面的预设问题是真向量。';
+        if (!res.hits.length) {
+            showNotice('没有命中任何片段，换一种说法试试。');
+        } else if (res.matched < res.total) {
+            showNotice('自由输入走的是 BM25 关键词召回，没有预计算向量。');
         } else {
-            state.notice = '';
+            hideNotice();
         }
+        applyHits(res.hits, text);
+    }
 
+    function applyHits(hits, query) {
         state.hits = hits;
-        state.queryPos = centroid(hits);
-        state.selected = null;
-        apply();
-        var label = (state.mode === 'vector' ? 'BM25 近似' : '关键词 BM25') +
-            ' · 命中 ' + res.hitTerms + '/' + res.terms + ' 词';
-        renderResults(label);
-        if (state.notice) showNotice(state.notice, 7000);
-    }
-
-    function centroid(hits) {
-        var top = (hits || []).slice(0, 8);
-        var wx = 0, wy = 0, wz = 0, w = 0;
-        top.forEach(function (h) {
-            var c = CHUNK_BY_ID[h.i];
-            if (!c) return;
-            var weight = h.score * h.score;
-            wx += c.p[0] * weight;
-            wy += c.p[1] * weight;
-            wz += c.p[2] * weight;
-            w += weight;
-        });
-        if (!w) return { x: 0, y: 0, z: 0 };
-        return { x: wx / w, y: wy / w, z: wz / w };
-    }
-
-    function apply() {
         state.hitMap = {};
-        state.hits.forEach(function (h, idx) {
-            state.hitMap[h.i] = { rank: idx, score: h.score };
+        hits.forEach(function (h, idx) {
+            state.hitMap[h.i] = { score: h.score, rank: idx + 1 };
         });
-        syncScene();
-        syncFlat();
+        state.selectedChunk = null;
+
+        if (engine) engine.setHits(hits);
+        renderResults(query);
+        renderDist();
         renderWindow();
-        renderDetail();
+        showResults();
+        syncStatus();
     }
 
-    /* ---------------- Three 场景 ---------------- */
+    /* ---------------- 面板 ---------------- */
 
-    var T = null; // three 相关对象集合
-
-    function initThree() {
-        if (!window.THREE) return false;
-        var canvas = $('#ssCanvas');
-        var stage = $('#ssStage');
-        var renderer;
-
-        try {
-            renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
-        } catch (err) {
-            return false;
-        }
-        if (!renderer.getContext()) return false;
-
-        var scene = new THREE.Scene();
-        var camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-        renderer.setClearAlpha(0);
-
-        var dotMap = dotTexture();
-        var ringMap = ringTexture();
-        var dots = [];
-        var group = new THREE.Group();
-        scene.add(group);
-
-        CHUNKS.forEach(function (c) {
-            var mat = new THREE.SpriteMaterial({
-                map: dotMap,
-                color: new THREE.Color(COLORS[c.c] || '#66727d'),
-                transparent: true,
-                opacity: 0.42,
-                depthWrite: false,
-                depthTest: false
-            });
-            var sprite = new THREE.Sprite(mat);
-            sprite.position.set(c.p[0], c.p[1], c.p[2]);
-            sprite.scale.setScalar(baseScale(c));
-            sprite.userData.index = c.i;
-            dots.push(sprite);
-            group.add(sprite);
-        });
-
-        // 地面网格：只给纵深参照，不做装饰（像一张摊开的坐标纸）
-        var grid = new THREE.GridHelper(2.9, 12, 0x172433, 0x172433);
-        grid.position.y = -1.02;
-        grid.material.transparent = true;
-        grid.material.opacity = 0.06;
-        grid.material.depthWrite = false;
-        scene.add(grid);
-
-        var ring = new THREE.Sprite(new THREE.SpriteMaterial({
-            map: ringMap, color: new THREE.Color('#315ce8'), transparent: true,
-            opacity: 0, depthWrite: false, depthTest: false
-        }));
-        ring.scale.setScalar(0.2);
-        scene.add(ring);
-
-        var anchor = new THREE.Sprite(new THREE.SpriteMaterial({
-            map: ringMap, color: new THREE.Color('#172433'), transparent: true,
-            opacity: 0, depthWrite: false, depthTest: false
-        }));
-        anchor.scale.setScalar(0.26);
-        scene.add(anchor);
-
-        var lineGeo = new THREE.BufferGeometry();
-        lineGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(3), 3));
-        var lines = new THREE.LineSegments(lineGeo, new THREE.LineBasicMaterial({
-            color: 0x315ce8, transparent: true, opacity: 0.34, depthWrite: false, depthTest: false
-        }));
-        scene.add(lines);
-
-        T = {
-            renderer: renderer,
-            scene: scene,
-            camera: camera,
-            dots: dots,
-            group: group,
-            ring: ring,
-            anchor: anchor,
-            lines: lines,
-            lineGeo: lineGeo,
-            raycaster: new THREE.Raycaster(),
-            pointer: new THREE.Vector2(-10, -10),
-            cam: { theta: 0.72, phi: 1.06, radius: 3.05, tx: 0, ty: 0, tz: 0 },
-            camTarget: { theta: 0.72, phi: 1.06, radius: 3.05, tx: 0, ty: 0, tz: 0 },
-            dragging: false,
-            moved: 0,
-            last: { x: 0, y: 0 },
-            pinch: 0,
-            visible: true,
-            frameId: null
-        };
-
-        resizeThree();
-        bindThreeInput();
-        startLoop();
-        if (window.ResizeObserver) {
-            var ro = new ResizeObserver(function () { resizeThree(); });
-            ro.observe($('#ssStage'));
-        }
-        return true;
-    }
-
-    function baseScale(c) {
-        return 0.042 + (c.k - 1) * 0.013;
-    }
-
-    function dotTexture() {
-        var s = 64;
-        var cv = document.createElement('canvas');
-        cv.width = cv.height = s;
-        var g = cv.getContext('2d');
-        var grd = g.createRadialGradient(s / 2, s / 2, s * 0.12, s / 2, s / 2, s * 0.5);
-        grd.addColorStop(0, 'rgba(255,255,255,1)');
-        grd.addColorStop(0.62, 'rgba(255,255,255,1)');
-        grd.addColorStop(0.78, 'rgba(255,255,255,.55)');
-        grd.addColorStop(1, 'rgba(255,255,255,0)');
-        g.fillStyle = grd;
-        g.beginPath();
-        g.arc(s / 2, s / 2, s * 0.5, 0, Math.PI * 2);
-        g.fill();
-        var tex = new THREE.CanvasTexture(cv);
-        if ('colorSpace' in tex && THREE.SRGBColorSpace) tex.colorSpace = THREE.SRGBColorSpace;
-        return tex;
-    }
-
-    function ringTexture() {
-        var s = 64;
-        var cv = document.createElement('canvas');
-        cv.width = cv.height = s;
-        var g = cv.getContext('2d');
-        g.strokeStyle = '#ffffff';
-        g.lineWidth = 3;
-        g.beginPath();
-        g.arc(s / 2, s / 2, s * 0.36, 0, Math.PI * 2);
-        g.stroke();
-        var tex = new THREE.CanvasTexture(cv);
-        if ('colorSpace' in tex && THREE.SRGBColorSpace) tex.colorSpace = THREE.SRGBColorSpace;
-        return tex;
-    }
-
-    function resizeThree() {
-        if (!T) return;
-        var stage = $('#ssStage');
-        var w = stage.clientWidth;
-        var h = stage.clientHeight;
-        T.renderer.setSize(w, h, false);
-        T.camera.aspect = w / Math.max(1, h);
-        T.camera.updateProjectionMatrix();
-    }
-
-    function syncScene() {
-        if (!T) return;
-        var hitMap = state.hitMap || {};
-        var selected = state.selected;
-
-        T.dots.forEach(function (sprite) {
-            var c = CHUNK_BY_ID[sprite.userData.index];
-            var hit = hitMap[c.i];
-            var isSelected = selected === c.i;
-            var isHovered = state.hovered === c.i;
-            var isDim = state.hits.length > 0 && !hit;
-
-            var scale = baseScale(c);
-            if (hit) scale *= 1.28 + hit.score * 0.55;
-            if (isSelected) scale *= 1.55;
-            if (isHovered) scale *= 1.22;
-
-            sprite.scale.setScalar(scale);
-            var mat = sprite.material;
-            mat.opacity = isDim ? 0.32 : (hit ? 0.96 : (isSelected ? 1 : 0.5));
-            mat.color.set(COLORS[c.c] || '#66727d');
-            if (isDim) mat.color.set('#a3acb3');
-        });
-
-        // 高亮环
-        var focus = state.selected != null ? CHUNK_BY_ID[state.selected] : (state.hovered != null ? CHUNK_BY_ID[state.hovered] : null);
-        if (focus) {
-            T.ring.position.set(focus.p[0], focus.p[1], focus.p[2]);
-            T.ring.material.opacity = state.selected != null ? 0.85 : 0.4;
-            T.ring.material.color.set(COLORS[focus.c] || '#315ce8');
-            T.ring.scale.setScalar(baseScale(focus) * 2.6);
-        } else {
-            T.ring.material.opacity = 0;
-        }
-
-        // 查询落点与连线
-        var qp = state.queryPos;
-        if (qp) {
-            T.anchor.position.set(qp.x, qp.y, qp.z);
-            T.anchor.material.opacity = 0.9;
-        } else {
-            T.anchor.material.opacity = 0;
-        }
-        drawLines(qp);
-
-        var tagBox = $('#ssTags');
-        renderTags(qp, tagBox);
-    }
-
-    function drawLines(qp) {
-        if (!T) return;
-        var pos = [];
-        if (qp) {
-            state.hits.slice(0, 12).forEach(function (h) {
-                var c = CHUNK_BY_ID[h.i];
-                if (!c) return;
-                var dx = c.p[0] - qp.x, dy = c.p[1] - qp.y, dz = c.p[2] - qp.z;
-                var dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
-                if (dist > 0.95) {
-                    // 排序靠前却离得远：用虚线，提示视觉距离只是近似
-                    var segs = 7;
-                    for (var s = 0; s < segs; s += 2) {
-                        var t0 = s / segs, t1 = (s + 1) / segs;
-                        pos.push(qp.x + dx * t0, qp.y + dy * t0, qp.z + dz * t0);
-                        pos.push(qp.x + dx * t1, qp.y + dy * t1, qp.z + dz * t1);
-                    }
-                } else {
-                    pos.push(qp.x, qp.y, qp.z, c.p[0], c.p[1], c.p[2]);
-                }
-            });
-        }
-        if (!pos.length) pos = [0, 0, 0, 0, 0, 0];
-        var attr = new THREE.BufferAttribute(new Float32Array(pos), 3);
-        T.lineGeo.setAttribute('position', attr);
-        T.lineGeo.computeBoundingSphere();
-    }
-
-    function renderTags(qp, host) {
-        if (!T) return;
-        var limit = window.matchMedia('(max-width: 760px)').matches ? 3 : 5;
-        var want = state.hits.slice(0, limit);
-        while (host.children.length > want.length) host.removeChild(host.lastChild);
-        while (host.children.length < want.length) {
-            var el = document.createElement('span');
-            el.className = 'ss-tag';
-            host.appendChild(el);
-        }
-        want.forEach(function (h, i) {
-            var el = host.children[i];
-            var c = CHUNK_BY_ID[h.i];
-            el.textContent = String(i + 1);
-            el.style.color = COLORS[c.c] || '#315ce8';
-            el.dataset.index = h.i;
-        });
-        state._tags = want;
-    }
-
-    function projectToScreen(v3) {
-        var p = v3.clone().project(T.camera);
-        var stage = $('#ssStage');
+    function panelViews() {
         return {
-            x: (p.x * 0.5 + 0.5) * stage.clientWidth,
-            y: (-p.y * 0.5 + 0.5) * stage.clientHeight,
-            visible: p.z < 1
+            results: $('#ssResults'),
+            detail: $('#ssDetail'),
+            part: $('#ssPart')
         };
     }
 
-    function startLoop() {
-        if (!T) return;
-        var tick = function () {
-            T.frameId = window.requestAnimationFrame(tick);
-            if (!T.visible || document.hidden || state.view !== '3d') return;
-            stepCamera();
-            T.renderer.render(T.scene, T.camera);
-            placeTags();
-        };
-        tick();
+    function showResults() {
+        var v = panelViews();
+        v.detail.hidden = true;
+        v.part.hidden = true;
+        v.results.hidden = false;
+        var first = $('.ss-hit', v.results);
+        if (first) {
+            $$('.ss-hit').forEach(function (b) { b.removeAttribute('aria-current'); });
+        }
     }
 
-    function stepCamera() {
-        var c = T.cam;
-        var t = T.camTarget;
-        var damp = reduceMotion.matches ? 1 : 0.12;
+    function showChunk(idx) {
+        var c = CHUNK_BY_ID[idx];
+        if (!c) return;
+        var v = panelViews();
+        var hit = state.hitMap[idx];
 
-        var idle = Date.now() - state.lastInput > 4200;
-        if (state.spin && idle && !T.dragging && state.view === '3d') {
-            t.theta += 0.0011;
+        state.selectedChunk = idx;
+        state.selectedPart = null;
+
+        $('#ssDetailCat').style.color = COLORS[c.c] || 'var(--ss-muted)';
+        $('#ssDetailCat').querySelector('span').textContent = CAT_LABEL[c.c] || c.c;
+        $('#ssDetailTitle').textContent = c.t || '（无标题）';
+        $('#ssDetailScore').textContent = hit ? hit.score.toFixed(4) : '—';
+        $('#ssDetailLen').textContent = (c.x || '').length + ' 字 / ' + tokensOf(c) + ' tok';
+        $('#ssDetailSource').textContent = (DOC_BY_ID[c.d] && DOC_BY_ID[c.d].title) || '笔记片段';
+        $('#ssDetailText').textContent = c.x || '';
+        $('#ssDetailLink').href = ANCHORS[c.c] || '../pages/AI.html';
+
+        v.results.hidden = true;
+        v.part.hidden = true;
+        v.detail.hidden = false;
+
+        $$('.ss-hit').forEach(function (b) {
+            b.setAttribute('aria-current', String(Number(b.dataset.i) === idx));
+        });
+    }
+
+    function kvRow(dt, dd) {
+        var div = document.createElement('div');
+        var a = document.createElement('dt');
+        a.textContent = dt;
+        var b = document.createElement('dd');
+        b.textContent = dd;
+        div.appendChild(a);
+        div.appendChild(b);
+        return div;
+    }
+
+    function showPart(key) {
+        var part = null;
+        if (engine) {
+            part = engine.parts.filter(function (p) { return p.key === key; })[0];
         }
 
-        c.theta += (t.theta - c.theta) * damp;
-        c.phi += (t.phi - c.phi) * damp;
-        c.radius += (t.radius - c.radius) * damp;
-        c.tx += (t.tx - c.tx) * damp;
-        c.ty += (t.ty - c.ty) * damp;
-        c.tz += (t.tz - c.tz) * damp;
-
-        var sp = Math.sin(c.phi);
-        T.camera.position.set(
-            c.tx + c.radius * sp * Math.cos(c.theta),
-            c.ty + c.radius * Math.cos(c.phi),
-            c.tz + c.radius * sp * Math.sin(c.theta)
-        );
-        T.camera.lookAt(c.tx, c.ty, c.tz);
-    }
-
-    function placeTags() {
-        if (!T || !state._tags) return;
-        var host = $('#ssTags');
-        if (!state._tags.length) { host.innerHTML = ''; return; }
-        state._tags.forEach(function (h, i) {
-            var el = host.children[i];
-            if (!el) return;
+        var isPlate = !!CAT_LABEL[key];
+        var meta = PART_META[key] || null;
+        var label = isPlate ? CAT_LABEL[key] : (meta ? meta.name : key);
+        var items = CHUNKS.filter(function (c) { return c.c === key; });
+        var chars = items.reduce(function (sum, c) { return sum + (c.x || '').length; }, 0);
+        var hits = state.hits.filter(function (h) {
             var c = CHUNK_BY_ID[h.i];
-            var p = projectToScreen(new THREE.Vector3(c.p[0], c.p[1], c.p[2]));
-            el.style.left = p.x + 'px';
-            el.style.top = p.y + 'px';
-            el.style.display = p.visible ? '' : 'none';
+            return c && c.c === key;
         });
+
+        var v = panelViews();
+        state.selectedPart = key;
+        state.selectedChunk = null;
+
+        $('#ssPartIndex').style.color = COLORS[key] || 'var(--ss-muted)';
+        $('#ssPartIndex').querySelector('span').textContent =
+            'PART ' + String((part ? part.index : 0) + 1).padStart(2, '0') + (isPlate ? '' : ' · 书架部件');
+        $('#ssPartName').textContent = label;
+        var link = $('#ssPartLink');
+        link.hidden = !isPlate;
+        link.href = ANCHORS[key] || '../pages/AI.html';
+
+        var kv = $('#ssPartKv');
+        kv.innerHTML = '';
+        var desc = $('#ssPartDesc');
+        var sub = $('#ssPartSub');
+        var list = $('#ssPartChunks');
+        list.innerHTML = '';
+
+        if (isPlate) {
+            desc.hidden = true;
+            sub.hidden = false;
+            list.hidden = false;
+            kv.appendChild(kvRow('片段数', items.length + ' 段'));
+            kv.appendChild(kvRow('总字数', chars.toLocaleString('en-US') + ' 字'));
+            kv.appendChild(kvRow('平均长度', items.length ? Math.round(chars / items.length) + ' 字' : '—'));
+            kv.appendChild(kvRow('本次命中', hits.length ? hits.length + ' 段' : '未命中'));
+
+            sub.textContent = '这本书里的片段';
+            items.slice(0, 8).forEach(function (c) {
+                var li = document.createElement('li');
+                var b = document.createElement('b');
+                b.textContent = '#' + String(c.i + 1).padStart(2, '0');
+                var span = document.createElement('span');
+                span.textContent = c.t || '（无标题）';
+                li.appendChild(b);
+                li.appendChild(span);
+                li.addEventListener('click', function () {
+                    if (engine) engine.focusChunk(c.i);
+                    showChunk(c.i);
+                });
+                list.appendChild(li);
+            });
+        } else {
+            desc.hidden = false;
+            desc.textContent = meta ? meta.desc : '这个部件没有挂内容片段。';
+            sub.hidden = true;
+            list.hidden = true;
+            (meta ? meta.specs : []).forEach(function (row) {
+                kv.appendChild(kvRow(row[0], row[1]));
+            });
+        }
+
+        v.results.hidden = true;
+        v.detail.hidden = true;
+        v.part.hidden = false;
+        syncStatus();
     }
 
-    function bindThreeInput() {
-        var stage = $('#ssStage');
-        var canvas = $('#ssCanvas');
+    function renderDist() {
+        var box = $('#ssDist');
+        var list = $('#ssDistList');
+        if (!box || !list) return;
 
-        stage.addEventListener('pointerdown', function (e) {
-            if (state.view !== '3d') return;
-            if (e.target.closest('.ss-stage-tools')) return;
-            T.dragging = true;
-            T.moved = 0;
-            T.last.x = e.clientX;
-            T.last.y = e.clientY;
-            stage.setPointerCapture(e.pointerId);
-        });
-
-        stage.addEventListener('pointermove', function (e) {
-            if (state.view !== '3d' || !T) return;
-            if (T.dragging) {
-                var dx = e.clientX - T.last.x;
-                var dy = e.clientY - T.last.y;
-                T.moved += Math.abs(dx) + Math.abs(dy);
-                T.last.x = e.clientX;
-                T.last.y = e.clientY;
-                T.camTarget.theta -= dx * 0.0062;
-                T.camTarget.phi = clamp(T.camTarget.phi - dy * 0.0055, 0.22, 2.92);
-                state.lastInput = Date.now();
-                hideTip();
-                return;
-            }
-            updateHover(e);
-        });
-
-        stage.addEventListener('pointerup', function (e) {
-            if (state.view !== '3d' || !T) return;
-            var wasDragging = T.dragging;
-            T.dragging = false;
-            if (!wasDragging) return;
-            if (T.moved < 6) handleClick(e);
-            state.lastInput = Date.now();
-        });
-
-        stage.addEventListener('pointerleave', function () {
-            if (!T) return;
-            T.dragging = false;
-            state.hovered = null;
-            hideTip();
-            syncScene();
-        });
-
-        canvas.addEventListener('wheel', function (e) {
-            if (state.view !== '3d' || !T) return;
-            e.preventDefault();
-            T.camTarget.radius = clamp(T.camTarget.radius * Math.exp(e.deltaY * 0.0011), 1.9, 7.2);
-            state.lastInput = Date.now();
-        }, { passive: false });
-
-        stage.addEventListener('dblclick', function (e) {
-            if (state.view !== '3d') return;
-            if (e.target.closest('.ss-stage-tools')) return;
-            resetCamera();
-        });
-
-        stage.addEventListener('keydown', function (e) {
-            if (state.view !== '3d' || !T) return;
-            var step = 0.11;
-            if (e.key === 'ArrowLeft') T.camTarget.theta -= step;
-            else if (e.key === 'ArrowRight') T.camTarget.theta += step;
-            else if (e.key === 'ArrowUp') T.camTarget.phi = clamp(T.camTarget.phi - step, 0.22, 2.92);
-            else if (e.key === 'ArrowDown') T.camTarget.phi = clamp(T.camTarget.phi + step, 0.22, 2.92);
-            else if (e.key === '+' || e.key === '=') T.camTarget.radius = clamp(T.camTarget.radius - 0.3, 1.9, 7.2);
-            else if (e.key === '-' || e.key === '_') T.camTarget.radius = clamp(T.camTarget.radius + 0.3, 1.9, 7.2);
-            else if (e.key === 'Escape') { state.selected = null; syncScene(); renderDetail(); return; }
-            else return;
-            e.preventDefault();
-            state.lastInput = Date.now();
-        });
-
-        window.addEventListener('resize', resizeThree);
-    }
-
-    function handleClick(e) {
-        var idx = pick(e);
-        if (idx != null) select(idx);
-    }
-
-    function pick(e) {
-        if (!T) return null;
-        var stage = $('#ssStage');
-        var rect = stage.getBoundingClientRect();
-        T.pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-        T.pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-        T.raycaster.setFromCamera(T.pointer, T.camera);
-        var hits = T.raycaster.intersectObjects(T.dots, false);
-        return hits.length ? hits[0].object.userData.index : null;
-    }
-
-    function updateHover(e) {
-        var idx = pick(e);
-        if (idx === state.hovered) {
-            if (idx != null) moveTip(e);
+        if (!state.hits.length) {
+            box.hidden = true;
             return;
         }
-        state.hovered = idx;
-        syncScene();
-        if (idx == null) { hideTip(); return; }
-        showTip(idx, e);
-    }
 
-    function showTip(idx, e) {
-        var c = CHUNK_BY_ID[idx];
-        var tip = $('#ssTip');
-        var doc = DOC_BY_ID[c.d];
-        tip.innerHTML = '';
-        var title = document.createElement('span');
-        title.textContent = c.t;
-        var sub = document.createElement('small');
-        sub.textContent = (doc ? doc.label : '') + ' · ' + c.n + ' 字';
-        tip.appendChild(title);
-        tip.appendChild(sub);
-        tip.hidden = false;
-        moveTip(e);
-    }
-
-    function moveTip(e) {
-        var stage = $('#ssStage');
-        var rect = stage.getBoundingClientRect();
-        var tip = $('#ssTip');
-        tip.style.left = (e.clientX - rect.left) + 'px';
-        tip.style.top = (e.clientY - rect.top) + 'px';
-    }
-
-    function hideTip() { $('#ssTip').hidden = true; }
-
-    function resetCamera() {
-        if (!T) return;
-        T.camTarget.theta = 0.72;
-        T.camTarget.phi = 1.06;
-        T.camTarget.radius = 3.05;
-        T.camTarget.tx = 0;
-        T.camTarget.ty = 0;
-        T.camTarget.tz = 0;
-        state.lastInput = Date.now();
-    }
-
-    function focusOn(c) {
-        if (!T) return;
-        T.camTarget.tx = c.p[0] * 0.35;
-        T.camTarget.ty = c.p[1] * 0.35;
-        T.camTarget.tz = c.p[2] * 0.35;
-        T.camTarget.radius = Math.min(T.camTarget.radius, 3.4);
-        state.lastInput = Date.now();
-    }
-
-    /* ---------------- 2D 平面视图 ---------------- */
-
-    var FLAT = { dots: [], lines: null, anchor: null };
-
-    function buildFlat() {
-        var svg = $('#ssFlat');
-        var NS = 'http://www.w3.org/2000/svg';
-
-        var grid = document.createElementNS(NS, 'g');
-        for (var g = -1; g <= 1; g += 0.5) {
-            var v = document.createElementNS(NS, 'line');
-            v.setAttribute('x1', g); v.setAttribute('x2', g);
-            v.setAttribute('y1', -1.5); v.setAttribute('y2', 1.5);
-            v.setAttribute('stroke', 'rgba(23,36,51,.06)');
-            v.setAttribute('stroke-width', '0.004');
-            grid.appendChild(v);
-            var h = document.createElementNS(NS, 'line');
-            h.setAttribute('y1', g); h.setAttribute('y2', g);
-            h.setAttribute('x1', -1.5); h.setAttribute('x2', 1.5);
-            h.setAttribute('stroke', 'rgba(23,36,51,.06)');
-            h.setAttribute('stroke-width', '0.004');
-            grid.appendChild(h);
-        }
-        svg.appendChild(grid);
-
-        FLAT.lines = document.createElementNS(NS, 'g');
-        svg.appendChild(FLAT.lines);
-
-        FLAT.dots.forEach(function (d) { d.remove(); });
-        FLAT.dots = [];
-
-        CHUNKS.forEach(function (c) {
-            var dot = document.createElementNS(NS, 'circle');
-            dot.setAttribute('cx', c.p[0]);
-            dot.setAttribute('cy', -c.p[1]);
-            dot.setAttribute('r', 0.016 + (c.k - 1) * 0.006);
-            dot.setAttribute('fill', COLORS[c.c] || '#66727d');
-            dot.setAttribute('fill-opacity', '0.55');
-            dot.dataset.index = c.i;
-            dot.style.cursor = 'pointer';
-            svg.appendChild(dot);
-            FLAT.dots.push(dot);
-        });
-
-        FLAT.anchor = document.createElementNS(NS, 'circle');
-        FLAT.anchor.setAttribute('r', '0.05');
-        FLAT.anchor.setAttribute('fill', 'none');
-        FLAT.anchor.setAttribute('stroke', '#172433');
-        FLAT.anchor.setAttribute('stroke-width', '0.008');
-        FLAT.anchor.setAttribute('opacity', '0');
-        svg.appendChild(FLAT.anchor);
-
-        svg.addEventListener('click', function (e) {
-            var idx = e.target && e.target.dataset ? e.target.dataset.index : null;
-            if (idx != null) select(Number(idx));
-        });
-
-        svg.addEventListener('pointermove', function (e) {
-            var idx = e.target && e.target.dataset ? e.target.dataset.index : null;
-            var next = idx == null ? null : Number(idx);
-            if (next === state.hovered) return;
-            state.hovered = next;
-            syncFlat();
-            if (next == null) { hideTip(); return; }
-            var rect = $('#ssStage').getBoundingClientRect();
-            showTipAt(next, e.clientX - rect.left, e.clientY - rect.top);
-        });
-
-        svg.addEventListener('pointerleave', function () {
-            state.hovered = null;
-            hideTip();
-            syncFlat();
-        });
-    }
-
-    function showTipAt(idx, x, y) {
-        var c = CHUNK_BY_ID[idx];
-        var doc = DOC_BY_ID[c.d];
-        var tip = $('#ssTip');
-        tip.innerHTML = '';
-        var title = document.createElement('span');
-        title.textContent = c.t;
-        var sub = document.createElement('small');
-        sub.textContent = (doc ? doc.label : '') + ' · ' + c.n + ' 字';
-        tip.appendChild(title);
-        tip.appendChild(sub);
-        tip.hidden = false;
-        tip.style.left = x + 'px';
-        tip.style.top = y + 'px';
-    }
-
-    function syncFlat() {
-        if (!FLAT.dots.length) return;
-        var hitMap = state.hitMap || {};
-        FLAT.dots.forEach(function (dot) {
-            var c = CHUNK_BY_ID[Number(dot.dataset.index)];
-            var hit = hitMap[c.i];
-            var dim = state.hits.length > 0 && !hit;
-            var isSel = state.selected === c.i;
-            var isHover = state.hovered === c.i;
-
-            var r = 0.016 + (c.k - 1) * 0.006;
-            if (hit) r *= 1.45 + hit.score * 0.5;
-            if (isSel) r *= 1.5;
-            if (isHover) r *= 1.25;
-
-            dot.setAttribute('r', r);
-            dot.setAttribute('fill', COLORS[c.c] || '#66727d');
-            dot.setAttribute('fill-opacity', dim ? '0.16' : (hit ? '0.95' : '0.5'));
-            dot.setAttribute('stroke', isSel ? '#172433' : 'none');
-            dot.setAttribute('stroke-width', isSel ? '0.008' : '0');
-        });
-
-        // 连线
-        while (FLAT.lines.firstChild) FLAT.lines.removeChild(FLAT.lines.firstChild);
-        var qp = state.queryPos;
-        if (qp) {
-            var NS = 'http://www.w3.org/2000/svg';
-            state.hits.slice(0, 12).forEach(function (h) {
-                var c = CHUNK_BY_ID[h.i];
-                var line = document.createElementNS(NS, 'line');
-                line.setAttribute('x1', qp.x);
-                line.setAttribute('y1', -qp.y);
-                line.setAttribute('x2', c.p[0]);
-                line.setAttribute('y2', -c.p[1]);
-                line.setAttribute('stroke', '#315ce8');
-                line.setAttribute('stroke-width', '0.004');
-                line.setAttribute('stroke-opacity', '0.3');
-                FLAT.lines.appendChild(line);
-            });
-            FLAT.anchor.setAttribute('cx', qp.x);
-            FLAT.anchor.setAttribute('cy', -qp.y);
-            FLAT.anchor.setAttribute('opacity', '0.85');
-        } else {
-            FLAT.anchor.setAttribute('opacity', '0');
-        }
-    }
-
-    /* ---------------- 视图切换 ---------------- */
-
-    function setView(view, silent) {
-        state.view = view;
-        var stage = $('#ssStage');
-        var isFlat = view === '2d';
-
-        stage.classList.toggle('is-flat', isFlat);
-        $('#ssCanvas').hidden = isFlat;
-        // SVGElement 没有 hidden 属性，必须直接改 attribute
-        var flatEl = $('#ssFlat');
-        if (isFlat) flatEl.removeAttribute('hidden');
-        else flatEl.setAttribute('hidden', '');
-        $('#ssTags').hidden = isFlat;
-        $('#ssSpaceLabel').textContent = isFlat ? 'SPACE / 2D' : 'SPACE / 3D';
-
-        $$('[data-view]').forEach(function (b) {
-            b.setAttribute('aria-pressed', String(b.dataset.view === view));
-        });
-
-        if (isFlat) {
-            syncFlat();
-        } else if (T) {
-            resizeThree();
-            syncScene();
-        }
-        if (!silent) state.lastInput = Date.now();
-    }
-
-    /* ---------------- 面板渲染 ---------------- */
-
-    function renderLegend() {
-        var host = $('#ssLegend');
         var counts = {};
-        CHUNKS.forEach(function (c) { counts[c.c] = (counts[c.c] || 0) + 1; });
-        (DATA.categories || []).forEach(function (cat) {
-            if (!counts[cat.key]) return;
+        state.hits.forEach(function (h) {
+            var c = CHUNK_BY_ID[h.i];
+            if (c) counts[c.c] = (counts[c.c] || 0) + 1;
+        });
+
+        var rows = Object.keys(counts).map(function (k) {
+            return { key: k, n: counts[k], label: CAT_LABEL[k] || k };
+        }).sort(function (a, b) { return b.n - a.n; });
+
+        var max = Math.max.apply(null, rows.map(function (r) { return r.n; }));
+        list.innerHTML = '';
+        rows.forEach(function (r) {
             var li = document.createElement('li');
             var dot = document.createElement('i');
             dot.className = 'ss-dot';
-            dot.style.color = COLORS[cat.key] || '#66727d';
-            var label = document.createElement('span');
-            label.textContent = cat.label;
-            var num = document.createElement('b');
-            num.textContent = counts[cat.key];
+            dot.style.color = COLORS[r.key] || 'var(--ss-muted)';
+            var name = document.createElement('span');
+            name.textContent = r.label;
+            var bar = document.createElement('span');
+            bar.className = 'ss-dist-bar';
+            bar.innerHTML = '<i style="width:' + Math.round((r.n / max) * 100) + '%;background:' + (COLORS[r.key] || '#315ce8') + '"></i>';
+            var num = document.createElement('em');
+            num.textContent = r.n;
             li.appendChild(dot);
-            li.appendChild(label);
+            li.appendChild(name);
+            li.appendChild(bar);
             li.appendChild(num);
-            host.appendChild(li);
+            list.appendChild(li);
         });
+
+        $('#ssDistTotal').textContent = state.hits.length + ' 段命中 / ' + rows.length + ' 个主题';
+        box.hidden = false;
     }
 
-    function renderPresets() {
-        var host = $('#ssPresets');
-        (DATA.queries || []).forEach(function (q, i) {
-            var b = document.createElement('button');
-            b.type = 'button';
-            b.className = 'ss-chip';
-            b.textContent = q.q;
-            b.dataset.q = q.q;
-            b.setAttribute('aria-pressed', 'false');
-            if (i >= 6) b.hidden = true;
-            b.addEventListener('click', function () { runPreset(q); });
-            host.appendChild(b);
-        });
-
-        var more = $('#ssMore');
-        if (!more) return;
-        if ((DATA.queries || []).length <= 6) { more.hidden = true; return; }
-        more.addEventListener('click', function () {
-            var open = more.getAttribute('aria-expanded') === 'true';
-            more.setAttribute('aria-expanded', String(!open));
-            more.textContent = open ? '看另外 6 个问题' : '收起问题';
-            $$('.ss-chip').forEach(function (chip, i) {
-                if (i >= 6) chip.hidden = open;
-            });
-            $('#ssPresets').classList.toggle('is-open', !open);
-        });
-    }
-
-    function highlightPreset() {
-        $$('.ss-chip').forEach(function (b) {
-            b.setAttribute('aria-pressed', String(b.dataset.q === state.preset));
-        });
-    }
-
-    function renderEmptyResults() {
+    function renderResults(query) {
         var list = $('#ssResultList');
         list.innerHTML = '';
-        var li = document.createElement('li');
-        li.className = 'ss-empty';
-        li.innerHTML = '<b>还没有检索</b>点上面的预设问题，或者在输入框里问一句。';
-        list.appendChild(li);
-        $('#ssResultMeta').textContent = '选一个问题开始';
-    }
-
-    function renderResults(modeLabel) {
-        var list = $('#ssResultList');
-        list.innerHTML = '';
+        $('#ssResultMeta').textContent = state.hits.length
+            ? state.hits.length + ' 条 · ' + (state.mode === 'vector' ? 'COSINE' : 'BM25')
+            : (query ? '没有命中' : '选一个问题开始');
 
         if (!state.hits.length) {
-            var empty = document.createElement('li');
-            empty.className = 'ss-empty';
-            empty.innerHTML = '<b>没有召回到片段</b>换一种说法，或切到另一个召回模式再试。';
-            list.appendChild(empty);
-            $('#ssResultMeta').textContent = '0 条';
+            renderEmptyResults(query);
             return;
         }
 
-        var frag = document.createDocumentFragment();
-        state.hits.slice(0, 18).forEach(function (h, idx) {
+        state.hits.forEach(function (h, idx) {
             var c = CHUNK_BY_ID[h.i];
-            var doc = DOC_BY_ID[c.d];
+            if (!c) return;
 
             var li = document.createElement('li');
             var btn = document.createElement('button');
             btn.type = 'button';
             btn.className = 'ss-hit';
-            btn.setAttribute('aria-current', String(state.selected === c.i));
-            btn.dataset.index = c.i;
+            btn.dataset.i = c.i;
 
             var rank = document.createElement('span');
             rank.className = 'ss-hit-rank';
@@ -1006,24 +521,23 @@
 
             var title = document.createElement('span');
             title.className = 'ss-hit-title';
-            title.textContent = c.t;
+            title.textContent = c.t || '（无标题）';
 
             var score = document.createElement('span');
             score.className = 'ss-hit-score';
-            score.textContent = h.score.toFixed(2);
+            score.textContent = h.score.toFixed(3);
 
             var snippet = document.createElement('span');
             snippet.className = 'ss-hit-snippet';
-            snippet.textContent = c.x.replace(/\n/g, ' ').slice(0, 96);
+            snippet.textContent = (c.x || '').replace(/\s+/g, ' ').slice(0, 96);
 
             var cat = document.createElement('span');
             cat.className = 'ss-hit-cat';
-            var dot = document.createElement('i');
-            dot.className = 'ss-dot';
-            dot.style.color = COLORS[c.c] || '#66727d';
+            cat.style.color = COLORS[c.c];
+            cat.innerHTML = '<i class="ss-dot"></i>';
             var catText = document.createElement('span');
-            catText.textContent = (doc ? doc.label : '') + (doc ? ' · ' + doc.title : '');
-            cat.appendChild(dot);
+            catText.textContent = CAT_LABEL[c.c] || c.c;
+            catText.style.color = 'var(--ss-faint)';
             cat.appendChild(catText);
 
             btn.appendChild(rank);
@@ -1031,196 +545,336 @@
             btn.appendChild(score);
             btn.appendChild(snippet);
             btn.appendChild(cat);
-            btn.addEventListener('click', function () { select(c.i, true); });
+
+            btn.addEventListener('click', function () {
+                if (engine) engine.focusChunk(c.i);
+                showChunk(c.i);
+            });
 
             li.appendChild(btn);
-            frag.appendChild(li);
+            list.appendChild(li);
         });
-        list.appendChild(frag);
-
-        $('#ssResultMeta').textContent = state.hits.length + ' 条 · ' + (modeLabel || '');
+        syncStatus();
     }
 
-    function select(index, scrollIntoView) {
-        state.selected = index;
-        var c = CHUNK_BY_ID[index];
-        if (c) focusOn(c);
-        apply();
-        $$('.ss-hit').forEach(function (b) {
-            b.setAttribute('aria-current', String(Number(b.dataset.index) === index));
-        });
-        if (scrollIntoView) {
-            var active = $('.ss-hit[aria-current="true"]');
-            if (active && active.scrollIntoView) active.scrollIntoView({ block: 'nearest' });
-        }
+    function renderEmptyResults(query) {
+        var list = $('#ssResultList');
+        list.innerHTML = '';
+        var li = document.createElement('li');
+        li.className = 'ss-empty';
+        li.innerHTML = query
+            ? '<b>没有命中的片段</b>换一种说法，或切到另一个召回模式。'
+            : '<b>还没有检索</b>点上面的预设问题，或者自己问一句。';
+        list.appendChild(li);
     }
 
-    function renderDetail() {
-        var box = $('#ssDetail');
-        var panel = $('.ss-panel');
-        if (state.selected == null || !CHUNK_BY_ID[state.selected]) {
-            box.hidden = true;
-            panel.classList.remove('is-detail');
-            return;
-        }
-        var c = CHUNK_BY_ID[state.selected];
-        var doc = DOC_BY_ID[c.d];
-        var hit = state.hitMap ? state.hitMap[c.i] : null;
+    /* ---------------- 上下文装配 ---------------- */
 
-        box.hidden = false;
-        panel.classList.add('is-detail');
-        $('#ssDetailTitle').textContent = c.t;
-        $('#ssDetailCat').style.color = COLORS[c.c] || '#315ce8';
-        $('#ssDetailCat').lastElementChild.textContent = doc ? doc.label : '';
-        $('#ssDetailScore').textContent = hit ? hit.score.toFixed(3) : '未命中';
-        $('#ssDetailLen').textContent = c.n + ' 字 / ' + tokensOf(c.x) + ' t';
-        $('#ssDetailSource').textContent = doc ? doc.title : '—';
-        $('#ssDetailText').textContent = c.x;
-        $('#ssDetailLink').href = ANCHORS[c.c] || '../pages/AI.html';
-    }
-
-    function tokensOf(text) {
-        var chars = String(text).replace(/\s/g, '').length;
-        return Math.ceil(chars / TOKEN_RATIO) + 4;
+    function tokensOf(c) {
+        var chars = (c.x || '').length;
+        return Math.max(4, Math.round(chars / TOKEN_RATIO));
     }
 
     function renderWindow() {
         var host = $('#ssWindow');
-        var note = $('#ssWindowNote');
-        var budget = state.budget;
+        if (!host) return;
         host.innerHTML = '';
 
         if (!state.hits.length) {
-            note.textContent = '先选一个问题，这里会显示片段如何被装进窗口。';
+            $('#ssWindowNote').textContent = '先选一个问题，这里会显示片段如何被装进窗口。';
             return;
         }
 
         var used = 0;
         var kept = 0;
         var dropped = 0;
+        var top = state.hits.slice(0, 8);
 
-        state.hits.slice(0, 8).forEach(function (h, idx) {
+        top.forEach(function (h) {
             var c = CHUNK_BY_ID[h.i];
-            var t = tokensOf(c.x);
-            var fits = used + t <= budget;
+            if (!c) return;
+            var tk = tokensOf(c);
+            var fits = used + tk <= state.budget;
 
             var row = document.createElement('div');
             row.className = 'ss-slot' + (fits ? '' : ' is-dropped');
 
-            var fill = document.createElement('div');
+            var fill = document.createElement('i');
             fill.className = 'ss-slot-fill';
-            var width = Math.min(100, (t / budget) * 100);
-            fill.style.width = (fits ? width : 0) + '%';
+            fill.style.width = Math.min(100, (tk / state.budget) * 100) + '%';
 
             var rank = document.createElement('b');
-            rank.textContent = String(idx + 1).padStart(2, '0');
+            rank.textContent = '#' + String(c.i + 1).padStart(2, '0');
 
-            var body = document.createElement('span');
-            body.textContent = fits ? c.t : c.t + ' · 溢出';
+            var title = document.createElement('span');
+            title.textContent = c.t || '（无标题）';
 
             var tok = document.createElement('em');
-            tok.textContent = (fits ? '+' : '×') + t + ' t';
+            tok.textContent = fits ? tk + ' tok' : '× ' + tk;
 
             row.appendChild(fill);
             row.appendChild(rank);
-            row.appendChild(body);
+            row.appendChild(title);
             row.appendChild(tok);
             host.appendChild(row);
 
-            if (fits) { used += t; kept += 1; } else { dropped += 1; }
+            if (fits) { used += tk; kept++; } else { dropped++; }
         });
 
-        note.innerHTML = '';
-        var b1 = document.createElement('b');
-        b1.textContent = kept + ' / ' + Math.min(8, state.hits.length);
-        note.appendChild(b1);
-        note.appendChild(document.createTextNode(
-            ' 条装入 · 用掉 ' + used + ' / ' + budget + ' tokens' +
-            (dropped ? ' · 丢弃 ' + dropped + ' 条' : ' · 没有溢出')
-        ));
+        $('#ssWindowNote').innerHTML = '装入 <b>' + kept + '</b> 段，用掉 <b>' + used +
+            '</b> / ' + state.budget + ' tokens，丢弃 <b>' + dropped + '</b> 段。' +
+            '总召回 ' + state.hits.length + ' 段，这里只显示前 8 条。';
     }
 
-    function showNotice(text, ms) {
-        var node = $('#ssNotice');
-        node.textContent = text;
-        node.hidden = false;
-        window.clearTimeout(showNotice._t);
-        showNotice._t = window.setTimeout(function () { node.hidden = true; }, ms || 5200);
+    /* ---------------- 预设与控件 ---------------- */
+
+    function renderPresets() {
+        var host = $('#ssPresets');
+        if (!host) return;
+        (DATA.queries || []).forEach(function (q, i) {
+            var b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'ss-chip';
+            b.dataset.q = q.q;
+            b.setAttribute('aria-pressed', 'false');
+            b.textContent = q.q;
+            if (i >= 6) b.hidden = true;
+            b.addEventListener('click', function () { runPreset(q); });
+            host.appendChild(b);
+        });
     }
 
-    /* ---------------- 绑定 UI ---------------- */
-
-    function bindUI() {
-        $('#ssForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-            runFree($('#ssInput').value);
+    function setMode(mode, quiet) {
+        state.mode = mode;
+        $$('[data-mode]').forEach(function (b) {
+            b.setAttribute('aria-pressed', String(b.dataset.mode === mode));
         });
-
-        $$('.ss-mode button').forEach(function (b) {
-            b.addEventListener('click', function () {
-                state.mode = b.dataset.mode;
-                syncModeButtons();
-                if (state.preset && state.mode === 'vector') {
-                    var preset = (DATA.queries || []).filter(function (q) { return q.q === state.preset; })[0];
-                    if (preset) runPreset(preset);
-                } else if (state.query) {
-                    runFree(state.query);
-                }
-            });
-        });
-
-        $$('[data-view]').forEach(function (b) {
-            b.addEventListener('click', function () { setView(b.dataset.view); });
-        });
-
-        $('#ssSpin').addEventListener('click', function () {
-            state.spin = !state.spin;
-            $('#ssSpin').setAttribute('aria-pressed', String(state.spin));
-            state.lastInput = 0;
-        });
-
-        $('#ssReset').addEventListener('click', function () {
-            resetCamera();
-            state.selected = null;
-            apply();
-        });
-
-        $('#ssBudget').addEventListener('input', function (e) {
-            state.budget = Number(e.target.value);
-            $('#ssBudgetOut').textContent = state.budget + ' tokens';
-            renderWindow();
-        });
-
-        $('#ssDetailClose').addEventListener('click', function () {
-            state.selected = null;
-            apply();
-        });
-
-        document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape' && state.selected != null) {
-                state.selected = null;
-                apply();
-            }
-        });
-
-        if (T) {
-            var stage = $('#ssStage');
-            var io = new IntersectionObserver(function (entries) {
-                T.visible = entries[0].isIntersecting;
-            }, { threshold: 0.05 });
-            io.observe(stage);
+        if (quiet) return;
+        var input = $('#ssInput').value.trim();
+        if (!input) return;
+        if (mode === 'vector') {
+            var preset = (DATA.queries || []).filter(function (q) { return q.q === input; })[0];
+            if (preset) runPreset(preset);
+            else { showNotice('这句没有预计算的问题向量，已改用 BM25。'); runFree(input); }
+        } else {
+            runFree(input);
         }
     }
 
-    function syncModeButtons() {
-        $$('.ss-mode button').forEach(function (b) {
-            b.setAttribute('aria-pressed', String(b.dataset.mode === state.mode));
-        });
+    function showNotice(text) {
+        var n = $('#ssNotice');
+        if (!n) return;
+        n.textContent = text;
+        n.hidden = false;
     }
 
-    function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+    function hideNotice() {
+        var n = $('#ssNotice');
+        if (n) n.hidden = true;
+    }
 
-    /* ---------------- 启动 ---------------- */
+    function syncStatus() {
+        var el = $('#ssStatus');
+        if (!el || !engine) return;
+        var exploded = engine.state.explodeTarget > 0.5;
+        el.classList.remove('is-hit', 'is-sel');
+
+        if (state.selectedChunk != null) {
+            var c = CHUNK_BY_ID[state.selectedChunk];
+            if (c) {
+                var hit = state.hitMap[state.selectedChunk];
+                el.classList.add('is-sel');
+                var title = (c.t || '无标题').slice(0, 16);
+                el.innerHTML = '片段 <b>#' + (c.i + 1) + '</b> · <b>' + title + '</b>' +
+                    (hit ? ' · 相似度 <b>' + hit.score.toFixed(3) + '</b>' : ' · 来自部件清单');
+            }
+            return;
+        }
+        if (state.selectedPart) {
+            el.classList.add('is-sel');
+            var isPlate = !!CAT_LABEL[state.selectedPart];
+            var name = isPlate ? CAT_LABEL[state.selectedPart] : (PART_META[state.selectedPart] || {}).name;
+            if (isPlate) {
+                var items = CHUNKS.filter(function (x) { return x.c === state.selectedPart; });
+                var hits = state.hits.filter(function (h) {
+                    var x = CHUNK_BY_ID[h.i];
+                    return x && x.c === state.selectedPart;
+                });
+                el.innerHTML = '选中：<b>' + name + '</b> · <b>' + items.length +
+                    '</b> 段 · 本次命中 <b>' + hits.length + '</b> 段';
+            } else {
+                el.innerHTML = '选中：<b>' + name + '</b> · 书架部件（不挂内容）';
+            }
+            return;
+        }
+        if (state.hits.length) {
+            el.classList.add('is-hit');
+            var cats = {};
+            state.hits.forEach(function (h) {
+                var x = CHUNK_BY_ID[h.i];
+                if (x) cats[x.c] = 1;
+            });
+            var k = Object.keys(cats).length;
+            el.innerHTML = '命中 <b>' + state.hits.length + '</b> 段 · 分布在 <b>' + k +
+                '</b> 本书 · 点亮处看详情';
+            return;
+        }
+        el.textContent = exploded
+            ? '已散开 · 点击书本看详情，或下面提问看谁亮'
+            : '点击任意一本书翻开看内容';
+    }
+
+    function maybeShowGuide() {
+        var g = $('#ssGuide');
+        if (!g) return;
+        try { if (localStorage.getItem('ss-guide-seen')) return; } catch (e) { return; }
+        g.hidden = false;
+    }
+
+    function dismissGuide() {
+        var g = $('#ssGuide');
+        if (!g || g.hidden) return;
+        g.hidden = true;
+        try { localStorage.setItem('ss-guide-seen', '1'); } catch (e) {}
+    }
+
+    function bindUI() {
+        var form = $('#ssForm');
+        if (form) {
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                var text = $('#ssInput').value.trim();
+                if (!text) return;
+                var preset = (DATA.queries || []).filter(function (q) { return q.q === text; })[0];
+                if (preset && state.mode === 'vector') runPreset(preset);
+                else runFree(text);
+            });
+        }
+
+        $$('[data-mode]').forEach(function (b) {
+            b.addEventListener('click', function () { setMode(b.dataset.mode); });
+        });
+
+        var more = $('#ssMore');
+        if (more) {
+            more.addEventListener('click', function () {
+                var open = more.getAttribute('aria-expanded') === 'true';
+                more.setAttribute('aria-expanded', String(!open));
+                more.textContent = open ? '看另外 6 个问题' : '收起问题';
+                $('#ssPresets').classList.toggle('is-open', !open);
+                $$('.ss-chip').forEach(function (c, i) {
+                    if (i >= 6) c.hidden = open;
+                });
+            });
+        }
+
+        var budget = $('#ssBudget');
+        if (budget) {
+            budget.addEventListener('input', function () {
+                state.budget = Number(budget.value);
+                $('#ssBudgetOut').textContent = state.budget + ' tokens';
+                renderWindow();
+            });
+        }
+
+        var guideOk = $('#ssGuideOk');
+        if (guideOk) {
+            guideOk.addEventListener('click', dismissGuide);
+        }
+        var stageEl = $('#ssStage');
+        if (stageEl) {
+            stageEl.addEventListener('pointerdown', dismissGuide, { once: true });
+        }
+
+        var detailClose = $('#ssDetailClose');
+        if (detailClose) {
+            detailClose.addEventListener('click', function () {
+                showResults();
+                if (engine) engine.deselect();
+            });
+        }
+
+        var partClose = $('#ssPartClose');
+        if (partClose) {
+            partClose.addEventListener('click', function () {
+                showResults();
+                if (engine) engine.deselect();
+            });
+        }
+
+        bindDock();
+    }
+
+    function bindDock() {
+        var explode = $('#ssExplode');
+        var tour = $('#ssTour');
+        var labels = $('#ssLabels');
+        var spin = $('#ssSpin');
+        var reset = $('#ssReset');
+
+        function syncExplode() {
+            var on = engine ? engine.state.explodeTarget > 0.5 : false;
+            explode.setAttribute('aria-pressed', String(on));
+            $('#ssExplodeTxt').textContent = on ? '合上书架' : '翻开书架';
+        }
+
+        if (explode) {
+            explode.addEventListener('click', function () {
+                if (!engine) return;
+                engine.toggleExplode();
+                window.setTimeout(syncExplode, 40);
+                if (engine.state.explodeTarget === 0) showResults();
+                syncStatus();
+            });
+        }
+
+        if (tour) {
+            tour.addEventListener('click', function () {
+                if (!engine) return;
+                engine.tour();
+                syncExplode();
+            });
+        }
+
+        if (labels) {
+            labels.addEventListener('click', function () {
+                if (!engine) return;
+                var on = labels.getAttribute('aria-pressed') !== 'true';
+                labels.setAttribute('aria-pressed', String(on));
+                engine.setLabels(on);
+            });
+        }
+
+        if (spin) {
+            spin.addEventListener('click', function () {
+                if (!engine) return;
+                var on = spin.getAttribute('aria-pressed') !== 'true';
+                spin.setAttribute('aria-pressed', String(on));
+                engine.setSpin(on);
+            });
+        }
+
+        if (reset) {
+            reset.addEventListener('click', function () {
+                if (!engine) return;
+                engine.reset();
+                syncExplode();
+                showResults();
+                syncStatus();
+                labels.setAttribute('aria-pressed', 'true');
+                spin.setAttribute('aria-pressed', 'false');
+                hideNotice();
+            });
+        }
+
+        window.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && engine) {
+                window.setTimeout(syncExplode, 60);
+            }
+        });
+
+        syncExplode();
+    }
 
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', boot);

@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="把 AI 工程笔记切成语义片段，用 TF-IDF 向量化、降维到三维，可视化一次检索在向量空间里到底发生了什么。">
+    <meta name="description" content="把 41 份笔记、78 个语义片段摆成一排可翻开的“内容书架”：7 本书对应 7 个主题，提问后命中的书脊灯条会亮起。">
     <meta name="theme-color" content="#f4f2ed">
-    <title>语义空间 · 一次检索发生在哪里 | 陈柏贤</title>
+    <title>内容书架 · 一次检索发生在哪里 | 陈柏贤</title>
     <link rel="icon" href="data:,">
     <link rel="stylesheet" href="../css/semantic-space.css">
 </head>
@@ -14,74 +14,97 @@
 
     <header class="ss-top">
         <a class="ss-back" href="../index.html"><span aria-hidden="true">↖</span> 返回首页</a>
-        <span class="ss-brand">语义空间 <em>SEMANTIC FIELD</em></span>
-        <span class="ss-top-meta">TF-IDF → SVD → COSINE</span>
+        <span class="ss-brand">内容书架 <em>CONTENT SHELF</em></span>
+        <span class="ss-top-meta">41 DOCS / 78 CHUNKS / 7 BOOKS</span>
     </header>
 
     <main class="ss-main" id="main">
         <section class="ss-hero">
             <div>
-                <p class="ss-kicker">Lab / 01 <span>/</span> 向量检索可视化</p>
-                <h1>把 <b data-stat="chunks">78</b> 段笔记，<br>摊成一片可以走进去的空间。</h1>
+                <p class="ss-kicker">Lab / 01 <span>/</span> 可翻开的检索书架</p>
+                <h1>把 <b data-stat="chunks">78</b> 段笔记，<br>摆成一排能翻开的书。</h1>
                 <p class="ss-lede">
-                    每个点的位置都不是随机撒的：它由 <strong>41 份笔记与项目案例</strong>切块、向量化、再降维得到。
-                    离得近，说明这两段文字在向量空间里真的相似。你可以提一个问题，看检索把哪些点照亮。
+                    这 78 个片段来自 <strong>41 份笔记与项目案例</strong>，先切块、再向量化，最后按主题摆成 7 本书。
+                    书脊上每道灯条就是一段笔记，位置由它在语义空间里的坐标决定——<strong>靠得越近，说得越像</strong>。
+                    点开书本能翻开，提个问题能看谁被点亮。
                 </p>
             </div>
             <dl class="ss-stats">
                 <div><dt>笔记与案例</dt><dd data-stat="docs">41</dd></div>
                 <div><dt>语义片段</dt><dd data-stat="chunks">78</dd></div>
                 <div><dt>词表维度</dt><dd data-stat="vocab">2429</dd></div>
-                <div><dt>降到</dt><dd>3 <small>DIM</small></dd></div>
+                <div><dt>书本</dt><dd>7 <small>BOOK</small></dd></div>
             </dl>
         </section>
 
-        <section class="ss-workspace" aria-label="向量空间与检索">
+        <section class="ss-rig" aria-label="内容书架翻阅视图">
             <div class="ss-stage" id="ssStage" tabindex="0" role="group"
-                 aria-label="向量空间视图。可用方向键旋转、加减号缩放，右侧列表是同等的文字入口。">
+                 aria-label="三维内容书架。拖拽旋转、滚轮缩放、点击书本查看详情；下方部件标注与召回列表是同等的键盘入口。">
                 <canvas class="ss-canvas" id="ssCanvas"></canvas>
-                <svg class="ss-flat" id="ssFlat" viewBox="-1.15 -1.15 2.3 2.3" preserveAspectRatio="xMidYMid meet" hidden aria-hidden="true"></svg>
-                <div class="ss-tags" id="ssTags" aria-hidden="true"></div>
+                <div class="ss-labels" id="ssLabels"><svg class="ss-leaders" aria-hidden="true"></svg></div>
 
-                <div class="ss-stage-corner">
-                    <b id="ssSpaceLabel">SPACE / 3D</b>
-                    <span id="ssSpaceSub">78 chunks · 7 topics</span>
+                <div class="ss-hud">
+                    <p class="ss-hud-k">内容书架 <em>CONTENT SHELF</em></p>
+                    <p class="ss-hud-m">本站 <b data-stat="docs">41</b> 份笔记 → <b>7</b> 本书 · <b data-stat="chunks">78</b> 道书脊灯条</p>
+                    <p class="ss-hud-hint">拖拽旋转 · 点书翻开 · 下面提问看谁亮</p>
                 </div>
 
-                <div class="ss-stage-tools">
-                    <button class="ss-tool" type="button" data-view="3d" aria-pressed="true">立体</button>
-                    <button class="ss-tool" type="button" data-view="2d" aria-pressed="false">平面</button>
-                    <button class="ss-tool" type="button" id="ssSpin" aria-pressed="true">自转</button>
-                    <button class="ss-tool" type="button" id="ssReset">复位</button>
+                <p class="ss-status" id="ssStatus">点击任意一本书翻开看内容</p>
+
+                <div class="ss-dock se-ui">
+                    <button class="ss-dock-btn ss-dock-btn--primary" id="ssExplode" type="button" aria-pressed="false">
+                        <span id="ssExplodeTxt">翻开书架</span>
+                    </button>
+                    <button class="ss-dock-btn" id="ssTour" type="button">自动演示</button>
+                    <button class="ss-dock-btn" id="ssLabels" type="button" aria-pressed="true">标注</button>
+                    <button class="ss-dock-btn" id="ssSpin" type="button" aria-pressed="false">自转</button>
+                    <button class="ss-dock-btn" id="ssReset" type="button">复位</button>
                 </div>
 
-                <ul class="ss-legend" id="ssLegend"></ul>
-                <div class="ss-tip" id="ssTip" hidden></div>
-                <p class="ss-notice" id="ssNotice" hidden></p>
+                <div class="ss-guide" id="ssGuide" hidden>
+                    <div class="ss-guide__card">
+                        <p class="ss-guide__k">快速上手 <em>QUICK START</em></p>
+                        <ul class="ss-guide__list">
+                            <li><kbd>拖拽</kbd><span>旋转视角，看清每一层</span></li>
+                            <li><kbd>滚轮</kbd><span>推近，看书脊上的灯条</span></li>
+                            <li><kbd>点击</kbd><span>书本或书脊灯条，翻开看内容</span></li>
+                            <li><kbd>提问</kbd><span>在下方问一句，看谁亮起来</span></li>
+                        </ul>
+                        <button class="ss-guide__ok" id="ssGuideOk" type="button">开始探索</button>
+                    </div>
+                </div>
 
                 <div class="ss-loading" id="ssLoading">
                     <i aria-hidden="true"></i>
-                    LOADING VECTORS
+                    BUILDING GEOMETRY
                 </div>
+                <p class="ss-notice" id="ssNotice" hidden></p>
             </div>
+        </section>
 
-            <aside class="ss-panel">
-                <form class="ss-card ss-query" id="ssForm">
-                    <label for="ssInput">问一句，看谁被点亮</label>
-                    <div class="ss-input-row">
-                        <input class="ss-input" id="ssInput" type="search" autocomplete="off"
-                               placeholder="例如：怎么让 AI 不乱改代码">
-                        <button class="ss-go" type="submit">检索</button>
-                    </div>
-                    <div class="ss-mode" role="group" aria-label="召回方式">
-                        <button type="button" data-mode="vector" aria-pressed="true">向量相似</button>
-                        <button type="button" data-mode="keyword" aria-pressed="false">关键词 BM25</button>
-                    </div>
-                    <div class="ss-presets" id="ssPresets" role="group" aria-label="预设问题"></div>
-                    <button class="ss-more" type="button" id="ssMore" aria-expanded="false" aria-controls="ssPresets">看另外 6 个问题</button>
-                </form>
+        <section class="ss-search" aria-label="检索与召回">
+            <form class="ss-card ss-query" id="ssForm">
+                <label for="ssInput">问一句，看哪本书亮起来</label>
+                <div class="ss-input-row">
+                    <input class="ss-input" id="ssInput" type="search" autocomplete="off"
+                           placeholder="例如：怎么让 AI 不乱改代码">
+                    <button class="ss-go" type="submit">检索</button>
+                </div>
+                <div class="ss-mode" role="group" aria-label="召回方式">
+                    <button type="button" data-mode="vector" aria-pressed="true">向量相似</button>
+                    <button type="button" data-mode="keyword" aria-pressed="false">关键词 BM25</button>
+                </div>
+                <div class="ss-presets" id="ssPresets" role="group" aria-label="预设问题"></div>
+                <button class="ss-more" type="button" id="ssMore" aria-expanded="false" aria-controls="ssPresets">看另外 6 个问题</button>
 
-                <section class="ss-results" aria-labelledby="ssResultTitle">
+                <div class="ss-dist" id="ssDist" hidden>
+                    <p class="ss-dist-title">命中分布 <span id="ssDistTotal"></span></p>
+                    <ul class="ss-dist-list" id="ssDistList"></ul>
+                </div>
+            </form>
+
+            <div class="ss-panel" id="ssPanel">
+                <section class="ss-results" id="ssResults" aria-labelledby="ssResultTitle">
                     <header>
                         <h2 id="ssResultTitle">召回结果</h2>
                         <span id="ssResultMeta">选一个问题开始</span>
@@ -103,7 +126,20 @@
                     <p class="ss-detail-text" id="ssDetailText"></p>
                     <a class="ss-detail-link" id="ssDetailLink" href="../pages/AI.html" target="_blank" rel="noopener noreferrer">在原文里查看 ↗</a>
                 </section>
-            </aside>
+
+                <section class="ss-part" id="ssPart" hidden aria-labelledby="ssPartName">
+                    <div class="ss-detail-head">
+                        <button class="ss-detail-back" type="button" id="ssPartClose"><span aria-hidden="true">←</span> 返回召回列表</button>
+                        <span class="ss-detail-cat" id="ssPartIndex"><i class="ss-dot" aria-hidden="true"></i><span>PART 01</span></span>
+                    </div>
+                    <h2 id="ssPartName">书本名称</h2>
+                    <p class="ss-part-desc" id="ssPartDesc" hidden></p>
+                    <dl class="ss-detail-kv" id="ssPartKv"></dl>
+                    <p class="ss-part-sub" id="ssPartSub">这本书里的片段</p>
+                    <ul class="ss-part-chunks" id="ssPartChunks"></ul>
+                    <a class="ss-detail-link" id="ssPartLink" href="../pages/AI.html" target="_blank" rel="noopener noreferrer">在原文里查看 ↗</a>
+                </section>
+            </div>
         </section>
 
         <section class="ss-context" aria-labelledby="ssContextTitle">
@@ -123,7 +159,7 @@
         </section>
 
         <section class="ss-method" aria-labelledby="ssMethodTitle">
-            <h2 id="ssMethodTitle">这一页是怎么来的</h2>
+            <h2 id="ssMethodTitle">这排书是怎么摆出来的</h2>
             <p>四步，全部离线完成。脚本在仓库里，改完重跑一次即可。</p>
             <div class="ss-steps">
                 <article class="ss-step">
@@ -137,9 +173,9 @@
                     <p>中文按相邻两字切成词项，得到 <code>2429</code> 维稀疏向量。这是 LSA，不是神经 embedding。</p>
                 </article>
                 <article class="ss-step">
-                    <i>STEP 03 / RETRIEVE</i>
-                    <h3>余弦相似度排序</h3>
-                    <p>问题向量与每个片段算余弦，取前 24 名。排序始终用原始向量，不用三维坐标。</p>
+                    <i>STEP 03 / SHELF</i>
+                    <h3>按主题摆成 7 本书</h3>
+                    <p>每个主题一本书，书厚与片段数成正比。片段在语义空间里的坐标决定它在书脊上的位置。</p>
                 </article>
                 <article class="ss-step">
                     <i>STEP 04 / ASSEMBLE</i>
@@ -151,11 +187,11 @@
             <div class="ss-limits">
                 <h3>边界与取舍</h3>
                 <ul>
-                    <li>三维坐标来自余弦矩阵的特征分解，只用于观察结构；<strong>视觉距离不等于排序</strong>，所以分数高但看起来远的点会用虚线连。</li>
+                    <li>书脊上的灯条位置来自余弦矩阵的特征分解（前两维），它表达的是结构，<strong>不是排序依据</strong>；排序始终用原始高维向量。</li>
+                    <li>7 个主题的片段数并不均匀：代理规则 44 段，软件设计 / 智能体开发 / 自动化 / 产品分析各只有 2 段，所以书的厚薄高低差别很大——这是数据本身的样子。</li>
                     <li>预设问题的问题向量是离线算好的；自由输入走 BM25 关键词召回，两种模式可以在上面切换对比。</li>
                     <li><strong>这里不演示生成</strong>：静态站跑不了真模型，硬编一段「AI 回答」没有意义。检索与装配才是这页要讲的部分。</li>
-                    <li>想换成神经 embedding，只需替换脚本里的向量化函数；索引结构、页面交互都不必改。</li>
-                    <li>重跑命令：<code>python script/build-semantic-space.py</code></li>
+                    <li>书架与书本全部由代码生成，没有外部 glTF / 贴图；换 Three.js 版本要确认仍提供 UMD 构建，页面走的是 <code>file://</code> 直开。</li>
                 </ul>
             </div>
         </section>
@@ -167,11 +203,12 @@
     </main>
 
     <noscript>
-        <p style="padding:24px;text-align:center">这一页需要 JavaScript 才能渲染向量空间。</p>
+        <p style="padding:24px;text-align:center">这一页需要 JavaScript 才能渲染三维模型。</p>
     </noscript>
 
     <script src="../js/vendor/three/three.min.js"></script>
     <script src="../data/semantic-space/space.js"></script>
+    <script src="../js/semantic-engine.js" defer></script>
     <script src="../js/semantic-space.js" defer></script>
 </body>
 </html>
