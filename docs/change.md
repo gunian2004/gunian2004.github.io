@@ -23,6 +23,8 @@
 
 | 日期 | 页面 | 类型 | 一句话说明 |
 | --- | --- | --- | --- |
+| 2026-10-25 | 首页 | 修改 | 新增 `#lab`「交互实验」整宽横条入口，指向语义空间页 |
+| 2026-10-25 | 语义空间 | 新增 | 新建 Three.js 向量检索页：78 个片段的 3D 点云、双模式召回、上下文装配与 2D 降级 |
 | 2026-10-25 | 问题排查库 | 修改 | 改为纯只读：删除记录 / 编辑 / 删除 / 导入导出，条目全部写死在 JS，仅保留收藏 |
 | 2026-10-25 | 开发文档模板台 | 修改 | ≤5 页形态改为完全扁平：不建 design/tasks/spec 文件夹，单文件 + 一份变更记录 |
 | 2026-10-25 | 开发文档模板台 | 重构 | 4 层级改为 docs 双形态目录骨架，13 份标题级模板，复制或 ZIP 直给 Agent |
@@ -36,6 +38,7 @@
 
 | 日期 | 类型 | 变更内容 | 影响文件 | 同步文档 | 记录人 |
 | --- | --- | --- | --- | --- | --- |
+| 2026-10-25 | 修改 | 在 `#practice` 与 `#experience` 之间新增 `#lab` 交互实验区块：整宽横条卡（眉题 / 标题 / 说明 / 3 个技术标签 / 「走进去」按钮），入口指向 `pages/semantic-space.html`；窄屏折为单列 | `index.html`、`css/blog.css` | `docs/design/pages/01-home.md` | Agent |
 | 2026-10-24 | 文档 | 建立首页文档基线：整理 10 个区块、双栏/两列布局、纸感配色、16 类组件与按钮入口；代码未改动 | — | `docs/design/pages/01-home.md` | Agent |
 
 ## 3. 项目演示
@@ -179,7 +182,17 @@
 
 ---
 
-## 20. 示例：一次合格的变更记录
+## 20. 语义空间
+
+页面文档：[19-semantic-space.md](design/pages/19-semantic-space.md) · 文件：`pages/semantic-space.html`
+
+| 日期 | 类型 | 变更内容 | 影响文件 | 同步文档 | 记录人 |
+| --- | --- | --- | --- | --- | --- |
+| 2026-10-25 | 新增 | 新建「语义空间」页：41 份语料切成 78 个片段，TF-IDF + SVD 降维到 3 维，Three.js 点云 + 自写轨道相机；12 个预设问题走离线向量、自由输入走 BM25，含上下文预算装配、片段详情、SVG 平面降级与键盘操作。新增离线管线 `script/build-semantic-space.py` 与产物 `data/semantic-space/space.js`，vendor Three.js r149 | `pages/semantic-space.html`、`css/semantic-space.css`、`js/semantic-space.js`、`js/vendor/three/three.min.js`、`data/semantic-space/space.js`、`data/semantic-space/space.json`、`script/build-semantic-space.py`、`index.html` | `docs/design/pages/19-semantic-space.md`、`docs/design/README.md` | Agent |
+
+---
+
+## 21. 示例：一次合格的变更记录
 
 需求：把首页首屏主按钮文案从「探索项目案例」改为「查看项目作品」。
 

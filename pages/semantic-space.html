@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="把 AI 工程笔记切成语义片段，用 TF-IDF 向量化、降维到三维，可视化一次检索在向量空间里到底发生了什么。">
+    <meta name="theme-color" content="#f4f2ed">
+    <title>语义空间 · 一次检索发生在哪里 | 陈柏贤</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="../css/semantic-space.css">
+</head>
+<body>
+    <a class="skip-link" href="#main">跳到主内容</a>
+
+    <header class="ss-top">
+        <a class="ss-back" href="../index.html"><span aria-hidden="true">↖</span> 返回首页</a>
+        <span class="ss-brand">语义空间 <em>SEMANTIC FIELD</em></span>
+        <span class="ss-top-meta">TF-IDF → SVD → COSINE</span>
+    </header>
+
+    <main class="ss-main" id="main">
+        <section class="ss-hero">
+            <div>
+                <p class="ss-kicker">Lab / 01 <span>/</span> 向量检索可视化</p>
+                <h1>把 <b data-stat="chunks">78</b> 段笔记，<br>摊成一片可以走进去的空间。</h1>
+                <p class="ss-lede">
+                    每个点的位置都不是随机撒的：它由 <strong>41 份笔记与项目案例</strong>切块、向量化、再降维得到。
+                    离得近，说明这两段文字在向量空间里真的相似。你可以提一个问题，看检索把哪些点照亮。
+                </p>
+            </div>
+            <dl class="ss-stats">
+                <div><dt>笔记与案例</dt><dd data-stat="docs">41</dd></div>
+                <div><dt>语义片段</dt><dd data-stat="chunks">78</dd></div>
+                <div><dt>词表维度</dt><dd data-stat="vocab">2429</dd></div>
+                <div><dt>降到</dt><dd>3 <small>DIM</small></dd></div>
+            </dl>
+        </section>
+
+        <section class="ss-workspace" aria-label="向量空间与检索">
+            <div class="ss-stage" id="ssStage" tabindex="0" role="group"
+                 aria-label="向量空间视图。可用方向键旋转、加减号缩放，右侧列表是同等的文字入口。">
+                <canvas class="ss-canvas" id="ssCanvas"></canvas>
+                <svg class="ss-flat" id="ssFlat" viewBox="-1.15 -1.15 2.3 2.3" preserveAspectRatio="xMidYMid meet" hidden aria-hidden="true"></svg>
+                <div class="ss-tags" id="ssTags" aria-hidden="true"></div>
+
+                <div class="ss-stage-corner">
+                    <b id="ssSpaceLabel">SPACE / 3D</b>
+                    <span id="ssSpaceSub">78 chunks · 7 topics</span>
+                </div>
+
+                <div class="ss-stage-tools">
+                    <button class="ss-tool" type="button" data-view="3d" aria-pressed="true">立体</button>
+                    <button class="ss-tool" type="button" data-view="2d" aria-pressed="false">平面</button>
+                    <button class="ss-tool" type="button" id="ssSpin" aria-pressed="true">自转</button>
+                    <button class="ss-tool" type="button" id="ssReset">复位</button>
+                </div>
+
+                <ul class="ss-legend" id="ssLegend"></ul>
+                <div class="ss-tip" id="ssTip" hidden></div>
+                <p class="ss-notice" id="ssNotice" hidden></p>
+
+                <div class="ss-loading" id="ssLoading">
+                    <i aria-hidden="true"></i>
+                    LOADING VECTORS
+                </div>
+            </div>
+
+            <aside class="ss-panel">
+                <form class="ss-card ss-query" id="ssForm">
+                    <label for="ssInput">问一句，看谁被点亮</label>
+                    <div class="ss-input-row">
+                        <input class="ss-input" id="ssInput" type="search" autocomplete="off"
+                               placeholder="例如：怎么让 AI 不乱改代码">
+                        <button class="ss-go" type="submit">检索</button>
+                    </div>
+                    <div class="ss-mode" role="group" aria-label="召回方式">
+                        <button type="button" data-mode="vector" aria-pressed="true">向量相似</button>
+                        <button type="button" data-mode="keyword" aria-pressed="false">关键词 BM25</button>
+                    </div>
+                    <div class="ss-presets" id="ssPresets" role="group" aria-label="预设问题"></div>
+                    <button class="ss-more" type="button" id="ssMore" aria-expanded="false" aria-controls="ssPresets">看另外 6 个问题</button>
+                </form>
+
+                <section class="ss-results" aria-labelledby="ssResultTitle">
+                    <header>
+                        <h2 id="ssResultTitle">召回结果</h2>
+                        <span id="ssResultMeta">选一个问题开始</span>
+                    </header>
+                    <ol class="ss-hit-list" id="ssResultList"></ol>
+                </section>
+
+                <section class="ss-detail" id="ssDetail" hidden aria-labelledby="ssDetailTitle">
+                    <div class="ss-detail-head">
+                        <button class="ss-detail-back" type="button" id="ssDetailClose"><span aria-hidden="true">←</span> 返回召回列表</button>
+                        <span class="ss-detail-cat" id="ssDetailCat"><i class="ss-dot" aria-hidden="true"></i><span>主题</span></span>
+                    </div>
+                    <h2 id="ssDetailTitle">片段标题</h2>
+                    <dl class="ss-detail-kv">
+                        <div><dt>相似度</dt><dd id="ssDetailScore">—</dd></div>
+                        <div><dt>字数 / token</dt><dd id="ssDetailLen">—</dd></div>
+                        <div><dt>来源</dt><dd id="ssDetailSource">—</dd></div>
+                    </dl>
+                    <p class="ss-detail-text" id="ssDetailText"></p>
+                    <a class="ss-detail-link" id="ssDetailLink" href="../pages/AI.html" target="_blank" rel="noopener noreferrer">在原文里查看 ↗</a>
+                </section>
+            </aside>
+        </section>
+
+        <section class="ss-context" aria-labelledby="ssContextTitle">
+            <div class="ss-context-head">
+                <div>
+                    <h2 id="ssContextTitle">上下文装配</h2>
+                    <p>召回不等于能用。把结果按分数装进一个有限窗口，超出的必须丢掉。</p>
+                </div>
+                <div class="ss-budget">
+                    <label for="ssBudget">窗口预算</label>
+                    <input id="ssBudget" type="range" min="120" max="480" step="20" value="240">
+                    <output id="ssBudgetOut" for="ssBudget">240 tokens</output>
+                </div>
+            </div>
+            <div class="ss-window" id="ssWindow"></div>
+            <p class="ss-window-note" id="ssWindowNote">先选一个问题，这里会显示片段如何被装进窗口。</p>
+        </section>
+
+        <section class="ss-method" aria-labelledby="ssMethodTitle">
+            <h2 id="ssMethodTitle">这一页是怎么来的</h2>
+            <p>四步，全部离线完成。脚本在仓库里，改完重跑一次即可。</p>
+            <div class="ss-steps">
+                <article class="ss-step">
+                    <i>STEP 01 / CHUNK</i>
+                    <h3>把笔记切成语义块</h3>
+                    <p>从知识手册与项目案例里抽正文，按段落与句子边界切成 78 个片段，每块 20–260 字。</p>
+                </article>
+                <article class="ss-step">
+                    <i>STEP 02 / VECTORIZE</i>
+                    <h3>中文二字切分 + TF-IDF</h3>
+                    <p>中文按相邻两字切成词项，得到 <code>2429</code> 维稀疏向量。这是 LSA，不是神经 embedding。</p>
+                </article>
+                <article class="ss-step">
+                    <i>STEP 03 / RETRIEVE</i>
+                    <h3>余弦相似度排序</h3>
+                    <p>问题向量与每个片段算余弦，取前 24 名。排序始终用原始向量，不用三维坐标。</p>
+                </article>
+                <article class="ss-step">
+                    <i>STEP 04 / ASSEMBLE</i>
+                    <h3>装进有限窗口</h3>
+                    <p>按分数顺序累加 token，超出预算的片段被划掉。<code>1 token ≈ 1.6 汉字</code>，仅作估算。</p>
+                </article>
+            </div>
+
+            <div class="ss-limits">
+                <h3>边界与取舍</h3>
+                <ul>
+                    <li>三维坐标来自余弦矩阵的特征分解，只用于观察结构；<strong>视觉距离不等于排序</strong>，所以分数高但看起来远的点会用虚线连。</li>
+                    <li>预设问题的问题向量是离线算好的；自由输入走 BM25 关键词召回，两种模式可以在上面切换对比。</li>
+                    <li><strong>这里不演示生成</strong>：静态站跑不了真模型，硬编一段「AI 回答」没有意义。检索与装配才是这页要讲的部分。</li>
+                    <li>想换成神经 embedding，只需替换脚本里的向量化函数；索引结构、页面交互都不必改。</li>
+                    <li>重跑命令：<code>python script/build-semantic-space.py</code></li>
+                </ul>
+            </div>
+        </section>
+
+        <footer class="ss-foot">
+            <span>© 2026 gunian · 数据来自本站笔记，非演示伪造</span>
+            <a href="../index.html#projects">继续看项目案例 ↗</a>
+        </footer>
+    </main>
+
+    <noscript>
+        <p style="padding:24px;text-align:center">这一页需要 JavaScript 才能渲染向量空间。</p>
+    </noscript>
+
+    <script src="../js/vendor/three/three.min.js"></script>
+    <script src="../data/semantic-space/space.js"></script>
+    <script src="../js/semantic-space.js" defer></script>
+</body>
+</html>

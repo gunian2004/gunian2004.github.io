@@ -1335,3 +1335,106 @@ body.egg-open { overflow: hidden; }
     [data-footer-reveal].is-footer-pending { opacity: 1; transform: none; }
     .skill-workbench-card:hover, .contact-github:hover, .contact-copy:hover { transform: none; }
 }
+
+/* ==========================================================================
+   LAB 入口卡（首页 → pages/semantic-space.html）
+   一整行的横条，不是并排卡片：它是「另一类内容」的入口，不该混进作品列表。
+   ========================================================================== */
+.lab-section { padding-top: 4px; }
+.lab-entry {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto 126px;
+    gap: 30px;
+    align-items: center;
+    overflow: hidden;
+    padding: 26px 28px;
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-lg);
+    background: linear-gradient(140deg, rgba(255, 254, 250, .98), rgba(244, 242, 237, .88));
+    box-shadow: var(--shadow-sm);
+    text-decoration: none;
+    color: inherit;
+    transition: transform .38s cubic-bezier(.2, .75, .25, 1), border-color .3s ease, box-shadow .38s ease;
+}
+.lab-entry::before {
+    content: "";
+    position: absolute;
+    top: -90px;
+    right: -60px;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(49, 92, 232, .12), transparent 70%);
+    pointer-events: none;
+    transition: transform .5s ease;
+}
+.lab-entry:hover {
+    transform: translateY(-4px);
+    border-color: rgba(49, 92, 232, .3);
+    box-shadow: var(--shadow-md);
+}
+.lab-entry:hover::before { transform: scale(1.15); }
+.lab-entry-body { position: relative; z-index: 1; min-width: 0; }
+.lab-entry-eyebrow {
+    display: block;
+    margin-bottom: 10px;
+    color: var(--primary);
+    font: 700 .62rem/1.4 ui-monospace, SFMono-Regular, Consolas, monospace;
+    letter-spacing: .14em;
+}
+.lab-entry-body strong {
+    display: block;
+    margin-bottom: 8px;
+    font-size: clamp(1.05rem, 2vw, 1.34rem);
+    font-weight: 650;
+    line-height: 1.45;
+    letter-spacing: -.03em;
+}
+.lab-entry-desc {
+    display: block;
+    max-width: 620px;
+    color: var(--text-muted);
+    font-size: .83rem;
+    line-height: 1.85;
+}
+.lab-entry-tags {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 6px;
+}
+.lab-entry-tags i {
+    padding: 4px 9px;
+    border: 1px solid var(--border-soft);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .66);
+    color: var(--text-muted);
+    font-style: normal;
+    font-size: .66rem;
+    white-space: nowrap;
+}
+.lab-entry-go {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 44px;
+    border-radius: 999px;
+    background: var(--primary);
+    color: #fff;
+    font-size: .78rem;
+    font-weight: 650;
+    white-space: nowrap;
+    transition: background .25s ease, transform .25s ease;
+}
+.lab-entry:hover .lab-entry-go { background: #2a4fd0; transform: translateX(2px); }
+
+@media (max-width: 900px) {
+    .lab-entry { grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 22px; }
+    .lab-entry-tags { justify-content: flex-start; }
+    .lab-entry-go { width: fit-content; padding: 0 20px; }
+}

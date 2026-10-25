@@ -36,15 +36,16 @@
 | 5 | 关于我 | `#about` | 左侧自我介绍卡 + 右侧 3 张能力卡 | 第 116–143 行 |
 | 6 | 项目作品 | `#projects` | 6 张可展开项目卡（截图 / 数据 / 案例三步） | 第 145 行起 |
 | 7 | 实践笔记 | `#practice` | 3 张实践卡（问题 → 做法 → 指标） | 第 145 行后段 |
-| 8 | 工作经历 | `#experience` | 竖向时间线，2 段经历，可展开详情与全屏阅读 | 后段 |
-| 9 | 技术栈 | `#skills` | 4 组技能工作台卡片 + 案例链接 | 后段 |
-| 10 | 教育背景 | `#education` | 录取通知书式卡片、专业课程、学位章 | 后段 |
-| 11 | 奖项荣誉 | `#awards` | 7 张荣誉卡（竞赛 / 写作 / 认证） | 后段 |
-| 12 | 组织经历 | `#school` | 2 张校园角色卡（学习部部长、学生会主席） | 后段 |
-| 13 | 联系我 | `#contact` | 深色邀请卡、GitHub 入口、复制地址 | 后段 |
-| 14 | 页脚 | `footer` | 版权行 | 尾部 |
-| 15 | 项目截图大图 | `dialog.project-image-dialog` | 点击项目截图后放大的图片弹窗 | 尾部 |
-| 16 | 隐藏入口面板 | `#eggModal` | 6 个受保护页面的选择面板 | 尾部 |
+| 8 | 交互实验 | `#lab` | 一条整宽横条：语义空间入口（Three.js 点云 + 向量检索） | 第 458 行前 |
+| 9 | 工作经历 | `#experience` | 竖向时间线，2 段经历，可展开详情与全屏阅读 | 后段 |
+| 10 | 技术栈 | `#skills` | 4 组技能工作台卡片 + 案例链接 | 后段 |
+| 11 | 教育背景 | `#education` | 录取通知书式卡片、专业课程、学位章 | 后段 |
+| 12 | 奖项荣誉 | `#awards` | 7 张荣誉卡（竞赛 / 写作 / 认证） | 后段 |
+| 13 | 组织经历 | `#school` | 2 张校园角色卡（学习部部长、学生会主席） | 后段 |
+| 14 | 联系我 | `#contact` | 深色邀请卡、GitHub 入口、复制地址 | 后段 |
+| 15 | 页脚 | `footer` | 版权行 | 尾部 |
+| 16 | 项目截图大图 | `dialog.project-image-dialog` | 点击项目截图后放大的图片弹窗 | 尾部 |
+| 17 | 隐藏入口面板 | `#eggModal` | 6 个受保护页面的选择面板 | 尾部 |
 
 ## 4. 布局
 
@@ -53,6 +54,7 @@
 - **首屏**：`.hero` 双栏 `minmax(0,.94fr) / minmax(450px,1.06fr)`，`gap: clamp(42px,7vw,96px)`，`min-height: min(790px, 100vh)`；移动端折叠为单栏。
 - **关于我**：`.about-layout` 双栏 `minmax(0,.95fr) minmax(0,1.15fr)`；右侧 3 张能力卡纵向排列。
 - **项目**：`.projects-grid` 两列 `repeat(2, minmax(0,1fr))`，首卡可跨列（featured）。
+- **实验入口**：`.lab-entry` 单行三列 `1fr / auto / 126px`，整宽横条，不与作品卡混排。
 - **实践**：`.practice-grid` 三列；**荣誉**：`.honor-gallery` 三列；**技能**：`.skill-workbench` 两列；**校园角色**：`.campus-roles` 两列。
 - **经历**：`.career-timeline` 左内边距 27px 的竖向时间线，卡片内再分「预览 / 详情」。
 - **联系**：`.contact-invitation` 双栏 `1.35fr / 1fr`，深色面板。
@@ -119,6 +121,7 @@
 | 展开按钮 | `.project-expand-btn` + `toggleProject()` | 展开 `.project-detail`，箭头翻转 |
 | 实践卡 | `.practice-card` `.practice-index` `.practice-metrics` | 编号、类型、标题、摘要、两个指标 |
 | 经历卡 | `.career-card` `.exp-box` `.exp-box-preview` `.exp-box-detail` `.exp-section` | 时间线 + 可折叠详情 + 全屏阅读 |
+| 实验入口横条 | `.lab-entry` `.lab-entry-eyebrow` `.lab-entry-tags` `.lab-entry-go` | 眉题、标题、一句说明、三个技术标签、胶囊按钮 |
 | 技能组 | `.skill-workbench-card` `.skill-tools` `.skill-practice` | 4 组技能 + 实践说明 |
 | 教育卡 | `.education-pass` `.education-stamp` `.education-courses` | 通知书版式 |
 | 荣誉卡 | `.honor-card` `.honor-seal` `.honor-category` `.honor-secondary` | 奖章、类别、级别 |
@@ -143,6 +146,7 @@
 | 项目展开 | 展开案例细节 / 收起细节 | `.project-expand-btn` | 展开 / 收起案例三段 | 本页 |
 | 项目截图 | 图片封面（⤢） | `.project-image-trigger` | 打开大图对话框 | `#erpImageDialog` |
 | 实践卡 | 查看 ERP 项目 → 等 | `.practice-card` | 跳转对应项目卡 | 本页 `#proj…` |
+| 实验入口 | 走进去 ↗ | `.lab-entry` | 打开语义空间可视页 | `pages/semantic-space.html` |
 | 经历展开 | 展开详情 / 收起详情 | `.exp-box-toggle` | 展开工作详情 | 本页 |
 | 经历全屏 | ⛶ 全屏查看 | `.exp-box-fullscreen` + `openExpFullscreen()` | 打开全屏阅读层 | 本页 |
 | 联系 | 在 GitHub 找到我 ↗ | `.contact-github` | 新窗口 | GitHub |
@@ -179,6 +183,7 @@
 | 三个能力方向 | `.about-capabilities` 三张 `.about-capability` |
 | 项目标题 / 描述 / 指标 / 案例 | 对应 `#projErp`、`#projAssistant` 等 `.project-card` |
 | 实践笔记 | `#practice` 的 `.practice-card` |
+| 实验入口文案 / 标签 | `#lab` 的 `.lab-entry`（眉题、标题、说明、三个 `<i>` 标签、按钮文案） |
 | 工作经历 | `#experience` 的 `.career-card` 与 `.exp-box-detail` |
 | 技术栈分组 | `#skills` 的 `.skill-workbench-card` |
 | 教育 / 奖项 / 校园 | `#education`、`#awards`、`#school` |

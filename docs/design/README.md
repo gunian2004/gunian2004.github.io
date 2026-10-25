@@ -44,6 +44,7 @@ docs/
 | 16 | [BI 经营分析](pages/16-frontend-bi.md) | `pages/frontend-BI.html` | `/pages/frontend-BI.html` | 深色数据观测台与指标订阅 |
 | 17 | [HR / OA 审批](pages/17-frontend-oa.md) | `pages/frontend-OA.html` | `/pages/frontend-OA.html` | 待办审批、申请与组织架构 |
 | 18 | [财务 / 费控](pages/18-frontend-fin.md) | `pages/frontend-FIN.html` | `/pages/frontend-FIN.html` | 资金、票据、对账与报表账簿 |
+| 19 | [语义空间](pages/19-semantic-space.md) | `pages/semantic-space.html` | `/pages/semantic-space.html` | 78 个语义片段的三维向量空间与检索可视化 |
 
 ## 3. 页面文档统一格式
 
@@ -95,6 +96,7 @@ docs/
 | 工作台四页（work / troubleshooting / doc-templates / snippets） | `#101821` + `#80e0c1` + `#d4f178` | 深夜蓝底、薄荷绿、荧光黄点缀、等宽字体 |
 | 小工具 / 小技能 | `#172433` + `#315ce8` | 工作室（studio）版式、大标题、纸卡片 |
 | 人生指南 | `#3451b2` | 阅读器：顶栏 + 侧栏目录 + 正文，明暗双主题 |
+| 语义空间 | `#315ce8` + `#287e79` | 纸感坐标图：米白底、墨点、细连线、地面网格、等宽标注 |
 | 前端设计规范库 | 一页一色 | 每个类目独立的字体、材质与布局实验 |
 
 ### 4.3 企业级 UI 令牌（`pages/css/frontend-base.css`）
