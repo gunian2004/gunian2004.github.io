@@ -33,7 +33,7 @@ docs/
 | 05 | [高性价比人生指南](pages/05-life-guide.md) | `pages/life-guide.html` | `/pages/life-guide.html` | 34 节、650 条建议的单文件离线读物 |
 | 06 | [工作经验库](pages/06-work.md) | `pages/work.html` | `/pages/work.html` | 踩坑经验与开发规范的私有笔记 |
 | 07 | [问题排查库](pages/07-troubleshooting.md) | `pages/troubleshooting.html` | `/pages/troubleshooting.html` | 现象 → 原因 → 验证的排查记录库 |
-| 08 | [开发文档模板台](pages/08-doc-templates.md) | `pages/doc-templates.html` | `/pages/doc-templates.html` | 按项目规模导出 10 份 AI 文档模板 |
+| 08 | [开发文档模板台](pages/08-doc-templates.md) | `pages/doc-templates.html` | `/pages/doc-templates.html` | 按 docs 目录规划输出 13 份 AI 文档骨架 |
 | 09 | [命令与代码片段](pages/09-snippets.md) | `pages/snippets.html` | `/pages/snippets.html` | 可搜索、参数化的命令片段库 |
 | 10 | [前端设计规范库](pages/10-frontend-style.md) | `pages/frontend-style.html` | `/pages/frontend-style.html` | 8 个设计类目的入口索引 |
 | 11 | [金融类](pages/11-frontend-finance.md) | `pages/frontend-finance.html` | `/pages/frontend-finance.html` | 5 套金融账户皮肤与票据存根规范 |

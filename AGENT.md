@@ -117,7 +117,7 @@ openspec/                 ← 需求变更提案（OpenSpec 工作流）
 | 小工具 | `pages/tool.html`、`js/tool.js`、`js/tool-workbench.js` | 新增工具要同步「卡片 / 侧栏 / 移动端下拉 / 首屏数量」四处 |
 | 知识手册 | `pages/AI.html`、`script/AI.js` | 主题数、笔记数、筛选按钮数字、`data-rule` 属性必须一致 |
 | 人生指南 | `pages/life-guide.html`、`js/life-reading.js` | 单文件、2.2 MB，只改目标段落；34 节与目录 / 跳转要一致 |
-| 工作台四页 | `work.html`、`troubleshooting.html`、`doc-templates.html`、`snippets.html` | 暗色 `work-hub.css`；本地存储有版本键，改数据结构要升版本 |
+| 工作台四页 | `work.html`、`troubleshooting.html`、`doc-templates.html`、`snippets.html` | 暗色 `work-hub.css`；`doc-templates` 的样式独立在 `css/doc-templates.css`（`dt-` 前缀），模板数据在 `js/project-doc-templates.js`，存储键 `work-hub.doc-templates.v2`；本地存储有版本键，改数据结构要升版本 |
 | 设计规范库入口 | `frontend-style.html`、`frontend-hub.css` | 一页一色 `--c`；新增类目要同步 8 个卡片的编号与筛选分组 |
 | 金融类 | `frontend-finance.html/css` | 皮肤由 `.theme-*` 变量驱动，不要写死颜色；涨红跌绿 |
 | 系统级规范 | `frontend-spec.html`、`frontend-base.css` | 令牌是单一事实来源；13 节必须与目录一致 |

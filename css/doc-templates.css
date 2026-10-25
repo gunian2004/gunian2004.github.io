@@ -1,0 +1,119 @@
+/* 开发文档模板台 · 只服务 pages/doc-templates.html，前缀 dt-。
+   颜色全部取自 css/work-hub.css 的令牌，不新增色值。 */
+
+.dt-head{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;flex-wrap:wrap;margin-bottom:16px}
+.dt-note{margin:0;color:var(--muted);font-size:12px;line-height:1.75}
+.dt-note code{font:11.5px var(--mono);color:var(--mint);background:#80e0c10f;border:1px solid var(--line);border-radius:5px;padding:1px 5px}
+.dt-foot{margin:18px 0 0;color:#72858b;font-size:11px;line-height:1.8;text-align:center}
+
+/* 形态切换 */
+.dt-mode{display:inline-flex;gap:2px;padding:3px;border:1px solid var(--line);border-radius:10px;background:#0d1720}
+.dt-mode-btn{padding:6px 12px;border:0;border-radius:8px;background:transparent;color:var(--muted);font-size:12px;line-height:1.4;cursor:pointer;white-space:nowrap}
+.dt-mode-btn:hover{color:var(--text);background:#80e0c10c}
+.dt-mode-btn[aria-pressed="true"]{background:#80e0c114;color:var(--mint);font-weight:650}
+.dt-mode-btn:focus-visible{outline:2px solid var(--mint);outline-offset:2px}
+
+/* 目录结构 */
+.dt-map-grid{display:grid;grid-template-columns:minmax(0,1.02fr) minmax(260px,.98fr);gap:22px;align-items:start}
+.dt-tree{margin:0;justify-self:start;max-width:100%;padding:16px 18px;background:#0d1720;border:1px solid var(--line);border-radius:10px;overflow:auto;max-height:470px}
+.dt-fs-root{margin:0 0 2px;color:var(--mint);font:600 12.5px/1.9 var(--mono)}
+.dt-fs,.dt-fs ul{list-style:none;margin:0;padding:0}
+.dt-fs ul{padding-left:18px}
+.dt-fs li{position:relative;padding-left:16px;font:12.5px/1.9 var(--mono)}
+.dt-fs li::before{content:"";position:absolute;left:0;top:0;bottom:0;border-left:1px solid #c5dedc33}
+.dt-fs li:last-child::before{bottom:auto;height:.95em}
+.dt-fs li::after{content:"";position:absolute;left:0;top:.95em;width:12px;border-top:1px solid #c5dedc33}
+.dt-fs-folder{color:var(--text);font-weight:600}
+.dt-fs-file{color:var(--text);opacity:.86}
+.dt-map-side{display:grid;gap:18px;align-content:start}
+.dt-naming{padding-top:14px;border-top:1px solid var(--line)}
+.dt-naming h3{margin:0 0 8px;color:var(--mint);font:600 10.5px var(--mono);letter-spacing:.1em;text-transform:uppercase}
+.dt-naming dl{margin:0;display:grid;gap:6px}
+.dt-naming dl>div{display:grid;grid-template-columns:86px minmax(0,1fr);gap:10px;align-items:baseline}
+.dt-naming dt{color:var(--muted);font-size:11.5px}
+.dt-naming dd{margin:0;color:var(--text);font-size:12px;line-height:1.65;opacity:.86}
+.dt-naming code{font:11px var(--mono);color:var(--text)}
+.dt-rules{list-style:none;margin:0;padding:0;display:grid;gap:14px;counter-reset:dt-rule}
+.dt-rules li{position:relative;padding-left:30px;color:var(--muted);font-size:12.5px;line-height:1.7}
+.dt-rules li b{display:block;margin-bottom:1px;color:var(--text);font-size:12.5px;font-weight:600}
+.dt-rules li::before{counter-increment:dt-rule;content:counter(dt-rule,decimal-leading-zero);position:absolute;left:0;top:1px;color:var(--mint);font:600 11px var(--mono);letter-spacing:.04em}
+.dt-actions{margin:18px 0 0}
+.dt-status-error{color:#ffbd78}
+
+/* 项目资料 */
+.dt-fields{display:grid;grid-template-columns:repeat(2,minmax(150px,220px));gap:10px}
+.dt-fields label{display:grid;gap:6px;font-size:11.5px;color:var(--muted);letter-spacing:.02em}
+.dt-fields input{padding:8px 10px;font-size:13px}
+
+/* 工作台两栏 */
+.dt-work{display:grid;grid-template-columns:276px minmax(0,1fr);gap:22px;align-items:start}
+.dt-nav-wrap{min-width:0}
+.dt-nav-toggle{display:none}
+.dt-nav[hidden]{display:none}
+.dt-nav{position:sticky;top:18px;max-height:calc(100vh - 36px);overflow:auto;overscroll-behavior:contain;padding-right:4px}
+.dt-group{margin:0 0 14px}
+.dt-group:last-child{margin-bottom:0}
+.dt-group-title{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:0 0 5px;font:600 10.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--mint)}
+.dt-group-count{color:var(--muted);font-weight:400}
+.dt-list{list-style:none;margin:0;padding:0;display:grid;gap:3px}
+.dt-doc{display:block;width:100%;padding:8px 10px;border:1px solid transparent;border-radius:10px;background:transparent;color:var(--text);font:inherit;text-align:left;cursor:pointer}
+.dt-doc:hover{background:#80e0c10c;border-color:var(--line)}
+.dt-doc[aria-current="true"]{background:#80e0c114;border-color:#80e0c166}
+.dt-doc:focus-visible{outline:2px solid var(--mint);outline-offset:2px}
+.dt-doc-path{display:block;font:11.5px/1.5 var(--mono);overflow-wrap:anywhere}
+.dt-doc-purpose{display:block;margin-top:2px;color:var(--muted);font-size:11px;line-height:1.5}
+
+/* 详情 */
+.dt-detail{display:flex;flex-direction:column;align-self:stretch;min-width:0;border-left:1px solid var(--line);padding-left:22px}
+.dt-detail>.dt-actions{margin-top:auto;padding-top:18px}
+.dt-path{margin:0 0 6px;font-size:12px;color:var(--muted)}
+.dt-path code{display:inline-block;max-width:100%;color:var(--mint);background:#80e0c10f;border:1px solid var(--line);border-radius:6px;padding:2px 7px;font:11.5px/1.6 var(--mono);overflow-wrap:anywhere}
+.dt-title{margin:0 0 6px;font-size:17px;line-height:1.5}
+.dt-title:focus-visible{outline:2px solid var(--mint);outline-offset:4px}
+.dt-meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:14px 0 16px}
+.dt-meta dt{margin:0 0 2px;color:var(--muted);font-size:11px;letter-spacing:.02em}
+.dt-meta dd{margin:0;font-size:12.5px;line-height:1.65}
+.dt-hint{margin:0 0 10px;color:#ffbd78;font-size:12px;line-height:1.7}
+.dt-hint code{font-family:var(--mono)}
+.dt-skeleton{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;max-height:min(58vh,620px);overflow:auto;tab-size:2}
+.dt-skeleton .dt-l1{color:var(--mint);font-weight:650}
+.dt-skeleton .dt-l2{color:var(--text);font-weight:600}
+.dt-skeleton .dt-l3{color:var(--text);opacity:.84}
+.dt-skeleton .dt-quote{color:var(--muted);font-style:italic}
+.dt-skeleton .dt-table{color:var(--muted)}
+
+/* 流程 */
+.dt-steps{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.dt-step{padding:14px;border:1px solid var(--line);border-radius:12px;background:#0d1720aa}
+.dt-step b{display:block;margin-bottom:4px;color:var(--mint);font:650 12px var(--mono);letter-spacing:.04em}
+.dt-step p{margin:0;color:var(--muted);font-size:12px;line-height:1.65}
+.dt-step code{font-family:var(--mono);color:var(--text)}
+
+@media(max-width:760px){
+  .dt-map-grid{grid-template-columns:1fr}
+  .dt-tree{justify-self:stretch;max-height:360px}
+}
+@media(max-width:900px){
+  .dt-work{grid-template-columns:1fr;gap:0}
+  .dt-nav-toggle{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;width:100%;padding:11px 14px;border:1px solid var(--line);border-radius:10px;background:#0d1720;color:var(--text);font-size:12.5px;text-align:left;cursor:pointer}
+  .dt-nav-toggle-label{color:var(--muted);font-size:11.5px}
+  .dt-nav-toggle span#dtNavCurrent{font-family:var(--mono);font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .dt-nav-toggle i{flex:none;color:var(--mint);font:600 11px var(--mono);font-style:normal}
+  .dt-nav-toggle:focus-visible{outline:2px solid var(--mint);outline-offset:2px}
+  .dt-nav{position:static;max-height:none;overflow:visible;padding:10px 0 14px;border-bottom:1px solid var(--line)}
+  .dt-nav-wrap{margin-bottom:0}
+  .dt-detail{border-left:0;border-top:1px solid var(--line);padding:18px 0 0}
+  .dt-fields{grid-template-columns:1fr}
+  .dt-steps{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:620px){
+  .dt-mode{width:100%}
+  .dt-mode-btn{flex:1}
+  .dt-fields{width:100%}
+  .dt-meta{grid-template-columns:1fr}
+  .dt-tree{font-size:11.5px}
+  .dt-fs li{font-size:11.5px}
+  .dt-fs ul{padding-left:14px}
+  .dt-fs-root{font-size:11.5px}
+  .dt-steps{grid-template-columns:1fr}
+}
