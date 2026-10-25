@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#101821"><meta name="robots" content="noindex">
-  <meta name="description" content="开发文档模板台：按 docs 目录规划给出 13 份标题级文档骨架，选位置、复制、直接贴给 AI Agent。">
+  <meta name="description" content="开发文档模板台：按 docs 目录规划给出 11–13 份标题级文档骨架，选位置、复制、直接贴给 AI Agent。">
   <title>开发文档模板台 · 工作台</title>
   <link rel="stylesheet" href="../css/work-hub.css">
   <link rel="stylesheet" href="../css/doc-templates.css">
@@ -25,7 +25,7 @@
       <p class="eyebrow">DOCUMENT STUDIO / 03</p>
       <h1>先立文档，再让 Agent 动手。</h1>
       <p>一套固定的 docs 目录 + AGENT.md：设计、任务、规范各就各位。选文件 → 复制骨架 → 贴给 AI，不用每次重讲一遍要求。</p>
-      <div class="chips"><span class="chip" id="dtChipMode">页面 &gt;5 形态</span><span class="chip" id="dtChipCount">13 个位置</span><span class="chip">只读 · 复制即用</span></div>
+      <div class="chips"><span class="chip" id="dtChipMode">页面规模</span><span class="chip" id="dtChipCount">11–13 个位置</span><span class="chip">只读 · 复制即用</span></div>
     </section>
 
     <section class="panel" aria-labelledby="dtMapTitle">
@@ -33,7 +33,7 @@
         <div>
           <p class="eyebrow">STRUCTURE</p>
           <h2 id="dtMapTitle">先看目录长什么样</h2>
-          <p class="dt-note">docs 放文档，AGENT.md 放在 docs 同级。三个目录同构：设计 → 任务 → 规范与验收。</p>
+          <p class="dt-note">docs 放文档，AGENT.md 放在 docs 同级。页面 &gt;5 时三个目录同构，≤5 时直接摊平成单文件。</p>
         </div>
         <div class="dt-mode" role="group" aria-label="页面数量形态">
           <button type="button" class="dt-mode-btn" data-mode="multi" aria-pressed="true">页面 &gt;5</button>
@@ -47,7 +47,7 @@
           <div class="dt-naming">
             <h3>命名速查</h3>
             <dl>
-              <div><dt>变更记录</dt><dd>design / tasks / spec 各一份，只追加不修改</dd></div>
+              <div><dt>变更记录</dt><dd id="dtNamingChange">design / tasks / spec 各一份，只追加不修改</dd></div>
               <div><dt>技术栈规范</dt><dd><code>docs/xxx编码规范.md</code>，xxx 换成技术栈名</dd></div>
               <div><dt>归档</dt><dd><code>docs/archive/日期-说明/</code>，索引写 README.md</dd></div>
               <div><dt>根入口</dt><dd><code>README.md</code> 讲项目，<code>AGENT.md</code> 讲规则</dd></div>
@@ -103,7 +103,7 @@
         <li class="dt-step"><b>01 开工</b><p>建 docs 目录，先复制 <code>AGENT.md</code> 与 <code>docs/README.md</code>。</p></li>
         <li class="dt-step"><b>02 设计</b><p>每个页面先写页面设计，再拆任务，最后补验收标准。</p></li>
         <li class="dt-step"><b>03 开发</b><p>把设计 + 验收一起贴给 Agent，按编号实现。</p></li>
-        <li class="dt-step"><b>04 变更</b><p>代码改完，同步三份文档，各补一条变更记录。</p></li>
+        <li class="dt-step"><b>04 变更</b><p>代码改完，同步三份文档，并在变更记录里补一条。</p></li>
       </ol>
     </section>
 

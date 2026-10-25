@@ -30,15 +30,10 @@
     ├── {技术栈}编码规范.md
     ├── 版本管理规范.md
     ├── database.md
-    ├── design/
-    │   ├── 变更记录.md
-    │   └── design.md
-    ├── tasks/
-    │   ├── 变更记录.md
-    │   └── tasks.md
-    ├── spec/
-    │   ├── 变更记录.md
-    │   └── spec.md
+    ├── design.md
+    ├── tasks.md
+    ├── spec.md
+    ├── 变更记录.md
     └── archive/`
   };
 
@@ -58,8 +53,8 @@
     version: 2,
     updatedAt: '2026-10-25',
     modes: {
-      multi: { label: '页面 >5', hint: 'design / tasks / spec 各建 pages/，一个页面一份文档' },
-      slim: { label: '页面 ≤5', hint: '不建 pages/，三个目录各用一个单文件装全部页面' }
+      multi: { label: '页面 >5', hint: 'design / tasks / spec 各建文件夹，页面放 pages/ 一页一份' },
+      slim: { label: '页面 ≤5', hint: '不建三个文件夹，docs 下直接放 design.md、tasks.md、spec.md 和一份 变更记录.md' }
     },
     groups: [
       { id: 'root', label: '项目根目录' },
@@ -71,9 +66,9 @@
     ],
     trees,
     rules: [
-      { title: '三个目录同构', text: 'design 写页面设计，tasks 拆任务，spec 定规范与验收；同一个页面在三处用同一个编号。' },
-      { title: '两种规模', text: '页面 >5 建 pages/，一页一份；页面 ≤5 不建 pages/，三个目录各用一个单文件装全部页面。' },
-      { title: '变更留痕', text: '每次动文档，在对应目录的 变更记录.md 记一条：变更时间、修改前、修改后、变更原因、变更文件。' },
+      { title: '设计→任务→验收', text: 'design 写页面设计，tasks 拆任务，spec 定规范与验收；同一个页面在三处用同一个编号。' },
+      { title: '两种规模', text: '页面 >5 时 design / tasks / spec 各建文件夹，页面放 pages/；≤5 时三个文件夹都不建，docs 下直接放 design.md、tasks.md、spec.md 和一份 变更记录.md。' },
+      { title: '变更留痕', text: '每次动文档，在 变更记录.md 记一条：变更时间、修改前、修改后、变更原因、变更文件；>5 页放各自目录，≤5 页统一放 docs/。' },
       { title: '代码同改', text: '代码改了，design / tasks / spec 与变更记录必须同改；archive/ 只装被替换的旧内容，只追加不修改。' }
     ],
     items: [
@@ -86,7 +81,7 @@
         title: 'Agent 工作入口',
         purpose: 'Agent 接手项目时先读的规则文件：读什么、守什么、改完同步什么',
         when: '项目初始化时写；协作规则变化时改',
-        refs: 'docs/README.md、三份 变更记录.md',
+        refs: 'docs/README.md、变更记录.md',
         skeleton: `# {项目名称} · AGENT 工作入口
 
 > 接手项目先读这里，再读 docs/README.md。只写规则，不写项目宣传。
@@ -257,8 +252,8 @@
       },
       {
         id: 'design-change',
-        pair: null,
-        modes: ['multi', 'slim'],
+        pair: 'change',
+        modes: ['multi'],
         group: 'design',
         path: 'docs/design/变更记录.md',
         title: 'design 变更记录',
@@ -303,12 +298,12 @@
         id: 'design-single',
         pair: 'design',
         modes: ['slim'],
-        group: 'design',
-        path: 'docs/design/design.md',
+        group: 'docs',
+        path: 'docs/design.md',
         title: '页面设计（合并版）',
         purpose: '页面 ≤5 个时，全部页面设计写在同一个文件里',
         when: '写页面前先写；页面变更时同步',
-        refs: 'docs/tasks/tasks.md、docs/spec/spec.md',
+        refs: 'docs/tasks.md、docs/spec.md',
         skeleton: `# 系统设计 · {项目名称}
 
 > 页面 ≤5 个：全部写在本文件；超过 5 个改为 pages/ 一页一份。
@@ -337,8 +332,8 @@
       },
       {
         id: 'tasks-change',
-        pair: null,
-        modes: ['multi', 'slim'],
+        pair: 'change',
+        modes: ['multi'],
         group: 'tasks',
         path: 'docs/tasks/变更记录.md',
         title: 'tasks 变更记录',
@@ -377,12 +372,12 @@
         id: 'tasks-single',
         pair: 'tasks',
         modes: ['slim'],
-        group: 'tasks',
-        path: 'docs/tasks/tasks.md',
+        group: 'docs',
+        path: 'docs/tasks.md',
         title: '任务清单（合并版）',
         purpose: '页面 ≤5 个时，全部任务按页面分节写在同一个文件',
         when: '设计确认后拆；开发中更新状态',
-        refs: 'docs/design/design.md、docs/spec/spec.md',
+        refs: 'docs/design.md、docs/spec.md',
         skeleton: `# 任务清单 · {项目名称}
 
 > 页面 ≤5 个：全部任务写在本文件，按页面分节。
@@ -401,8 +396,8 @@
       },
       {
         id: 'spec-change',
-        pair: null,
-        modes: ['multi', 'slim'],
+        pair: 'change',
+        modes: ['multi'],
         group: 'spec',
         path: 'docs/spec/变更记录.md',
         title: 'spec 变更记录',
@@ -442,12 +437,12 @@
         id: 'spec-single',
         pair: 'spec',
         modes: ['slim'],
-        group: 'spec',
-        path: 'docs/spec/spec.md',
+        group: 'docs',
+        path: 'docs/spec.md',
         title: '规范与验收（合并版）',
         purpose: '页面 ≤5 个时，全部规范与验收按页面分节写在同一个文件',
         when: '设计确定后写；验收前补齐',
-        refs: 'docs/design/design.md、docs/tasks/tasks.md',
+        refs: 'docs/design.md、docs/tasks.md',
         skeleton: `# 规范开发与验收 · {项目名称}
 
 > 页面 ≤5 个：全部写在本文件，按页面分节。
@@ -460,6 +455,28 @@
 #### 验收标准
 #### 自测清单
 ## 4. 验收结论`
+      },
+      {
+        id: 'change-single',
+        pair: 'change',
+        modes: ['slim'],
+        group: 'docs',
+        path: 'docs/变更记录.md',
+        title: '变更记录（统一）',
+        purpose: '页面 ≤5 个时，design / tasks / spec 的变更统一记在这一份',
+        when: '每次动 design.md / tasks.md / spec.md 后追加',
+        refs: 'docs/design.md、docs/tasks.md、docs/spec.md',
+        skeleton: `# 变更记录 · {项目名称}
+
+> 页面 ≤5 个：design / tasks / spec 的变更统一记在本文件，只追加不修改。
+
+## 1. 记录规则
+## 2. 变更记录
+
+| 变更时间 | 修改前 | 修改后 | 变更原因 | 变更文件 |
+| --- | --- | --- | --- | --- |
+
+## 3. 归档`
       },
       {
         id: 'archive',
@@ -505,10 +522,15 @@
       const bad = tokens.filter(token => !allowed.has(token));
       if (bad.length) problems.push(`${item.id} 含非约定占位符：${bad.join('、')}`);
     }
+    const pairs = new Map();
     for (const item of data.items.filter(entry => entry.pair)) {
-      const sibling = data.items.find(entry => entry.id !== item.id && entry.pair === item.pair);
-      if (!sibling) problems.push(`pair ${item.pair} 缺少另一半`);
-      else if (item.modes.join() === sibling.modes.join()) problems.push(`pair ${item.pair} 两半形态相同`);
+      if (!pairs.has(item.pair)) pairs.set(item.pair, []);
+      pairs.get(item.pair).push(item);
+    }
+    for (const [pair, group] of pairs) {
+      for (const mode of Object.keys(data.modes)) {
+        if (!group.some(item => item.modes.includes(mode))) problems.push(`pair ${pair} 缺少 ${mode} 形态`);
+      }
     }
     for (const mode of Object.keys(data.modes)) {
       if (!data.items.some(item => item.modes.includes(mode))) problems.push(`形态 ${mode} 没有任何模板`);

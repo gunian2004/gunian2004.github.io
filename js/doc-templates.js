@@ -43,7 +43,6 @@
 
   const itemsFor = mode => KIT.items.filter(item => item.modes.includes(mode));
   const itemById = id => KIT.items.find(item => item.id === id) || null;
-  const pairOf = item => (item && item.pair ? KIT.items.find(entry => entry.id !== item.id && entry.pair === item.pair) || null : null);
   const bytesOf = text => new Blob([text]).size;
 
   function formatBytes(size) {
@@ -215,9 +214,16 @@
     }
   }
 
+  function renderNaming() {
+    $('dtNamingChange').textContent = state.mode === 'multi'
+      ? 'design / tasks / spec 各一份，只追加不修改'
+      : 'docs/变更记录.md 一份，统一记录三份文档的变更';
+  }
+
   function render() {
     renderMode();
     renderChips();
+    renderNaming();
     renderTree();
     renderNav();
     renderDetail();
@@ -258,8 +264,11 @@
     const visible = itemsFor(mode);
     state.mode = mode;
     if (!visible.some(item => item.id === state.activeId)) {
-      const sibling = pairOf(itemById(state.activeId));
-      state.activeId = sibling && sibling.modes.includes(mode) ? sibling.id : visible[0].id;
+      const current = itemById(state.activeId);
+      const sibling = current && current.pair
+        ? KIT.items.find(entry => entry.id !== current.id && entry.pair === current.pair && entry.modes.includes(mode))
+        : null;
+      state.activeId = sibling ? sibling.id : visible[0].id;
     }
     render();
     saveState();

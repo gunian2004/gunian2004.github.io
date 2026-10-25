@@ -23,6 +23,7 @@
 
 | 日期 | 页面 | 类型 | 一句话说明 |
 | --- | --- | --- | --- |
+| 2026-10-25 | 开发文档模板台 | 修改 | ≤5 页形态改为完全扁平：不建 design/tasks/spec 文件夹，单文件 + 一份变更记录 |
 | 2026-10-25 | 开发文档模板台 | 重构 | 4 层级改为 docs 双形态目录骨架，13 份标题级模板，复制或 ZIP 直给 Agent |
 | 2026-10-24 | 全部页面 | 文档 | 建立 `docs/` 设计文档体系：18 份页面文档 + 变更记录 + `AGENT.md` 协作规范 |
 
@@ -90,6 +91,7 @@
 
 | 日期 | 类型 | 变更内容 | 影响文件 | 同步文档 | 记录人 |
 | --- | --- | --- | --- | --- | --- |
+| 2026-10-25 | 修改 | ≤5 页形态改为扁平结构：不建 design / tasks / spec 三个文件夹，docs 下直接放 design.md、tasks.md、spec.md 和一份 变更记录.md；archive/ 保留；形态位置数改为 >5 13 个、≤5 11 个 | `pages/doc-templates.html`、`js/project-doc-templates.js`、`js/doc-templates.js` | `docs/design/pages/08-doc-templates.md`、`docs/design/README.md` | Agent |
 | 2026-10-25 | 重构 | 4 层级改为 docs 双形态目录骨架：页面 >5 建 pages/、≤5 合并单文件；16 份标题级模板、两个资料输入、整套复制与 ZIP；删除重复表单、Markdown 编辑器与草稿导入导出；样式拆到 `css/doc-templates.css`，存储升到 v2 并迁移 v1 资料 | `pages/doc-templates.html`、`css/doc-templates.css`、`js/project-doc-templates.js`、`js/doc-templates.js` | `docs/design/pages/08-doc-templates.md`、`docs/design/README.md` | Agent |
 | 2026-10-24 | 文档 | 建立文档模板台基线：4 层级 3/5/8/10 份、变量表单、Markdown 编辑器、ZIP 导出、草稿备份；代码未改动 | — | `docs/design/pages/08-doc-templates.md` | Agent |
 
