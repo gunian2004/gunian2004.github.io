@@ -23,6 +23,7 @@
 
 | 日期 | 页面 | 类型 | 一句话说明 |
 | --- | --- | --- | --- |
+| 2026-10-27 | 语义空间 | 修改 | 删除「这间屋子是怎么盖起来的」整块方法说明（四步管线、参数说明、边界与取舍）及其 CSS，页脚上移 |
 | 2026-10-26 | 首页 | 修改 | `#lab` 入口文案同步小屋改版：VECTOR SPACE → CONTENT HOUSE |
 | 2026-10-26 | 语义空间 | 重构 | 三维主体改为「可拆解内容小屋」：5 个结构壳 + 7 个主题展台，拆解不穿模，全站改深色科技底 |
 | 2026-10-25 | 首页 | 修改 | 新增 `#lab`「交互实验」整宽横条入口，指向语义空间页 |
@@ -191,6 +192,7 @@
 
 | 日期 | 类型 | 变更内容 | 影响文件 | 同步文档 | 记录人 |
 | --- | --- | --- | --- | --- | --- |
+| 2026-10-27 | 修改 | 删除「这间屋子是怎么盖起来的」整块方法说明：四步管线（CHUNK / VECTORIZE / BUILD / ASSEMBLE）、参数说明（整屋外形、拆解位移、展台规格、发光规则、材质与光源、性能策略）与「边界与取舍」列表全部移除，对应 `.ss-method` / `.ss-steps` / `.ss-step` / `.ss-spec` / `.ss-limits` 样式与媒体查询一并清理；页脚加 `margin-top: 44px` 补上原先由该方法区块提供的间距。三维小屋、检索与上下文装配不受影响 | `pages/semantic-space.html`、`css/semantic-space.css` | `docs/design/pages/19-semantic-space.md`（区块表、布局、修改须知） | Agent |
 | 2026-10-26 | 重构 | 三维主体从「内容书架」改为「可拆解的内容小屋」：程序化生成基座 / 地板 / 玻璃四壁 / 双坡屋顶 / 烟囱 5 个结构壳，屋内 7 个主题展台各配专属形态（机器人、控制台、蓝图桌、机柜、小工厂、数据塔、货箱）。拆解按层位移，屋顶底面 2.64 始终高于展台顶 2.21，解决原先书本穿模。新增左下常驻部件清单、右侧部件详情（含形态 / 参数 / 所属片段）、参数说明区块；全站改深色科技底，命中按 `0.6 + 归一化分数 × 3.4` 发光。相机取景改解析法（逐真实子包围盒投影），修掉 `D2R` 未定义与联合 AABB 幽灵角导致的取景过远 | `pages/semantic-space.html`、`css/semantic-space.css`、`js/semantic-space.js`、`js/semantic-engine.js` | `docs/design/pages/19-semantic-space.md` | Agent |
 | 2026-10-25 | 新增 | 新建「语义空间」页：41 份语料切成 78 个片段，TF-IDF + SVD 降维到 3 维，Three.js 点云 + 自写轨道相机；12 个预设问题走离线向量、自由输入走 BM25，含上下文预算装配、片段详情、SVG 平面降级与键盘操作。新增离线管线 `script/build-semantic-space.py` 与产物 `data/semantic-space/space.js`，vendor Three.js r149 | `pages/semantic-space.html`、`css/semantic-space.css`、`js/semantic-space.js`、`js/vendor/three/three.min.js`、`data/semantic-space/space.js`、`data/semantic-space/space.json`、`script/build-semantic-space.py`、`index.html` | `docs/design/pages/19-semantic-space.md`、`docs/design/README.md` | Agent |
 

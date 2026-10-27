@@ -1409,188 +1409,10 @@ input { font: inherit; color: inherit; }
 
 .ss-window-note b { color: var(--ss-ink); font-weight: 600; }
 
-/* ---------------- 方法说明 ---------------- */
-
-.ss-method {
-    margin-top: 64px;
-    padding-top: 34px;
-    border-top: 1px solid var(--ss-line);
-}
-
-.ss-method h2 {
-    margin: 0 0 6px;
-    font-size: 22px;
-    letter-spacing: -.02em;
-}
-
-.ss-method > p {
-    margin: 0 0 26px;
-    color: var(--ss-muted);
-    font-size: 13.5px;
-    max-width: 760px;
-}
-
-.ss-steps {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 1px;
-    background: var(--ss-line-soft);
-    border: 1px solid var(--ss-line-soft);
-    border-radius: var(--ss-r-md);
-    overflow: hidden;
-    margin-bottom: 22px;
-}
-
-.ss-step {
-    padding: 18px 18px 20px;
-    background: var(--ss-surface);
-}
-
-.ss-step i {
-    display: block;
-    font-family: var(--ss-mono);
-    font-style: normal;
-    font-size: 10px;
-    letter-spacing: .12em;
-    color: var(--ss-primary);
-    opacity: .8;
-    margin-bottom: 10px;
-}
-
-.ss-step h3 {
-    margin: 0 0 7px;
-    font-size: 13.5px;
-    letter-spacing: -.005em;
-}
-
-.ss-step p {
-    margin: 0;
-    font-size: 12px;
-    line-height: 1.7;
-    color: var(--ss-muted);
-}
-
-.ss-step code {
-    font-family: var(--ss-mono);
-    font-size: 11px;
-    background: rgba(79, 240, 220, .1);
-    color: var(--ss-primary);
-    padding: 1px 4px;
-    border-radius: 3px;
-}
-
-/* 参数说明 */
-.ss-spec {
-    margin-bottom: 22px;
-    padding: 20px 22px;
-    background: var(--ss-surface);
-    border: 1px solid var(--ss-line);
-    border-radius: var(--ss-r-md);
-}
-
-.ss-spec h3 {
-    margin: 0 0 14px;
-    font-family: var(--ss-mono);
-    font-size: 11px;
-    letter-spacing: .14em;
-    color: var(--ss-primary);
-    text-transform: uppercase;
-}
-
-.ss-spec-list {
-    margin: 0;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px 28px;
-}
-
-.ss-spec-list div {
-    display: grid;
-    grid-template-columns: 82px minmax(0, 1fr);
-    gap: 12px;
-    padding-bottom: 11px;
-    border-bottom: 1px dashed var(--ss-line-soft);
-}
-
-.ss-spec-list dt {
-    font-size: 11.5px;
-    font-weight: 600;
-    color: var(--ss-ink);
-}
-
-.ss-spec-list dd {
-    margin: 0;
-    font-size: 12px;
-    line-height: 1.7;
-    color: var(--ss-muted);
-}
-
-.ss-spec-list code {
-    font-family: var(--ss-mono);
-    font-size: 10.5px;
-    background: rgba(79, 240, 220, .1);
-    color: var(--ss-primary);
-    padding: 1px 4px;
-    border-radius: 3px;
-}
-
-.ss-limits {
-    display: grid;
-    grid-template-columns: 132px minmax(0, 1fr);
-    gap: 8px 20px;
-    padding: 20px 22px;
-    background: rgba(11, 20, 32, .55);
-    border: 1px solid var(--ss-line-soft);
-    border-radius: var(--ss-r-md);
-}
-
-.ss-limits h3 {
-    margin: 0;
-    font-size: 12px;
-    font-family: var(--ss-mono);
-    letter-spacing: .1em;
-    color: var(--ss-faint);
-    text-transform: uppercase;
-}
-
-.ss-limits ul {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    display: grid;
-    gap: 9px;
-}
-
-.ss-limits li {
-    font-size: 12.5px;
-    line-height: 1.7;
-    color: #b6c6d4;
-    padding-left: 14px;
-    position: relative;
-}
-
-.ss-limits li::before {
-    content: "—";
-    position: absolute;
-    left: 0;
-    color: var(--ss-faint);
-}
-
-.ss-limits strong { color: var(--ss-ink); }
-
-.ss-limits code {
-    font-family: var(--ss-mono);
-    font-size: 11.5px;
-    background: rgba(79, 240, 220, .1);
-    color: var(--ss-primary);
-    border: 1px solid rgba(79, 240, 220, .18);
-    padding: 1px 5px;
-    border-radius: 3px;
-}
-
 /* ---------------- 页脚 ---------------- */
 
 .ss-foot {
+    margin-top: 44px;
     border-top: 1px solid var(--ss-line-soft);
     padding: 26px 0 46px;
     display: flex;
@@ -1620,7 +1442,6 @@ input { font: inherit; color: inherit; }
     .ss-hero { grid-template-columns: minmax(0, 1fr); gap: 26px; }
     .ss-stats { max-width: 420px; }
     .ss-panel { height: 470px; }
-    .ss-spec-list { grid-template-columns: minmax(0, 1fr); }
 }
 
 @media (max-width: 880px) {
@@ -1688,20 +1509,14 @@ input { font: inherit; color: inherit; }
     .se-label__meta { display: none; }
     .ss-context { padding: 16px; }
     .ss-context-head { flex-direction: column; align-items: flex-start; gap: 12px; }
-    .ss-steps { grid-template-columns: 1fr 1fr; }
     .ss-panel { height: 470px; }
     .ss-slot { grid-template-columns: 16px minmax(0, 1fr) 44px; }
-    .ss-spec { padding: 16px; }
-    .ss-spec-list div { grid-template-columns: 72px minmax(0, 1fr); gap: 9px; }
-    .ss-limits { grid-template-columns: minmax(0, 1fr); }
     .ss-foot { flex-direction: column; }
 }
 
 @media (max-width: 420px) {
-    .ss-steps { grid-template-columns: minmax(0, 1fr); }
     .ss-dock { left: 8px; right: 8px; transform: none; justify-content: space-between; }
     .ss-dock-btn { padding: 8px 8px; }
-    .ss-spec-list div { grid-template-columns: minmax(0, 1fr); gap: 2px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
