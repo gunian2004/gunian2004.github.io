@@ -23,6 +23,8 @@
 
 | 日期 | 页面 | 类型 | 一句话说明 |
 | --- | --- | --- | --- |
+| 2026-10-26 | 首页 | 修改 | `#lab` 入口文案同步小屋改版：VECTOR SPACE → CONTENT HOUSE |
+| 2026-10-26 | 语义空间 | 重构 | 三维主体改为「可拆解内容小屋」：5 个结构壳 + 7 个主题展台，拆解不穿模，全站改深色科技底 |
 | 2026-10-25 | 首页 | 修改 | 新增 `#lab`「交互实验」整宽横条入口，指向语义空间页 |
 | 2026-10-25 | 语义空间 | 新增 | 新建 Three.js 向量检索页：78 个片段的 3D 点云、双模式召回、上下文装配与 2D 降级 |
 | 2026-10-25 | 问题排查库 | 修改 | 改为纯只读：删除记录 / 编辑 / 删除 / 导入导出，条目全部写死在 JS，仅保留收藏 |
@@ -38,6 +40,7 @@
 
 | 日期 | 类型 | 变更内容 | 影响文件 | 同步文档 | 记录人 |
 | --- | --- | --- | --- | --- | --- |
+| 2026-10-26 | 修改 | `#lab` 入口文案同步小屋改版：眉题 `VECTOR SPACE` → `CONTENT HOUSE`，标题改为「78 段笔记，装进一间可以拆开的房子」，说明改为 7 个主题展台与拆解；`aria-label` 与 `.lab-entry` 行为不变 | `index.html` | `docs/design/pages/01-home.md` | Agent |
 | 2026-10-25 | 修改 | 在 `#practice` 与 `#experience` 之间新增 `#lab` 交互实验区块：整宽横条卡（眉题 / 标题 / 说明 / 3 个技术标签 / 「走进去」按钮），入口指向 `pages/semantic-space.html`；窄屏折为单列 | `index.html`、`css/blog.css` | `docs/design/pages/01-home.md` | Agent |
 | 2026-10-24 | 文档 | 建立首页文档基线：整理 10 个区块、双栏/两列布局、纸感配色、16 类组件与按钮入口；代码未改动 | — | `docs/design/pages/01-home.md` | Agent |
 
@@ -188,6 +191,7 @@
 
 | 日期 | 类型 | 变更内容 | 影响文件 | 同步文档 | 记录人 |
 | --- | --- | --- | --- | --- | --- |
+| 2026-10-26 | 重构 | 三维主体从「内容书架」改为「可拆解的内容小屋」：程序化生成基座 / 地板 / 玻璃四壁 / 双坡屋顶 / 烟囱 5 个结构壳，屋内 7 个主题展台各配专属形态（机器人、控制台、蓝图桌、机柜、小工厂、数据塔、货箱）。拆解按层位移，屋顶底面 2.64 始终高于展台顶 2.21，解决原先书本穿模。新增左下常驻部件清单、右侧部件详情（含形态 / 参数 / 所属片段）、参数说明区块；全站改深色科技底，命中按 `0.6 + 归一化分数 × 3.4` 发光。相机取景改解析法（逐真实子包围盒投影），修掉 `D2R` 未定义与联合 AABB 幽灵角导致的取景过远 | `pages/semantic-space.html`、`css/semantic-space.css`、`js/semantic-space.js`、`js/semantic-engine.js` | `docs/design/pages/19-semantic-space.md` | Agent |
 | 2026-10-25 | 新增 | 新建「语义空间」页：41 份语料切成 78 个片段，TF-IDF + SVD 降维到 3 维，Three.js 点云 + 自写轨道相机；12 个预设问题走离线向量、自由输入走 BM25，含上下文预算装配、片段详情、SVG 平面降级与键盘操作。新增离线管线 `script/build-semantic-space.py` 与产物 `data/semantic-space/space.js`，vendor Three.js r149 | `pages/semantic-space.html`、`css/semantic-space.css`、`js/semantic-space.js`、`js/vendor/three/three.min.js`、`data/semantic-space/space.js`、`data/semantic-space/space.json`、`script/build-semantic-space.py`、`index.html` | `docs/design/pages/19-semantic-space.md`、`docs/design/README.md` | Agent |
 
 ---

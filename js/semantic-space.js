@@ -1,5 +1,5 @@
 /* ============================================================
-   内容书架 / semantic-space.js
+   内容小屋 / semantic-space.js
    职责：数据索引、分词与 BM25、召回、右侧面板、上下文装配
    三维部分在 semantic-engine.js，通过回调与这里通信
    ============================================================ */
@@ -13,13 +13,13 @@
     };
 
     var COLORS = {
-        prompts: '#315ce8',
-        rules: '#2b7d78',
-        design: '#8a6a2f',
-        agent: '#6b4a86',
-        automation: '#6f7f2a',
-        product: '#4a6472',
-        project: '#a8472f'
+        prompts: '#4f7ef0',
+        rules: '#35b3a6',
+        design: '#c39a52',
+        agent: '#9a7ec0',
+        automation: '#9dae4e',
+        product: '#6f92a6',
+        project: '#d1745a'
     };
 
     var ANCHORS = {
@@ -30,19 +30,6 @@
         automation: '../pages/AI.html#automation',
         product: '../pages/AI.html#product',
         project: '../index.html#projects'
-    };
-
-    var PART_META = {
-        shelf: {
-            name: '书架',
-            desc: '承托七本书的木质书架。侧板和背板把书固定成一排，前缘铭牌上刻着这排书总的范围。',
-            specs: [['尺寸', '2.5 × 0.86'], ['层数', '1 排 7 本'], ['材质', '深色 hardwood + 金属包边']]
-        },
-        rail: {
-            name: '顶横梁',
-            desc: '压在书架顶部的横梁，底面 78 道刻度对应 78 个片段——它不参与装载，只负责把「一共有多少段」摊开给你看。',
-            specs: [['刻度', '78 道'], ['长度', '2.5'], ['含义', '1 刻度 = 1 个片段']]
-        }
     };
 
     var TOKEN_RATIO = 1.6;   // 1 token ≈ 1.6 汉字，仅作估算
@@ -63,6 +50,7 @@
     var DOC_BY_ID = {};
     var CAT_LABEL = {};
     var engine = null;
+    var PART_INDEX = {};     // key -> 引擎部件（含 desc / specs / form / stat）
 
     /* ---------------- 启动 ---------------- */
 
@@ -116,13 +104,13 @@
         });
     }
 
-    /* ---------------- 三维书架 ---------------- */
+    /* ---------------- 三维小屋 ---------------- */
 
     function initEngine() {
         var stage = $('#ssStage');
         var canvas = $('#ssCanvas');
         if (!window.SSEngine) {
-            fallback('三维书架没有加载，下面是同一份数据的结构剖面。');
+            fallback('三维场景没有加载，下面是同一份数据的结构剖面。');
             return;
         }
         engine = window.SSEngine.create({
@@ -145,7 +133,12 @@
             fallback('当前环境不支持 WebGL，下面是同一份数据的结构剖面。');
             return;
         }
+
+        PART_INDEX = {};
+        engine.parts.forEach(function (p) { PART_INDEX[p.key] = p; });
+
         $('#ssLoading').hidden = true;
+        renderInventory();
     }
 
     function fallback(message) {
@@ -168,20 +161,84 @@
             var w = 150 + 300 * Math.sqrt(p.n / maxN);
             var y = 20 + i * 46;
             return '<g transform="translate(' + (300 - w / 2) + ',' + y + ')">' +
-                '<rect width="' + w + '" height="30" rx="7" fill="#161d29" stroke="' + COLORS[p.key] + '" stroke-width="1.4"/>' +
+                '<rect width="' + w + '" height="30" rx="7" fill="#101b24" stroke="' + COLORS[p.key] + '" stroke-width="1.4"/>' +
                 '<rect x="10" y="12" width="' + Math.min(52, w - 20) + '" height="4" rx="2" fill="' + COLORS[p.key] + '" opacity=".9"/>' +
-                '<text x="' + (w - 10) + '" y="20" text-anchor="end" font-family="Consolas, monospace" font-size="11" fill="#e8eef6">' +
+                '<text x="' + (w - 10) + '" y="20" text-anchor="end" font-family="Consolas, monospace" font-size="11" fill="#dbe8f2">' +
                 p.label + ' · ' + p.n + '</text></g>';
         }).join('');
 
-        box.innerHTML = '<svg viewBox="0 0 600 360" role="img" aria-label="7 本书的结构剖面">' +
-            '<text x="300" y="12" text-anchor="middle" font-family="Consolas, monospace" font-size="10" fill="#8f979f">STRUCTURE SECTION</text>' +
+        box.innerHTML = '<svg viewBox="0 0 600 360" role="img" aria-label="7 个主题展台的片段分布">' +
+            '<text x="300" y="12" text-anchor="middle" font-family="Consolas, monospace" font-size="10" fill="#7c93a5">STRUCTURE SECTION</text>' +
             rows + '</svg>' +
             '<p class="ss-fallback-note">' + message + '</p>';
         stage.appendChild(box);
     }
 
-    /* ---------------- 分词 / BM25 ---------------- */
+    /* ---------------- 部件清单（左下常驻面板） ---------------- */
+
+    function renderInventory() {
+        var host = $('#ssInv');
+        if (!host || !engine) return;
+        host.innerHTML = '';
+
+        var shells = engine.parts.filter(function (p) { return p.kind === 'shell'; });
+        var cores = engine.parts.filter(function (p) { return p.kind === 'core'; });
+
+        function group(title, list, tag) {
+            var box = document.createElement('div');
+            box.className = 'ss-inv__group';
+            var h = document.createElement('p');
+            h.className = 'ss-inv__title';
+            h.textContent = title;
+            box.appendChild(h);
+
+            list.forEach(function (p) {
+                var b = document.createElement('button');
+                b.type = 'button';
+                b.className = 'ss-inv__item';
+                b.dataset.part = p.key;
+                b.style.setProperty('--acc', p.color);
+
+                var i = document.createElement('i');
+                i.className = 'ss-inv__dot';
+                var n = document.createElement('b');
+                n.className = 'ss-inv__name';
+                n.textContent = p.name;
+                var e = document.createElement('em');
+                e.className = 'ss-inv__meta';
+                e.textContent = p.kind === 'core'
+                    ? (p.form + ' · ' + p.stat.count + ' 段')
+                    : (p.specs[0] ? p.specs[0][1] : '');
+
+                b.appendChild(i);
+                b.appendChild(n);
+                b.appendChild(e);
+                b.addEventListener('click', function () { selectPartFromList(p.key); });
+                box.appendChild(b);
+            });
+            void tag;
+            host.appendChild(box);
+        }
+
+        group('结构壳 / SHELL', shells, 'S');
+        group('主题展台 / TOPIC', cores, 'T');
+        syncInventory();
+    }
+
+    function syncInventory() {
+        $$('.ss-inv__item').forEach(function (b) {
+            var on = b.dataset.part === state.selectedPart;
+            b.classList.toggle('is-on', on);
+            b.setAttribute('aria-pressed', String(on));
+        });
+    }
+
+    function selectPartFromList(key) {
+        if (!engine) return;
+        engine.focusPart(key);
+        showPart(key);
+    }
+
 
     var CJK = /[\u4e00-\u9fff]+/g;
     var ASCIIW = /[a-z0-9][a-z0-9+#._-]*/g;
@@ -374,16 +431,10 @@
     }
 
     function showPart(key) {
-        var part = null;
-        if (engine) {
-            part = engine.parts.filter(function (p) { return p.key === key; })[0];
-        }
-
-        var isPlate = !!CAT_LABEL[key];
-        var meta = PART_META[key] || null;
-        var label = isPlate ? CAT_LABEL[key] : (meta ? meta.name : key);
+        var part = PART_INDEX[key] || null;
+        var isCore = !!(part && part.kind === 'core');
+        var label = part ? part.name : (CAT_LABEL[key] || key);
         var items = CHUNKS.filter(function (c) { return c.c === key; });
-        var chars = items.reduce(function (sum, c) { return sum + (c.x || '').length; }, 0);
         var hits = state.hits.filter(function (h) {
             var c = CHUNK_BY_ID[h.i];
             return c && c.c === key;
@@ -393,12 +444,21 @@
         state.selectedPart = key;
         state.selectedChunk = null;
 
+        var badge = part ? part.badge : '—';
         $('#ssPartIndex').style.color = COLORS[key] || 'var(--ss-muted)';
         $('#ssPartIndex').querySelector('span').textContent =
-            'PART ' + String((part ? part.index : 0) + 1).padStart(2, '0') + (isPlate ? '' : ' · 书架部件');
-        $('#ssPartName').textContent = label;
+            badge + ' · ' + (isCore ? '主题展台' : '结构壳');
+
+        var name = $('#ssPartName');
+        name.textContent = label;
+        var formEl = $('#ssPartForm');
+        if (formEl) {
+            formEl.hidden = !isCore;
+            formEl.textContent = isCore ? part.form : '';
+        }
+
         var link = $('#ssPartLink');
-        link.hidden = !isPlate;
+        link.hidden = !isCore;
         link.href = ANCHORS[key] || '../pages/AI.html';
 
         var kv = $('#ssPartKv');
@@ -408,22 +468,27 @@
         var list = $('#ssPartChunks');
         list.innerHTML = '';
 
-        if (isPlate) {
-            desc.hidden = true;
+        desc.hidden = false;
+        desc.textContent = part ? part.desc : '这个部件没有挂内容片段。';
+
+        (part ? part.specs : []).forEach(function (row) {
+            kv.appendChild(kvRow(row[0], row[1]));
+        });
+        if (isCore) {
+            kv.appendChild(kvRow('本次命中', hits.length ? hits.length + ' 段' : '未命中'));
+        }
+
+        if (isCore) {
             sub.hidden = false;
             list.hidden = false;
-            kv.appendChild(kvRow('片段数', items.length + ' 段'));
-            kv.appendChild(kvRow('总字数', chars.toLocaleString('en-US') + ' 字'));
-            kv.appendChild(kvRow('平均长度', items.length ? Math.round(chars / items.length) + ' 字' : '—'));
-            kv.appendChild(kvRow('本次命中', hits.length ? hits.length + ' 段' : '未命中'));
-
-            sub.textContent = '这本书里的片段';
-            items.slice(0, 8).forEach(function (c) {
+            sub.textContent = '这个展台背着的 ' + items.length + ' 段片段（点一条在屋里定位）';
+            items.slice(0, 10).forEach(function (c) {
                 var li = document.createElement('li');
                 var b = document.createElement('b');
                 b.textContent = '#' + String(c.i + 1).padStart(2, '0');
                 var span = document.createElement('span');
                 span.textContent = c.t || '（无标题）';
+                if (state.hitMap[c.i]) li.classList.add('is-hit');
                 li.appendChild(b);
                 li.appendChild(span);
                 li.addEventListener('click', function () {
@@ -433,18 +498,14 @@
                 list.appendChild(li);
             });
         } else {
-            desc.hidden = false;
-            desc.textContent = meta ? meta.desc : '这个部件没有挂内容片段。';
             sub.hidden = true;
             list.hidden = true;
-            (meta ? meta.specs : []).forEach(function (row) {
-                kv.appendChild(kvRow(row[0], row[1]));
-            });
         }
 
         v.results.hidden = true;
         v.detail.hidden = true;
         v.part.hidden = false;
+        syncInventory();
         syncStatus();
     }
 
@@ -692,18 +753,20 @@
         }
         if (state.selectedPart) {
             el.classList.add('is-sel');
-            var isPlate = !!CAT_LABEL[state.selectedPart];
-            var name = isPlate ? CAT_LABEL[state.selectedPart] : (PART_META[state.selectedPart] || {}).name;
-            if (isPlate) {
-                var items = CHUNKS.filter(function (x) { return x.c === state.selectedPart; });
+            var part = PART_INDEX[state.selectedPart];
+            var name = part ? part.name : state.selectedPart;
+            if (part && part.kind === 'core') {
                 var hits = state.hits.filter(function (h) {
                     var x = CHUNK_BY_ID[h.i];
                     return x && x.c === state.selectedPart;
                 });
-                el.innerHTML = '选中：<b>' + name + '</b> · <b>' + items.length +
-                    '</b> 段 · 本次命中 <b>' + hits.length + '</b> 段';
+                el.innerHTML = '选中：<b>' + name + '</b> · ' + part.form +
+                    ' · <b>' + part.stat.count + '</b> 段 · 本次命中 <b>' + hits.length + '</b> 段';
+            } else if (part) {
+                el.innerHTML = '选中：<b>' + name + '</b> · 结构壳 · ' +
+                    (part.specs[0] ? part.specs[0][1] : '');
             } else {
-                el.innerHTML = '选中：<b>' + name + '</b> · 书架部件（不挂内容）';
+                el.innerHTML = '选中：<b>' + name + '</b>';
             }
             return;
         }
@@ -716,12 +779,12 @@
             });
             var k = Object.keys(cats).length;
             el.innerHTML = '命中 <b>' + state.hits.length + '</b> 段 · 分布在 <b>' + k +
-                '</b> 本书 · 点亮处看详情';
+                '</b> 个展台 · 亮起的灯条就是它们';
             return;
         }
         el.textContent = exploded
-            ? '已散开 · 点击书本看详情，或下面提问看谁亮'
-            : '点击任意一本书翻开看内容';
+            ? '已拆开 · 点任意部件看详情，或下面提问看谁亮'
+            : '点一下房子，整间屋会拆开';
     }
 
     function maybeShowGuide() {
@@ -815,7 +878,7 @@
         function syncExplode() {
             var on = engine ? engine.state.explodeTarget > 0.5 : false;
             explode.setAttribute('aria-pressed', String(on));
-            $('#ssExplodeTxt').textContent = on ? '合上书架' : '翻开书架';
+            $('#ssExplodeTxt').textContent = on ? '合上房子' : '拆开房子';
         }
 
         if (explode) {

@@ -1,8 +1,11 @@
 /* ============================================================
-   语义空间 · 内容引擎 / semantic-engine.js
-   一台可拆解的拟物装置：基座 → 导柱 → 7 块内容层板 → 索引环 → 顶盖
+   小屋 · 可拆解的内容馆 / semantic-engine.js
+   一台程序化生成的“小房子”：
+     基座 → 地板 → 玻璃四壁 → 双坡屋顶 → 烟囱（结构壳 shell）
+     房里 7 个主题展台（机器人 / 控制台 / 蓝图桌 / 机柜 / 小工厂 / 数据塔 / 货箱）
+   点开任意部件 → 结构壳向外摊开、展台升到屋顶之上，互不穿插
    依赖：window.THREE（本地 r149 UMD，不用 addons）
-   约束：file:// 直开、无外部模型 / 贴图，几何与材质全部程序化生成
+   约束：file:// 直开、无外部模型 / 贴图，几何与材质全部代码生成
    ============================================================ */
 (function (global) {
     'use strict';
@@ -16,12 +19,32 @@
     // r149 默认 legacy 色彩管理：关掉它，主题色才不会被 sRGB 输出洗成粉彩
     if (THREE.ColorManagement) THREE.ColorManagement.legacyMode = false;
 
+    /* ---------------- 房子骨架尺寸（单位：世界单位，约等于米） ---------------- */
+
+    var HX = 1.62;              // 墙体中线半宽（X）
+    var HZ = 1.42;              // 墙体中线半深（Z）
+    var T = 0.10;               // 墙厚
+    var FLOOR_TOP = 0.12;       // 室内地平面
+    var WALL_H = 1.02;          // 墙高（含玻璃）
+    var EAVE_Y = FLOOR_TOP + WALL_H;   // 檐口 1.14
+    var RIDGE_Y = EAVE_Y + 0.62;       // 屋脊 1.76
+    var ROOF_HALF = HX + T;            // 屋面半跨 1.72
+
+    /* ---------------- 拆解布局：全部按“层”与“环”算好，保证不互相穿插 ---------------- */
+
+    var RING_R = 0.78;          // 未拆解时 7 个展台所在环半径
+    var RING_SCALE = 1.86;      // 拆解后环放大倍数
+    var RING_Y = 1.40;          // 拆解后展台抬升到的平面（高于墙顶 1.14）
+    var BASE_DY = -0.46;        // 基座下沉
+    var FLOOR_DY = 0.02;
+    var WALLS_DY = 0.16;
+    var WALLS_OUT = 1.18;       // 四壁水平外摊距离
+    var ROOF_DY = 1.74;         // 屋顶整体抬升（檐口 2.88 > 展台顶 ~2.3）
+    var CHIM_DY = 1.96;
+
     var D2R = Math.PI / 180;
-    var PLATE_GAP = 0.045;
-    var EXPLODE_STEP = 0.22;
 
     function clamp(v, a, b) { return v < a ? a : (v > b ? b : v); }
-    function lerp(a, b, t) { return a + (b - a) * t; }
 
     /* ---------------- 几何工具 ---------------- */
 
@@ -41,15 +64,16 @@
         return s;
     }
 
-    function slab(w, d, h, r, bevel) {
-        var bev = bevel === undefined ? 0.008 : bevel;
+    // 水平薄板：宽 w（X）、深 d（Z）、高 h（Y），圆角 r
+    function slabGeo(w, d, h, r, bevel) {
+        var bev = bevel === undefined ? 0.006 : bevel;
         var geo = new THREE.ExtrudeGeometry(roundedRectShape(w, d, r), {
             depth: Math.max(0.001, h - bev * 2),
             bevelEnabled: bev > 0,
             bevelThickness: bev,
             bevelSize: bev * 0.9,
-            bevelSegments: 2,
-            curveSegments: 10
+            bevelSegments: 1,
+            curveSegments: 6
         });
         geo.rotateX(-Math.PI / 2);
         geo.translate(0, -(h - bev * 2) / 2, 0);
@@ -57,37 +81,66 @@
         return geo;
     }
 
-    function ngonShape(r, sides) {
-        var s = new THREE.Shape();
-        for (var i = 0; i <= sides; i++) {
-            var a = (i / sides) * Math.PI * 2;
-            var x = Math.cos(a) * r, y = Math.sin(a) * r;
-            if (i === 0) s.moveTo(x, y); else s.lineTo(x, y);
+    // 带齿的齿轮：半径 r、厚 t、齿数 n，面朝 +Z
+    function gearGeo(r, t, n) {
+        var shape = new THREE.Shape();
+        var steps = n * 4;
+        for (var i = 0; i < steps; i++) {
+            var a = (i / steps) * Math.PI * 2;
+            var rr = (i % 4 < 2) ? r : r * 0.78;
+            var x = Math.cos(a) * rr, y = Math.sin(a) * rr;
+            if (i === 0) shape.moveTo(x, y); else shape.lineTo(x, y);
         }
-        return s;
+        shape.closePath();
+        var geo = new THREE.ExtrudeGeometry(shape, { depth: t, bevelEnabled: false, curveSegments: 1 });
+        geo.translate(0, 0, -t / 2);
+        return geo;
     }
 
-    /* ---------------- 程序化环境贴图 ---------------- */
+    function lineLoop(points, color, opacity, width) {
+        var geo = new THREE.BufferGeometry().setFromPoints(points);
+        var mat = new THREE.LineBasicMaterial({
+            color: new THREE.Color(color),
+            transparent: true,
+            opacity: opacity === undefined ? 0.5 : opacity
+        });
+        var l = new THREE.Line(geo, mat);
+        if (width && l.material.linewidth !== undefined) l.material.linewidth = width;
+        return l;
+    }
+
+    function lineSegs(pts, color, opacity) {
+        var geo = new THREE.BufferGeometry().setFromPoints(pts);
+        var mat = new THREE.LineBasicMaterial({
+            color: new THREE.Color(color),
+            transparent: true,
+            opacity: opacity === undefined ? 0.35 : opacity
+        });
+        return new THREE.LineSegments(geo, mat);
+    }
+
+    /* ---------------- 程序化纹理 ---------------- */
 
     function envTexture() {
         var c = document.createElement('canvas');
         c.width = 512; c.height = 256;
         var g = c.getContext('2d');
 
+        // 深色环境：上半冷光，下半近黑，金属才不脏
         var grd = g.createLinearGradient(0, 0, 0, 256);
-        grd.addColorStop(0.00, '#f6f8fb');
-        grd.addColorStop(0.26, '#cdd6e2');
-        grd.addColorStop(0.48, '#8b97a7');
-        grd.addColorStop(0.66, '#4b5563');
-        grd.addColorStop(1.00, '#0e131a');
+        grd.addColorStop(0.00, '#2c3d52');
+        grd.addColorStop(0.26, '#18242f');
+        grd.addColorStop(0.52, '#0d151d');
+        grd.addColorStop(0.74, '#070b10');
+        grd.addColorStop(1.00, '#030507');
         g.fillStyle = grd;
         g.fillRect(0, 0, 512, 256);
 
-        // 两处柔光灯箱，给金属一条像样的高光
-        [[150, 74, 120], [386, 96, 90]].forEach(function (b) {
+        // 两块灯箱：给金属一条像样的高光
+        [[132, 60, 116, 'rgba(180,235,255,.85)'], [392, 88, 84, 'rgba(255,236,204,.62)']].forEach(function (b) {
             var hot = g.createRadialGradient(b[0], b[1], 0, b[0], b[1], b[2]);
-            hot.addColorStop(0, 'rgba(255,255,255,.95)');
-            hot.addColorStop(0.45, 'rgba(255,255,255,.35)');
+            hot.addColorStop(0, b[3]);
+            hot.addColorStop(0.42, 'rgba(255,255,255,.14)');
             hot.addColorStop(1, 'rgba(255,255,255,0)');
             g.fillStyle = hot;
             g.fillRect(b[0] - b[2], b[1] - b[2], b[2] * 2, b[2] * 2);
@@ -105,86 +158,67 @@
         var g = c.getContext('2d');
         var grd = g.createRadialGradient(64, 64, 0, 64, 64, 64);
         grd.addColorStop(0.00, 'rgba(255,255,255,1)');
-        grd.addColorStop(0.35, 'rgba(255,255,255,.55)');
-        grd.addColorStop(1.00, 'rgba(255,255,255,0)');
+        grd.addColorStop(0.32, 'rgba(255,255,255,.5)');
+    grd.addColorStop(1.00, 'rgba(255,255,255,0)');
         g.fillStyle = grd;
         g.fillRect(0, 0, 128, 128);
         return new THREE.CanvasTexture(c);
     }
 
-    function shadowTexture() {
+    function contactTexture() {
         var c = document.createElement('canvas');
         c.width = c.height = 256;
         var g = c.getContext('2d');
-        var grd = g.createRadialGradient(128, 128, 10, 128, 128, 126);
-        grd.addColorStop(0.00, 'rgba(23,36,51,.42)');
-        grd.addColorStop(0.45, 'rgba(23,36,51,.18)');
-        grd.addColorStop(1.00, 'rgba(23,36,51,0)');
+        var grd = g.createRadialGradient(128, 128, 8, 128, 128, 126);
+        grd.addColorStop(0.00, 'rgba(0,0,0,.62)');
+        grd.addColorStop(0.44, 'rgba(0,0,0,.26)');
+        grd.addColorStop(1.00, 'rgba(0,0,0,0)');
         g.fillStyle = grd;
         g.fillRect(0, 0, 256, 256);
         return new THREE.CanvasTexture(c);
     }
 
-    /* ---------------- 晶格布局 ---------------- */
+    /* ============================================================
+       部件文案：结构壳 + 七个主题展台
+       ============================================================ */
 
-    // 把某主题的片段按 SVD 前两维投到板面，再做最小间距松弛
-    function layoutCells(members, w, d) {
-        var pad = 0.085;
-        var hw = Math.max(0.05, w / 2 - pad);
-        var hd = Math.max(0.05, d / 2 - pad);
-
-        var pts = members.map(function (c) {
-            return { i: c.i, c: c, ux: c.p ? c.p[0] : 0, uz: c.p ? c.p[2] : 0, x: 0, z: 0 };
-        });
-
-        var minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
-        pts.forEach(function (p) {
-            if (p.ux < minX) minX = p.ux;
-            if (p.ux > maxX) maxX = p.ux;
-            if (p.uz < minZ) minZ = p.uz;
-            if (p.uz > maxZ) maxZ = p.uz;
-        });
-        var spanX = Math.max(1e-4, maxX - minX);
-        var spanZ = Math.max(1e-4, maxZ - minZ);
-
-        pts.forEach(function (p) {
-            var nx = (p.ux - minX) / spanX * 2 - 1;
-            var nz = (p.uz - minZ) / spanZ * 2 - 1;
-            p.x = clamp(nx * hw * 0.86, -hw, hw);
-            p.z = clamp(-nz * hd * 0.86, -hd, hd);
-        });
-
-        // 松弛：把过近的点推开，避免晶格叠在一起
-        var minDist = 0.096;
-        var iters = pts.length > 1 ? 60 : 0;
-        for (var k = 0; k < iters; k++) {
-            for (var a = 0; a < pts.length; a++) {
-                for (var b = a + 1; b < pts.length; b++) {
-                    var dx = pts[b].x - pts[a].x;
-                    var dz = pts[b].z - pts[a].z;
-                    var dist = Math.sqrt(dx * dx + dz * dz) || 1e-4;
-                    if (dist < minDist) {
-                        var push = (minDist - dist) * 0.5;
-                        var ux = dx / dist, uz = dz / dist;
-                        pts[a].x -= ux * push; pts[a].z -= uz * push;
-                        pts[b].x += ux * push; pts[b].z += uz * push;
-                    }
-                }
-            }
-            pts.forEach(function (p) {
-                p.x = clamp(p.x, -hw, hw);
-                p.z = clamp(p.z, -hd, hd);
-            });
+    var SHELL_META = {
+        base: {
+            name: '基座',
+            desc: '整间屋子的承重台。前缘铭牌刻着这一批数据的范围，四角螺栓把它固定在地面上——拆开后它会最先下沉，给上面所有层让出高度。',
+            specs: [['外形尺寸', '3.74 × 3.34'], ['台体厚度', '0.24'], ['材质', '深色金属 + 磨砂面板'], ['承载', '11 个部件']]
+        },
+        floor: {
+            name: '地板',
+            desc: '室内地平面。上面铺了 16 × 14 的刻度网格，7 个主题展台就摆在这张网格上；语义空间中靠得近的片段，在屋里也摆得近。',
+            specs: [['平面尺寸', '3.28 × 2.88'], ['刻度网格', '16 × 14'], ['台面高度', '0.12'], ['功能', '展台定位基准']]
+        },
+        walls: {
+            name: '四壁',
+            desc: '四面玻璃幕墙，只保留 0.30 高的实心墙裙和顶部发光压梁。做成半透明是刻意的：屋里装的是内容，墙不该挡住它。正面留了门洞。',
+            specs: [['墙面数', '4'], ['墙高', '1.02（玻璃 0.66）'], ['墙裙', '0.30 实心'], ['门洞', '0.78 × 0.72']]
+        },
+        roof: {
+            name: '屋顶',
+            desc: '双坡屋顶，坡角 19.8°，两片玻璃屋面加屋脊压条。拆解时两片屋面像翻盖一样向上掀开并轻微外张——这是整个动画里最容易被看懂的一步。',
+            specs: [['形式', '双坡 / Gable'], ['坡度', '19.8°'], ['檐口标高', '1.14'], ['屋脊标高', '1.76']]
+        },
+        chimney: {
+            name: '烟囱',
+            desc: '屋面上唯一的实体凸起，顶端有一圈发光环。它单独作为一个部件，是因为它能最直观地说明「拆解后每个零件都还认得出来」。',
+            specs: [['高度', '0.60'], ['截面', '0.24 × 0.24'], ['顶部', '发光环 + 通风缝'], ['位置', '+X / -Z 坡面']]
         }
+    };
 
-        // 单个 / 双个片段时不要挤在角落
-        if (pts.length === 1) { pts[0].x = 0; pts[0].z = 0; }
-        if (pts.length === 2) {
-            pts[0].z = -hd * 0.45; pts[1].z = hd * 0.45;
-            pts[0].x = pts[1].x = 0;
-        }
-        return pts;
-    }
+    var TOPIC_FORM = {
+        prompts: { form: '控制台', desc: '一张斜面操作台，屏幕上三条亮线代表提示词的三段结构。提示词是最“手动”的一类知识，所以做成需要人坐下来的工作台。' },
+        rules: { form: '机器人', desc: '房里的主角。机器人代表代理规则——它执行、它守边界，天线和目镜就是它的状态灯：规则越多，灯越密。' },
+        design: { form: '蓝图桌', desc: '一块斜立图板，板上是发光的结构线框。软件设计只有 2 段，所以这块板做得很薄，不假装内容很多。' },
+        agent: { form: '机柜', desc: '一台服务器机柜，正面 6 道插槽灯。智能体开发在这一版语料里只有 2 段，机柜高度按真实片段数收缩。' },
+        automation: { form: '小工厂', desc: '一条带齿轮的传送带，是屋里唯一的机械装置。它转起来的时候，正好对应「把重复流程交给机器」这句话。' },
+        product: { form: '数据塔', desc: '五根荧光柱加一条趋势线，代表产品分析里的对比与排序。它的高度由片段数决定，不按重要程度排。' },
+        project: { form: '货箱', desc: '三只堆叠货箱，代表已经交付的项目案例。箱子是完整的、封口的——项目实践讲的是结果，不是过程。' }
+    };
 
     /* ============================================================
        引擎
@@ -196,7 +230,6 @@
         var labelLayer = opts.labelLayer;
         var data = opts.data || {};
         var colors = opts.colors || {};
-        var labelsCN = opts.labels || {};
 
         var onSelectPart = opts.onSelectPart || function () {};
         var onSelectChunk = opts.onSelectChunk || function () {};
@@ -221,12 +254,11 @@
         renderer.setClearAlpha(0);
         renderer.outputEncoding = THREE.sRGBEncoding;
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        renderer.toneMappingExposure = 1.02;
+        renderer.toneMappingExposure = 1.16;
 
         var scene = new THREE.Scene();
 
         var camera = new THREE.PerspectiveCamera(34, 1, 0.1, 200);
-        camera.position.set(3.4, 2.8, 4.2);
 
         var pmrem = new THREE.PMREMGenerator(renderer);
         var envTex = envTexture();
@@ -235,19 +267,27 @@
         envTex.dispose();
         pmrem.dispose();
 
-        scene.add(new THREE.HemisphereLight(0xffffff, 0x4b5563, 0.32));
+        scene.add(new THREE.HemisphereLight(0x9fd8ff, 0x0a1016, 0.42));
 
-        var keyLight = new THREE.DirectionalLight(0xffffff, 1.55);
-        keyLight.position.set(4.2, 6.4, 4.8);
+        var keyLight = new THREE.DirectionalLight(0xdcefff, 1.35);
+        keyLight.position.set(4.4, 6.6, 4.2);
         scene.add(keyLight);
 
-        var fillLight = new THREE.DirectionalLight(0xdfe9f6, 0.55);
-        fillLight.position.set(-4.6, 2.6, 2.2);
+        var fillLight = new THREE.DirectionalLight(0x8fb6e0, 0.5);
+        fillLight.position.set(-5.0, 2.4, 2.0);
         scene.add(fillLight);
 
-        var rimLight = new THREE.DirectionalLight(0xffffff, 1.25);
-        rimLight.position.set(-1.4, 3.0, -5.2);
+        var rimLight = new THREE.DirectionalLight(0x6ff2dd, 0.9);
+        rimLight.position.set(-1.2, 3.2, -5.4);
         scene.add(rimLight);
+
+        // 屋里两盏灯：让玻璃房里真的有光
+        var inWarm = new THREE.PointLight(0xffd7a3, 0.85, 4.6, 2);
+        inWarm.position.set(-0.5, 0.78, 0.42);
+        scene.add(inWarm);
+        var inCool = new THREE.PointLight(0x59e8ff, 0.6, 4.2, 2);
+        inCool.position.set(0.62, 0.66, -0.5);
+        scene.add(inCool);
 
         var root = new THREE.Group();
         scene.add(root);
@@ -255,18 +295,45 @@
         /* ---------- 材质 ---------- */
 
         var glowTex = radialTexture();
+        var CYAN = '#4ff0dc';
+        var AMBER = '#ffcf8a';
 
         function metal(color, rough, metalness) {
-            var m = new THREE.MeshStandardMaterial({
+            return new THREE.MeshStandardMaterial({
                 color: color,
-                metalness: metalness === undefined ? 0.82 : metalness,
+                metalness: metalness === undefined ? 0.86 : metalness,
                 roughness: rough === undefined ? 0.38 : rough,
-                envMapIntensity: 0.62
+                envMapIntensity: 0.9
             });
-            return m;
         }
 
-        /* ---------- 数据分组 ---------- */
+        // 自发光条 / 灯带
+        function neon(color, intensity) {
+            var c = new THREE.Color(color);
+            return new THREE.MeshStandardMaterial({
+                color: c.clone().multiplyScalar(0.55),
+                emissive: c,
+                emissiveIntensity: intensity === undefined ? 1.5 : intensity,
+                metalness: 0.35,
+                roughness: 0.42
+            });
+        }
+
+        // 玻璃幕墙 / 玻璃屋面：半透明，不写深度，永远能看进去
+        function glass(color, opacity) {
+            return new THREE.MeshStandardMaterial({
+                color: new THREE.Color(color || 0x0b2632),
+                metalness: 0.62,
+                roughness: 0.08,
+                transparent: true,
+                opacity: opacity === undefined ? 0.16 : opacity,
+                depthWrite: false,
+                side: THREE.DoubleSide,
+                envMapIntensity: 1.2
+            });
+        }
+
+        /* ---------- 数据分组（7 个主题 → 7 个展台） ---------- */
 
         var cats = (data.categories || []).slice();
         var chunks = data.chunks || [];
@@ -277,7 +344,7 @@
             return {
                 key: cat.key,
                 name: cat.label,
-                color: colors[cat.key] || '#315ce8',
+                color: colors[cat.key] || CYAN,
                 members: members,
                 count: members.length,
                 chars: chars,
@@ -292,322 +359,975 @@
         /* ---------- 部件注册 ---------- */
 
         var parts = [];
+        var cells = [];                 // 78 道片段灯条
         var partsGroup = new THREE.Group();
         root.add(partsGroup);
-
-        function registerPart(def) {
-            var g = new THREE.Group();
-            g.name = def.key;
-            g.add(def.inner);
-            partsGroup.add(g);
-            var p = {
-                key: def.key,
-                index: parts.length,
-                group: g,
-                inner: def.inner,
-                basePos: def.pos.clone(),
-                dir: def.dir.clone(),
-                rotZ: def.rotZ || 0,
-                color: def.color || '#315ce8',
-                mats: def.mats || [],
-                outline: null,
-                glow: null,
-                lift: 0,
-                liftTarget: 0,
-                hit: 0,
-                stretch: def.stretch || 0,
-                radial: def.radial || 0,
-                anchor: def.anchor || new THREE.Object3D()
-            };
-            if (def.anchor) g.add(def.anchor);
-            parts.push(p);
-            return p;
-        }
 
         function collectMats(obj, out) {
             obj.traverse(function (o) {
                 if (!o.isMesh) return;
                 var list = Array.isArray(o.material) ? o.material : [o.material];
                 list.forEach(function (m) {
-                    if (!m || !m.isMeshStandardMaterial) return;
-                    if (out.indexOf(m) < 0) out.push({ m: m, opacity: m.opacity, transparent: m.transparent });
+                    if (!m) return;
+                    if (out.some(function (r) { return r.m === m; })) return;
+                    out.push({
+                        m: m,
+                        opacity: m.opacity,
+                        transparent: m.transparent,
+                        depthWrite: m.depthWrite,
+                        emissiveIntensity: m.emissiveIntensity
+                    });
                 });
             });
             return out;
         }
 
-        /* ---------- 书架 ---------- */
+        function registerPart(def) {
+            var g = new THREE.Group();
+            g.name = def.key;
+            g.position.copy(def.pos);
+            g.add(def.inner);
 
-        var SHELF_W = 2.5, SHELF_D = 0.62, SHELF_H = 0.14;
-        var BOOK_H = 1.18, BOOK_DEPTH = 0.6, BOOK_GAP = 0.006;
-
-        (function buildShelf() {
-            var inner = new THREE.Group();
-            // 底板
-            var body = new THREE.Mesh(slab(SHELF_W, SHELF_D, SHELF_H, 0.06, 0.008), metal(0x10161e, 0.42, 0.85));
-            inner.add(body);
-            // 两侧细立柱
-            [-1, 1].forEach(function (sgn) {
-                var side = new THREE.Mesh(slab(0.05, SHELF_D, 1.22, 0.02, 0.003), metal(0x161d27, 0.5, 0.7));
-                side.position.set(sgn * (SHELF_W / 2 - 0.025), SHELF_H / 2 + 0.61, 0);
-                inner.add(side);
+            var subs = (def.subs || [{ obj: def.inner, delta: def.delta || new THREE.Vector3() }]).map(function (s) {
+                return {
+                    obj: s.obj,
+                    base: s.obj.position.clone(),
+                    baseRot: s.obj.rotation.clone(),
+                    delta: s.delta.clone(),
+                    dRot: s.dRot || null
+                };
             });
-            // 前缘铭牌
-            var plate = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.04, 0.008), metal(0x8c97a8, 0.28, 1.0));
-            plate.position.set(0, 0.01, SHELF_D / 2 + 0.002);
-            inner.add(plate);
 
-            var mats = collectMats(inner, []);
-            var anchor = new THREE.Object3D();
-            anchor.position.set(SHELF_W * 0.42, 0.04, SHELF_D * 0.42);
+            def.inner.traverse(function (o) {
+                if (o.isMesh || o.isLineSegments) o.userData.partKey = def.key;
+            });
+            g.traverse(function (o) {
+                if (o.isMesh || o.isLineSegments) o.userData.partKey = def.key;
+            });
+            partsGroup.add(g);
+
+            var p = {
+                key: def.key,
+                kind: def.kind || 'shell',
+                index: parts.length,
+                group: g,
+                inner: def.inner,
+                basePos: def.pos.clone(),
+                subs: subs,
+                color: def.color || CYAN,
+                name: def.name || def.key,
+                desc: def.desc || '',
+                specs: def.specs || [],
+                stat: def.stat || null,
+                form: def.form || '',
+                mats: collectMats(def.inner, []),
+                outline: null,
+                glow: null,
+                lift: 0,
+                liftTarget: 0,
+                hit: 0,
+                hitCount: 0,
+                accent: def.accent || [],
+                anchor: new THREE.Object3D()
+            };
+
+            if (def.anchor) p.anchor.position.copy(def.anchor);
+            (def.anchorOn || def.inner).add(p.anchor);
+
+            parts.push(p);
+            return p;
+        }
+
+        /* ============================================================
+           A. 结构壳
+           ============================================================ */
+
+        /* ---------- A1 基座 ---------- */
+
+        (function buildBase() {
+            var inner = new THREE.Group();
+
+            var plinth = new THREE.Mesh(slabGeo(3.74, 3.34, 0.24, 0.06, 0.008), metal(0x0c1219, 0.46, 0.9));
+            plinth.position.y = -0.12;
+            inner.add(plinth);
+
+            var foot = new THREE.Mesh(slabGeo(3.96, 3.56, 0.05, 0.08, 0.004), metal(0x05080c, 0.72, 0.55));
+            foot.position.y = -0.245;
+            inner.add(foot);
+
+            // 台面内嵌的一圈亮边
+            var inset = new THREE.Mesh(slabGeo(3.42, 3.02, 0.014, 0.04, 0.002), neon(CYAN, 0.85));
+            inset.position.y = 0.002;
+            inner.add(inset);
+
+            // 四角螺栓
+            var boltGeo = new THREE.CylinderGeometry(0.045, 0.05, 0.03, 6);
+            var boltMat = metal(0x6f7f92, 0.3, 1.0);
+            [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(function (s) {
+                var b = new THREE.Mesh(boltGeo, boltMat);
+                b.position.set(s[0] * (3.74 / 2 - 0.14), 0.015, s[1] * (3.34 / 2 - 0.14));
+                inner.add(b);
+            });
+
+            // 前缘铭牌
+            var plate = new THREE.Mesh(new THREE.BoxGeometry(0.86, 0.055, 0.014), metal(0x93a2b5, 0.3, 1.0));
+            plate.position.set(0, -0.052, 3.34 / 2 + 0.008);
+            inner.add(plate);
+            var plateGlow = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.012, 0.016), neon(AMBER, 1.1));
+            plateGlow.position.set(0, -0.052, 3.34 / 2 + 0.014);
+            inner.add(plateGlow);
+
+            // 侧向散热缝
+            var ventMat = metal(0x131b25, 0.55, 0.7);
+            for (var i = 0; i < 9; i++) {
+                var v = new THREE.Mesh(new THREE.BoxGeometry(0.016, 0.1, 0.9), ventMat);
+                v.position.set(-3.74 / 2 + 0.02, -0.12, -1.2 + i * 0.3);
+                inner.add(v);
+            }
+
             registerPart({
-                key: 'shelf', inner: inner,
+                key: 'base', kind: 'shell', name: SHELL_META.base.name,
+                desc: SHELL_META.base.desc, specs: SHELL_META.base.specs,
+                color: '#7d8ea3', inner: inner,
                 pos: new THREE.Vector3(0, 0, 0),
-                dir: new THREE.Vector3(0, 0, 0),
-                mats: mats, anchor: anchor, color: '#5b6678'
+                delta: new THREE.Vector3(0, BASE_DY, 0),
+                anchor: new THREE.Vector3(1.42, 0.02, 1.4)
             });
         })();
 
-        /* ---------- 7 本书（书脊朝观众，高低不齐） ---------- */
+        /* ---------- A2 地板 ---------- */
 
-        var cells = [];
-        var CELL_GEO = new THREE.BoxGeometry(0.014, 0.022, 0.006);
+        (function buildFloor() {
+            var inner = new THREE.Group();
 
-        (function buildBooks() {
-            var widths = groups.map(function (g) {
-                return 0.17 + 0.22 * Math.sqrt(g.count / MAXN);
-            });
-            var heights = groups.map(function (g) {
-                return 0.96 + 0.24 * Math.sqrt(g.count / MAXN);
-            });
-            var totalW = widths.reduce(function (a, b) { return a + b; }, 0) + (groups.length - 1) * 0.004;
-            var cursor = -totalW / 2;
+            var deck = new THREE.Mesh(slabGeo(3.28, 2.88, 0.12, 0.05, 0.005), metal(0x0e1720, 0.5, 0.82));
+            deck.position.y = FLOOR_TOP - 0.06;
+            inner.add(deck);
 
-            groups.forEach(function (g, i) {
-                var w = widths[i];
-                var h = heights[i];
-                var inner = new THREE.Group();
-                var x = cursor + w / 2;
-                cursor += w + 0.004;
-
-                // 书体（封面，深色，在书脊后面）
-                var cover = new THREE.Mesh(slab(w, BOOK_DEPTH, h, 0.012, 0.003), metal(0x0d1219, 0.62, 0.5));
-                inner.add(cover);
-
-                // 书脊（朝观众 +Z）—— 整块亮主题色，是主视觉
-                var spineMat = new THREE.MeshStandardMaterial({
-                    color: new THREE.Color(g.color),
-                    emissive: new THREE.Color(g.color), emissiveIntensity: 0.42,
-                    metalness: 0.25, roughness: 0.5
-                });
-                var spine = new THREE.Mesh(slab(w, 0.03, h, 0.006, 0.002), spineMat);
-                spine.position.set(0, 0, BOOK_DEPTH / 2 + 0.015);
-                inner.add(spine);
-
-                // 书脊中央竖向亮带（像书脊烫印）
-                var accentMat = new THREE.MeshStandardMaterial({
-                    color: new THREE.Color(g.color), emissive: new THREE.Color(g.color),
-                    emissiveIntensity: 0.95, roughness: 0.35
-                });
-                var accent = new THREE.Mesh(new THREE.BoxGeometry(w * 0.22, h * 0.62, 0.006), accentMat);
-                accent.position.set(0, 0, BOOK_DEPTH / 2 + 0.034);
-                inner.add(accent);
-
-                // 书脊顶/底压边（深色，像书脊护套）
-                [h / 2 - 0.018, -h / 2 + 0.018].forEach(function (yy) {
-                    var edge = new THREE.Mesh(new THREE.BoxGeometry(w, 0.018, 0.034), metal(0x080c12, 0.4, 0.6));
-                    edge.position.set(0, yy, BOOK_DEPTH / 2 + 0.017);
-                    inner.add(edge);
-                });
-
-                // 书页切口（左右侧边，浅色，拆解散开时可见）
-                var edgeMat = new THREE.MeshStandardMaterial({ color: 0xe7e0d2, metalness: 0.1, roughness: 0.85 });
-                [-1, 1].forEach(function (sgn) {
-                    var edge = new THREE.Mesh(new THREE.BoxGeometry(0.004, h * 0.92, BOOK_DEPTH * 0.94), edgeMat);
-                    edge.position.set(sgn * (w / 2), 0, 0);
-                    inner.add(edge);
-                });
-
-                // 顶面书页切口
-                var topEdge = new THREE.Mesh(new THREE.BoxGeometry(w * 0.96, 0.004, BOOK_DEPTH * 0.94), edgeMat);
-                topEdge.position.set(0, h / 2 + 0.001, 0);
-                inner.add(topEdge);
-
-                // 书页（-Z 背面）
-                var pages = new THREE.Mesh(
-                    new THREE.PlaneGeometry(w * 0.94, h * 0.92),
-                    new THREE.MeshStandardMaterial({ color: 0xe7e0d2, metalness: 0.1, roughness: 0.88, side: THREE.DoubleSide })
-                );
-                pages.position.set(0, 0, -BOOK_DEPTH / 2 - 0.001);
-                inner.add(pages);
-                for (var li = 0; li < 8; li++) {
-                    var ln = new THREE.Mesh(new THREE.PlaneGeometry(w * 0.82, 0.003),
-                        new THREE.MeshBasicMaterial({ color: 0xb8ad97 }));
-                    ln.position.set(0, -h * 0.4 + li * 0.1, -BOOK_DEPTH / 2 - 0.003);
-                    inner.add(ln);
-                }
-
-                // 书脊索引灯条（竖向，一道=一个片段）
-                var n = g.count;
-                var cellMats = [];
-                var span = h * 0.56;
-                var yTop = h * 0.28;
-                var yBot = yTop - span;
-                for (var ci = 0; ci < n; ci++) {
-                    var m = new THREE.MeshStandardMaterial({
-                        color: new THREE.Color(g.color),
-                        emissive: new THREE.Color(g.color), emissiveIntensity: 0.3,
-                        metalness: 0.3, roughness: 0.5
-                    });
-                    var mesh = new THREE.Mesh(CELL_GEO, m);
-                    var yy = n === 1 ? 0 : (yBot + (ci + 0.5) / n * span);
-                    mesh.position.set(0, yy, BOOK_DEPTH / 2 + 0.04);
-                    mesh.userData.chunkIndex = g.members[ci].i;
-                    mesh.userData.partKey = g.key;
-                    inner.add(mesh);
-                    cellMats.push({ mesh: mesh, mat: m, baseColor: m.color.clone(), chunk: g.members[ci] });
-                }
-
-                inner.traverse(function (o) { if (o.isMesh) o.userData.partKey = g.key; });
-
-                var mats = collectMats(inner, []);
-                var anchor = new THREE.Object3D();
-                anchor.position.set(w / 2 + 0.02, h / 2 + 0.04, BOOK_DEPTH / 2 + 0.2);
-
-                var part = registerPart({
-                    key: g.key, inner: inner,
-                    pos: new THREE.Vector3(x, SHELF_H / 2 + h / 2, 0),
-                    dir: new THREE.Vector3(
-                        (i - (groups.length - 1) / 2) * 0.22,
-                        0.04 + i * 0.01,
-                        (i % 2 ? 1 : -1) * 0.14
-                    ),
-                    rotZ: (i % 2 ? 1 : -1) * 0.016,
-                    mats: mats, anchor: anchor, color: g.color
-                });
-                part.book = { w: w, h: h, depth: BOOK_DEPTH };
-                part.strip = { mats: [spineMat, accentMat], base: 0.42 };
-                part.cells = cellMats;
-                part.stat = { count: g.count, chars: g.chars, avg: g.avg };
-                part.name = g.name;
-
-                cellMats.forEach(function (o) {
-                    cells.push(o);
-                    o.mat.userData = { part: part };
-                });
-            });
-
-            var stackTop = SHELF_H / 2 + 1.2 + 0.04;
-
-            /* ---------- 顶横梁 ---------- */
-
-            var railGroup = new THREE.Group();
-            var rail = new THREE.Mesh(slab(SHELF_W, SHELF_D, 0.1, 0.06, 0.006), metal(0x10161e, 0.42, 0.85));
-            railGroup.add(rail);
-
-            var tickCount = chunks.length || 78;
-            var tickGeo = new THREE.BoxGeometry(0.005, 0.004, 0.04);
-            var tickMat = metal(0x78849a, 0.4, 0.9);
-            var ticks = new THREE.InstancedMesh(tickGeo, tickMat, tickCount);
-            var dummy = new THREE.Object3D();
-            for (var ti = 0; ti < tickCount; ti++) {
-                var tx = -SHELF_W * 0.46 + (ti + 0.5) / tickCount * SHELF_W * 0.92;
-                dummy.position.set(tx, 0.052, SHELF_D / 2 + 0.002);
-                dummy.updateMatrix();
-                ticks.setMatrixAt(ti, dummy.matrix);
+            // 刻度网格（只画线，不用贴图）
+            var pts = [];
+            var gx = 16, gz = 14;
+            var hw = 1.5, hz = 1.32;
+            for (var i = 0; i <= gx; i++) {
+                var x = -hw + (i / gx) * hw * 2;
+                pts.push(new THREE.Vector3(x, FLOOR_TOP + 0.004, -hz));
+                pts.push(new THREE.Vector3(x, FLOOR_TOP + 0.004, hz));
             }
-            ticks.instanceMatrix.needsUpdate = true;
-            ticks.userData.partKey = 'rail';
-            railGroup.add(ticks);
+            for (var j = 0; j <= gz; j++) {
+                var z = -hz + (j / gz) * hz * 2;
+                pts.push(new THREE.Vector3(-hw, FLOOR_TOP + 0.004, z));
+                pts.push(new THREE.Vector3(hw, FLOOR_TOP + 0.004, z));
+            }
+            inner.add(lineSegs(pts, CYAN, 0.13));
 
-            railGroup.traverse(function (o) { if (o.isMesh) o.userData.partKey = 'rail'; });
+            // 中央定位环
+            var ring = new THREE.Mesh(new THREE.TorusGeometry(0.3, 0.007, 6, 48), neon(CYAN, 1.3));
+            ring.rotation.x = -Math.PI / 2;
+            ring.position.y = FLOOR_TOP + 0.008;
+            inner.add(ring);
 
-            var railMats = [];
-            railGroup.traverse(function (o) {
-                if (!o.isMesh || !o.material.isMeshStandardMaterial) return;
-                railMats.push({ m: o.material, opacity: 1, transparent: false });
-            });
-
-            var railAnchor = new THREE.Object3D();
-            railAnchor.position.set(SHELF_W * 0.42, 0.05, 0);
+            var ring2 = new THREE.Mesh(new THREE.TorusGeometry(0.44, 0.004, 6, 56), neon(AMBER, 0.9));
+            ring2.rotation.x = -Math.PI / 2;
+            ring2.position.y = FLOOR_TOP + 0.008;
+            inner.add(ring2);
 
             registerPart({
-                key: 'rail', inner: railGroup,
-                pos: new THREE.Vector3(0, stackTop, 0),
-                dir: new THREE.Vector3(0, 0.22, 0),
-                mats: railMats, anchor: railAnchor, color: '#3f7f9a'
+                key: 'floor', kind: 'shell', name: SHELL_META.floor.name,
+                desc: SHELL_META.floor.desc, specs: SHELL_META.floor.specs,
+                color: '#58c7d8', inner: inner,
+                pos: new THREE.Vector3(0, 0, 0),
+                delta: new THREE.Vector3(0, FLOOR_DY, 0),
+                anchor: new THREE.Vector3(-1.25, FLOOR_TOP + 0.02, 1.2)
+            });
+        })();
+
+        /* ---------- A3 四壁 ---------- */
+
+        var wallSubs = [];
+
+        (function buildWalls() {
+            var inner = new THREE.Group();
+            var capLen = 2 * HX + T;
+
+            // 单面墙：沿本地 X 铺开，厚度朝本地 Z
+            function wallLocal(len, withDoor) {
+                var g = new THREE.Group();
+
+                var skirt = new THREE.Mesh(new THREE.BoxGeometry(len, 0.30, T), metal(0x0d151e, 0.5, 0.86));
+                skirt.position.y = FLOOR_TOP + 0.15;
+                g.add(skirt);
+
+                // 墙裙上的一道亮缝
+                var strip = new THREE.Mesh(new THREE.BoxGeometry(len * 0.94, 0.014, 0.012), neon(CYAN, 1.35));
+                strip.position.set(0, FLOOR_TOP + 0.305, T / 2 + 0.004);
+                g.add(strip);
+
+                // 玻璃
+                var gl = new THREE.Mesh(new THREE.BoxGeometry(len - 0.04, 0.66, 0.03), glass(0x0b2630, 0.15));
+                gl.position.y = FLOOR_TOP + 0.65;
+                g.add(gl);
+
+                // 竖向发光立柱
+                var n = Math.max(2, Math.round(len / 0.44));
+                for (var i = 0; i <= n; i++) {
+                    var x = -len / 2 + 0.03 + (i / n) * (len - 0.06);
+                    var mull = new THREE.Mesh(new THREE.BoxGeometry(0.024, 0.68, 0.05), metal(0x121d27, 0.42, 0.8));
+                    mull.position.set(x, FLOOR_TOP + 0.65, 0);
+                    g.add(mull);
+                }
+
+                // 顶部压梁（发光）
+                var cap = new THREE.Mesh(new THREE.BoxGeometry(len, 0.075, T + 0.03), metal(0x121b25, 0.4, 0.9));
+                cap.position.y = EAVE_Y - 0.037;
+                g.add(cap);
+                var capGlow = new THREE.Mesh(new THREE.BoxGeometry(len * 0.99, 0.012, 0.016), neon(CYAN, 1.1));
+                capGlow.position.set(0, EAVE_Y - 0.079, (T + 0.03) / 2);
+                g.add(capGlow);
+
+                if (withDoor) {
+                    var dw = 0.78, dh = 0.72;
+                    var frameMat = metal(0x2a3a4a, 0.34, 0.95);
+                    [-1, 1].forEach(function (s) {
+                        var post = new THREE.Mesh(new THREE.BoxGeometry(0.05, dh + 0.04, T + 0.02), frameMat);
+                        post.position.set(s * (dw / 2 + 0.02), FLOOR_TOP + dh / 2 + 0.02, 0);
+                        g.add(post);
+                    });
+                    var header = new THREE.Mesh(new THREE.BoxGeometry(dw + 0.09, 0.05, T + 0.02), frameMat);
+                    header.position.set(0, FLOOR_TOP + dh + 0.045, 0);
+                    g.add(header);
+
+                    var leaf = new THREE.Mesh(new THREE.BoxGeometry(dw, dh, 0.022), glass(0x0d3540, 0.26));
+                    leaf.position.set(0, FLOOR_TOP + dh / 2 + 0.02, 0);
+                    g.add(leaf);
+
+                    var handle = new THREE.Mesh(new THREE.BoxGeometry(0.016, 0.12, 0.016), neon(AMBER, 1.5));
+                    handle.position.set(dw / 2 - 0.1, FLOOR_TOP + dh / 2 + 0.02, T / 2 + 0.02);
+                    g.add(handle);
+                }
+                return g;
+            }
+
+            var defs = [
+                { key: 'back', pos: new THREE.Vector3(0, 0, -HZ), rot: 0, len: capLen, dir: new THREE.Vector3(0, 0, -1) },
+                { key: 'front', pos: new THREE.Vector3(0, 0, HZ), rot: 0, len: capLen, dir: new THREE.Vector3(0, 0, 1), door: true },
+                { key: 'left', pos: new THREE.Vector3(-HX, 0, 0), rot: Math.PI / 2, len: 2 * HZ, dir: new THREE.Vector3(-1, 0, 0) },
+                { key: 'right', pos: new THREE.Vector3(HX, 0, 0), rot: Math.PI / 2, len: 2 * HZ, dir: new THREE.Vector3(1, 0, 0) }
+            ];
+
+            var subs = [];
+            defs.forEach(function (d) {
+                var g = wallLocal(d.len, d.door);
+                g.position.copy(d.pos);
+                g.rotation.y = d.rot;
+                inner.add(g);
+                subs.push({
+                    obj: g,
+                    delta: d.dir.clone().multiplyScalar(WALLS_OUT).add(new THREE.Vector3(0, WALLS_DY, 0))
+                });
             });
 
-            // 装配总高，供取景用
-            root.userData.topY = stackTop + 0.1;
+            var anchorOn = inner.children[1];
+            var part = registerPart({
+                key: 'walls', kind: 'shell', name: SHELL_META.walls.name,
+                desc: SHELL_META.walls.desc, specs: SHELL_META.walls.specs,
+                color: '#4fd6c4', inner: inner, subs: subs,
+                pos: new THREE.Vector3(0, 0, 0),
+                anchorOn: anchorOn,
+                anchor: new THREE.Vector3(0.95, 0.35, 0.06)
+            });
+            wallSubs = part.subs;
+        })();
+
+        /* ---------- A4 双坡屋顶 ---------- */
+
+        (function buildRoof() {
+            var inner = new THREE.Group();
+            var rise = RIDGE_Y - EAVE_Y;
+            var slopeLen = Math.sqrt(ROOF_HALF * ROOF_HALF + rise * rise);
+            var slopeAng = Math.atan2(rise, ROOF_HALF);
+            var depth = 2 * HZ + 0.34;
+
+            function panel(sign) {
+                var g = new THREE.Group();
+
+                var glassPanel = new THREE.Mesh(new THREE.BoxGeometry(slopeLen, 0.035, depth), glass(0x0a202a, 0.2));
+                g.add(glassPanel);
+
+                // 檩条：几道横向加强筋，让玻璃有结构感
+                for (var i = 1; i <= 3; i++) {
+                    var rib = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.045, depth * 0.98), metal(0x1a2733, 0.4, 0.9));
+                    rib.position.set(-slopeLen / 2 + (i / 4) * slopeLen, 0.03, 0);
+                    g.add(rib);
+                }
+
+                // 檐口压条
+                var eave = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.09, depth), metal(0x16222d, 0.38, 0.95));
+                eave.position.set(sign * (slopeLen / 2 - 0.02), -0.035, 0);
+                g.add(eave);
+
+                var eaveGlow = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.014, depth * 0.97), neon(CYAN, 1.5));
+                eaveGlow.position.set(sign * (slopeLen / 2 - 0.02), -0.088, 0);
+                g.add(eaveGlow);
+
+                g.rotation.z = -sign * slopeAng;
+                g.position.set(sign * slopeLen / 2 * Math.cos(slopeAng), EAVE_Y + rise / 2, 0);
+                return g;
+            }
+
+            var left = panel(-1);
+            var right = panel(1);
+            inner.add(left);
+            inner.add(right);
+
+            // 屋脊压条
+            var ridge = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.06, depth), metal(0x1c2a36, 0.36, 0.95));
+            ridge.position.set(0, RIDGE_Y + 0.01, 0);
+            inner.add(ridge);
+            var ridgeGlow = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.014, depth * 0.98), neon(AMBER, 1.4));
+            ridgeGlow.position.set(0, RIDGE_Y + 0.05, 0);
+
+            // 两端山墙三角形
+            function gable(sign) {
+                var g = new THREE.Group();
+                var shape = new THREE.Shape();
+                shape.moveTo(-ROOF_HALF, 0);
+                shape.lineTo(ROOF_HALF, 0);
+                shape.lineTo(0, rise);
+                shape.closePath();
+                var geo = new THREE.ExtrudeGeometry(shape, { depth: 0.05, bevelEnabled: false });
+                geo.translate(0, 0, -0.025);
+                var mesh = new THREE.Mesh(geo, glass(0x0a202a, 0.22));
+                mesh.position.y = EAVE_Y;
+                g.add(mesh);
+
+                // 三角形边框
+                var frame = lineLoop([
+                    new THREE.Vector3(-ROOF_HALF, EAVE_Y, 0),
+                    new THREE.Vector3(ROOF_HALF, EAVE_Y, 0),
+                    new THREE.Vector3(0, RIDGE_Y, 0),
+                    new THREE.Vector3(-ROOF_HALF, EAVE_Y, 0)
+                ], CYAN, 0.7);
+                g.add(frame);
+                g.position.z = sign * (HZ + 0.12);
+                return g;
+            }
+
+            var gf = gable(1);
+            var gb = gable(-1);
+            inner.add(gf);
+            inner.add(gb);
+            inner.add(ridgeGlow);
+
+            var subs = [
+                { obj: left, delta: new THREE.Vector3(-0.42, ROOF_DY, 0), dRot: new THREE.Vector3(0, 0, 0.2) },
+                { obj: right, delta: new THREE.Vector3(0.42, ROOF_DY, 0), dRot: new THREE.Vector3(0, 0, -0.2) },
+                { obj: gf, delta: new THREE.Vector3(0, ROOF_DY, 0.52), dRot: null },
+                { obj: gb, delta: new THREE.Vector3(0, ROOF_DY, -0.52), dRot: null },
+                { obj: ridge, delta: new THREE.Vector3(0, ROOF_DY + 0.06, 0), dRot: null },
+                { obj: ridgeGlow, delta: new THREE.Vector3(0, ROOF_DY + 0.06, 0), dRot: null }
+            ];
+
+            registerPart({
+                key: 'roof', kind: 'shell', name: SHELL_META.roof.name,
+                desc: SHELL_META.roof.desc, specs: SHELL_META.roof.specs,
+                color: '#ffc98a', inner: inner, subs: subs,
+                pos: new THREE.Vector3(0, 0, 0),
+                anchorOn: left,
+                anchor: new THREE.Vector3(-0.95, 0.1, 0.3)
+            });
+        })();
+
+        /* ---------- A5 烟囱 ---------- */
+
+        (function buildChimney() {
+            var inner = new THREE.Group();
+            var body = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.60, 0.24), metal(0x16202b, 0.44, 0.88));
+            body.position.y = 1.62;
+            inner.add(body);
+
+            var capRing = new THREE.Mesh(new THREE.TorusGeometry(0.131, 0.012, 6, 20), neon(AMBER, 1.6));
+            capRing.rotation.x = -Math.PI / 2;
+            capRing.position.y = 1.925;
+            inner.add(capRing);
+
+            var innerGlow = new THREE.Mesh(new THREE.CylinderGeometry(0.098, 0.098, 0.014, 16), neon('#ff9d4d', 1.9));
+            innerGlow.position.y = 1.918;
+            inner.add(innerGlow);
+
+            // 砖缝
+            for (var i = 0; i < 3; i++) {
+                var seam = new THREE.Mesh(new THREE.BoxGeometry(0.248, 0.012, 0.248), metal(0x24313d, 0.5, 0.7));
+                seam.position.y = 1.38 + i * 0.15;
+                inner.add(seam);
+            }
+
+            registerPart({
+                key: 'chimney', kind: 'shell', name: SHELL_META.chimney.name,
+                desc: SHELL_META.chimney.desc, specs: SHELL_META.chimney.specs,
+                color: '#ffb066', inner: inner,
+                pos: new THREE.Vector3(1.0, 0, -0.5),
+                delta: new THREE.Vector3(0.28, CHIM_DY, 0),
+                anchor: new THREE.Vector3(0.16, 0.34, 0.16)
+            });
+        })();
+
+        /* ============================================================
+           B. 七个主题展台
+           ============================================================ */
+
+        // 展台公用底座
+        function dioBase() {
+            var g = new THREE.Group();
+            var pad = new THREE.Mesh(slabGeo(0.46, 0.36, 0.05, 0.018, 0.004), metal(0x101a24, 0.5, 0.8));
+            pad.position.y = 0.025;
+            g.add(pad);
+            var edge = new THREE.Mesh(slabGeo(0.42, 0.32, 0.008, 0.014, 0.002), neon(CYAN, 0.55));
+            edge.position.y = 0.052;
+            g.add(edge);
+            return g;
+        }
+
+        var DIO = {
+            /* 机器人 —— 代理规则 */
+            rules: function (m) {
+                var g = new THREE.Group();
+                g.add(dioBase());
+                var bodyMat = metal(0x28323d, 0.4, 0.85);
+                var plateMat = metal(0x3b4a58, 0.34, 0.95);
+
+                // 腿
+                [-1, 1].forEach(function (s) {
+                    var leg = new THREE.Mesh(new THREE.BoxGeometry(0.075, 0.17, 0.09), bodyMat);
+                    leg.position.set(s * 0.065, 0.138, 0);
+                    g.add(leg);
+                });
+
+                // 躯干
+                var torso = new THREE.Mesh(slabGeo(0.26, 0.19, 0.28, 0.03, 0.004), plateMat);
+                torso.position.y = 0.36;
+                g.add(torso);
+
+                // 胸口指示灯阵列
+                var eyeMat = neon(m, 2.0);
+                for (var r = 0; r < 2; r++) {
+                    for (var c = 0; c < 3; c++) {
+                        var led = new THREE.Mesh(new THREE.BoxGeometry(0.032, 0.014, 0.012), eyeMat);
+                        led.position.set(-0.05 + c * 0.05, 0.40 - r * 0.035, 0.098);
+                        g.add(led);
+                    }
+                }
+
+                // 手臂
+                [-1, 1].forEach(function (s) {
+                    var arm = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.21, 0.05), bodyMat);
+                    arm.position.set(s * 0.163, 0.345, 0);
+                    arm.rotation.z = s * 0.09;
+                    g.add(arm);
+                });
+
+                // 头
+                var head = new THREE.Mesh(slabGeo(0.21, 0.17, 0.16, 0.04, 0.004), plateMat);
+                head.position.y = 0.60;
+                g.add(head);
+
+                var visor = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.045, 0.012), neon(m, 2.4));
+                visor.position.set(0, 0.607, 0.083);
+                g.add(visor);
+
+                // 颈
+                var neck = new THREE.Mesh(new THREE.CylinderGeometry(0.026, 0.028, 0.04, 8), bodyMat);
+                neck.position.y = 0.515;
+                g.add(neck);
+
+                // 天线
+                var ant = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 0.11, 6), bodyMat);
+                ant.position.set(0.06, 0.73, -0.02);
+                g.add(ant);
+                var tip = new THREE.Mesh(new THREE.SphereGeometry(0.019, 10, 8), neon('#ff7d6b', 2.4));
+                tip.position.set(0.06, 0.79, -0.02);
+                g.add(tip);
+
+                return { group: g, anchorY: 0.92, accent: [eyeMat, visor], spin: null };
+            },
+
+            /* 控制台 —— 提示词 */
+            prompts: function (m) {
+                var g = new THREE.Group();
+                g.add(dioBase());
+                var frameMat = metal(0x212b36, 0.42, 0.82);
+
+                var top = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.03, 0.24), metal(0x2b3641, 0.36, 0.9));
+                top.position.y = 0.265;
+                g.add(top);
+
+                // 四条腿
+                [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(function (s) {
+                    var leg = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.21, 0.02), frameMat);
+                    leg.position.set(s[0] * 0.185, 0.155, s[1] * 0.1);
+                    g.add(leg);
+                });
+
+                // 斜面屏
+                var screen = new THREE.Group();
+                var panel = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.21, 0.014), metal(0x0a1219, 0.5, 0.6));
+                screen.add(panel);
+                var glowPanel = new THREE.Mesh(new THREE.PlaneGeometry(0.30, 0.17), neon(m, 0.55));
+                glowPanel.position.z = 0.008;
+                screen.add(glowPanel);
+                for (var i = 0; i < 3; i++) {
+                    var ln = new THREE.Mesh(new THREE.BoxGeometry(0.20 - i * 0.045, 0.012, 0.004), neon(m, 2.2));
+                    ln.position.set(-0.04 + i * 0.01, 0.05 - i * 0.045, 0.012);
+                    screen.add(ln);
+                }
+                screen.position.set(0, 0.40, -0.055);
+                screen.rotation.x = -0.28;
+                g.add(screen);
+
+                // 键盘
+                var kb = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.012, 0.09), metal(0x1b242e, 0.55, 0.7));
+                kb.position.set(0, 0.285, 0.075);
+                g.add(kb);
+                var kbGlow = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.004, 0.06), neon(m, 1.2));
+                kbGlow.position.set(0, 0.293, 0.075);
+                g.add(kbGlow);
+
+                // 悬浮光标
+                var cursor = new THREE.Mesh(new THREE.BoxGeometry(0.022, 0.03, 0.022), neon('#ffffff', 1.8));
+                cursor.position.set(0.12, 0.50, 0.02);
+                g.add(cursor);
+
+                return { group: g, anchorY: 0.62, accent: [glowPanel], spin: { obj: cursor, axis: 'y', speed: 0.9 } };
+            },
+
+            /* 蓝图桌 —— 软件设计 */
+            design: function (m) {
+                var g = new THREE.Group();
+                g.add(dioBase());
+                var frameMat = metal(0x3a3428, 0.44, 0.8);
+
+                var board = new THREE.Group();
+                var face = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.28, 0.012), metal(0x0c141b, 0.52, 0.55));
+                board.add(face);
+
+                var glowFace = new THREE.Mesh(new THREE.PlaneGeometry(0.32, 0.24), neon(m, 0.32));
+                glowFace.position.z = 0.007;
+                board.add(glowFace);
+
+                // 图板上的结构线框：一个房子的剖面，正好呼应这页本身
+                var pts = [
+                    new THREE.Vector3(-0.11, -0.07, 0.01), new THREE.Vector3(0.11, -0.07, 0.01),
+                    new THREE.Vector3(0.11, 0.03, 0.01), new THREE.Vector3(-0.11, 0.03, 0.01),
+                    new THREE.Vector3(-0.11, -0.07, 0.01),
+                    new THREE.Vector3(-0.13, 0.03, 0.01), new THREE.Vector3(0, 0.105, 0.01),
+                    new THREE.Vector3(0.13, 0.03, 0.01),
+                    new THREE.Vector3(0.05, -0.07, 0.01), new THREE.Vector3(0.05, 0.005, 0.01)
+                ];
+                var wire = lineLoop(pts, m, 0.95);
+                board.add(wire);
+
+                // 尺寸标注点
+                [[-0.11, -0.07], [0.11, 0.03]].forEach(function (p) {
+                    var dot = new THREE.Mesh(new THREE.SphereGeometry(0.008, 8, 6), neon('#ffffff', 1.6));
+                    dot.position.set(p[0], p[1], 0.012);
+                    board.add(dot);
+                });
+
+                board.position.set(0, 0.34, -0.01);
+                board.rotation.x = -0.18;
+                g.add(board);
+
+                // 支架
+                [-1, 1].forEach(function (s) {
+                    var strut = new THREE.Mesh(new THREE.BoxGeometry(0.018, 0.34, 0.018), frameMat);
+                    strut.position.set(s * 0.13, 0.20, 0.03);
+                    strut.rotation.x = -0.18;
+                    g.add(strut);
+                });
+                var bar = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.02, 0.02), frameMat);
+                bar.position.set(0, 0.075, 0.05);
+                g.add(bar);
+
+                return { group: g, anchorY: 0.64, accent: [glowFace], spin: null };
+            },
+
+            /* 机柜 —— 智能体开发 */
+            agent: function (m) {
+                var g = new THREE.Group();
+                g.add(dioBase());
+                var cab = new THREE.Mesh(slabGeo(0.30, 0.24, 0.50, 0.014, 0.004), metal(0x1a232d, 0.42, 0.9));
+                cab.position.y = 0.30;
+                g.add(cab);
+
+                var slotMat = neon(m, 1.5);
+                for (var i = 0; i < 6; i++) {
+                    var slot = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.018, 0.012), slotMat);
+                    slot.position.set(0, 0.15 + i * 0.05, 0.126);
+                    g.add(slot);
+                    // 每个插槽左侧的状态点
+                    var dot = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.012, 0.014), neon('#ffffff', 1.4));
+                    dot.position.set(-0.088, 0.15 + i * 0.05, 0.128);
+                    g.add(dot);
+                }
+
+                // 顶部风扇
+                var fan = new THREE.Mesh(new THREE.TorusGeometry(0.055, 0.008, 6, 20), metal(0x40505f, 0.34, 1.0));
+                fan.rotation.x = -Math.PI / 2;
+                fan.position.y = 0.555;
+                g.add(fan);
+                var fanGlow = new THREE.Mesh(new THREE.CircleGeometry(0.05, 16), neon(m, 1.1));
+                fanGlow.rotation.x = -Math.PI / 2;
+                fanGlow.position.y = 0.548;
+                g.add(fanGlow);
+
+                // 侧边走线
+                var curve = new THREE.CatmullRomCurve3([
+                    new THREE.Vector3(-0.152, 0.52, 0.0),
+                    new THREE.Vector3(-0.175, 0.36, 0.06),
+                    new THREE.Vector3(-0.152, 0.14, 0.02)
+                ]);
+                var tube = new THREE.Mesh(new THREE.TubeGeometry(curve, 14, 0.008, 6, false), metal(0x51616f, 0.4, 0.9));
+                g.add(tube);
+
+                return { group: g, anchorY: 0.72, accent: [slotMat], spin: null };
+            },
+
+            /* 小工厂 —— 自动化工作流 */
+            automation: function (m) {
+                var g = new THREE.Group();
+                g.add(dioBase());
+                var frameMat = metal(0x27313b, 0.42, 0.86);
+
+                // 传送带
+                var belt = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.035, 0.15), metal(0x141d26, 0.55, 0.7));
+                belt.position.y = 0.20;
+                g.add(belt);
+
+                var beltGlow = new THREE.Mesh(new THREE.BoxGeometry(0.40, 0.006, 0.13), neon(m, 1.0));
+                beltGlow.position.y = 0.222;
+                g.add(beltGlow);
+
+                // 滚筒
+                var rollerGeo = new THREE.CylinderGeometry(0.026, 0.026, 0.14, 10);
+                var rollerMat = metal(0x485764, 0.36, 0.95);
+                var rollers = [];
+                for (var i = 0; i < 4; i++) {
+                    // 外层 group 把轴摆到 Z 方向，内层 mesh 绕自身 Y 轴自转
+                    var wrap = new THREE.Group();
+                    wrap.rotation.x = Math.PI / 2;
+                    var roll = new THREE.Mesh(rollerGeo, rollerMat);
+                    wrap.add(roll);
+                    wrap.position.set(-0.15 + i * 0.1, 0.20, 0);
+                    g.add(wrap);
+                    rollers.push(roll);
+                }
+
+                // 支腿
+                [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(function (s) {
+                    var leg = new THREE.Mesh(new THREE.BoxGeometry(0.018, 0.19, 0.018), frameMat);
+                    leg.position.set(s[0] * 0.185, 0.115, s[1] * 0.06);
+                    g.add(leg);
+                });
+
+                // 齿轮组
+                var gearMat = neon(m, 1.1);
+                var g1 = new THREE.Mesh(gearGeo(0.075, 0.02, 9), gearMat);
+                g1.position.set(-0.06, 0.345, -0.075);
+                g.add(g1);
+                var g2 = new THREE.Mesh(gearGeo(0.052, 0.018, 7), gearMat);
+                g2.position.set(0.055, 0.328, -0.075);
+                g.add(g2);
+
+                // 烟囱
+                var stack = new THREE.Mesh(new THREE.CylinderGeometry(0.026, 0.032, 0.28, 10), metal(0x33414e, 0.44, 0.8));
+                stack.position.set(-0.155, 0.40, -0.055);
+                g.add(stack);
+                var stackRing = new THREE.Mesh(new THREE.TorusGeometry(0.031, 0.006, 6, 14), neon(AMBER, 1.4));
+                stackRing.rotation.x = -Math.PI / 2;
+                stackRing.position.set(-0.155, 0.545, -0.055);
+                g.add(stackRing);
+
+                // 带上的箱子
+                var crate = new THREE.Mesh(slabGeo(0.075, 0.075, 0.075, 0.008, 0.003), metal(0x5a6572, 0.42, 0.75));
+                crate.position.set(0.10, 0.258, 0);
+                g.add(crate);
+
+                return {
+                    group: g, anchorY: 0.70, accent: [beltGlow, gearMat],
+                    spin: { gears: [g1, g2], rollers: rollers, crate: crate }
+                };
+            },
+
+            /* 数据塔 —— 产品分析 */
+            product: function (m) {
+                var g = new THREE.Group();
+                g.add(dioBase());
+
+                var base = new THREE.Mesh(new THREE.BoxGeometry(0.40, 0.03, 0.24), metal(0x1b2530, 0.44, 0.86));
+                base.position.y = 0.065;
+                g.add(base);
+
+                var heights = [0.12, 0.20, 0.31, 0.26, 0.38];
+                var barMat = neon(m, 1.15);
+                heights.forEach(function (h, i) {
+                    var bar = new THREE.Mesh(new THREE.BoxGeometry(0.05, h, 0.05), barMat);
+                    bar.position.set(-0.14 + i * 0.07, 0.08 + h / 2, 0);
+                    g.add(bar);
+                });
+
+                // 趋势折线
+                var pts = heights.map(function (h, i) {
+                    return new THREE.Vector3(-0.14 + i * 0.07, 0.08 + h + 0.03, 0.0);
+                });
+                var trend = lineLoop(pts, '#ffffff', 0.85);
+                g.add(trend);
+
+                // 悬浮环
+                var halo = new THREE.Mesh(new THREE.TorusGeometry(0.13, 0.006, 6, 32), neon(AMBER, 1.5));
+                halo.rotation.x = -Math.PI / 2 + 0.3;
+                halo.position.set(0, 0.60, 0);
+                g.add(halo);
+
+                return { group: g, anchorY: 0.74, accent: [barMat], spin: { obj: halo, axis: 'y', speed: 0.5 } };
+            },
+
+            /* 货箱 —— 项目实践 */
+            project: function (m) {
+                var g = new THREE.Group();
+                g.add(dioBase());
+                var crateMat = metal(0x3b3730, 0.5, 0.72);
+                var edgeMat = neon(m, 1.2);
+
+                function crate(x, y, z, s, rot) {
+                    var c = new THREE.Group();
+                    var body = new THREE.Mesh(slabGeo(s, s, s * 0.86, 0.008, 0.003), crateMat);
+                    c.add(body);
+                    // 三面亮边
+                    var geo = new THREE.EdgesGeometry(new THREE.BoxGeometry(s * 0.99, s * 0.85, s * 0.99));
+                    var e = new THREE.LineSegments(geo, new THREE.LineBasicMaterial({
+                        color: new THREE.Color(m), transparent: true, opacity: 0.75
+                    }));
+                    c.add(e);
+                    c.position.set(x, y, z);
+                    c.rotation.y = rot || 0;
+                    return c;
+                }
+
+                g.add(crate(-0.085, 0.105, 0.01, 0.17, 0.12));
+                g.add(crate(0.075, 0.105, -0.03, 0.17, -0.2));
+                g.add(crate(0.0, 0.255, -0.01, 0.15, 0.42));
+
+                // 顶部吊牌杆
+                var pole = new THREE.Mesh(new THREE.CylinderGeometry(0.005, 0.005, 0.2, 6), metal(0x6a7280, 0.36, 1.0));
+                pole.position.set(-0.1, 0.42, 0.05);
+                g.add(pole);
+                var flag = new THREE.Mesh(new THREE.PlaneGeometry(0.09, 0.05), neon(m, 1.4));
+                flag.position.set(-0.055, 0.48, 0.05);
+                flag.material.side = THREE.DoubleSide;
+                g.add(flag);
+
+                return { group: g, anchorY: 0.62, accent: [edgeMat], spin: null };
+            }
+        };
+
+        /* ---------- 布置展台 ---------- */
+
+        var dioramas = [];
+
+        (function buildDioramas() {
+            var n = groups.length;
+            // 从 -Z（后墙中点）起排，正面留出门口，7 个展台大致左右对称
+            var start = -Math.PI / 2;
+
+            groups.forEach(function (g, i) {
+                var maker = DIO[g.key];
+                var ang = start + (i / n) * Math.PI * 2;
+                var rx = Math.sin(ang) * RING_R;
+                var rz = Math.cos(ang) * RING_R;
+
+                var built = maker ? maker(g.color) : { group: new THREE.Group(), anchorY: 0.6, accent: [] };
+                var inner = built.group;
+                inner.position.set(rx, FLOOR_TOP, rz);
+                // 面向圆心：本地 +Z 指向原点
+                inner.rotation.y = Math.atan2(-rx, -rz);
+
+                var meta = TOPIC_FORM[g.key] || { form: '展台', desc: '' };
+
+                var part = registerPart({
+                    key: g.key,
+                    kind: 'core',
+                    name: g.name,
+                    form: meta.form,
+                    desc: meta.desc +
+                        '这一版语料里属于「' + g.name + '」的片段共 ' + g.count + ' 段、' + g.chars +
+                        ' 字，平均每段 ' + g.avg + ' 字。展台背后那根竖列就是 ' + g.count + ' 道片段灯条，检索命中时会逐条亮起。',
+                    specs: [
+                        ['形态', meta.form],
+                        ['片段数', g.count + ' 段'],
+                        ['总字数', g.chars.toLocaleString('en-US') + ' 字'],
+                        ['平均长度', g.avg + ' 字'],
+                        ['索引列', g.count + ' 道灯条']
+                    ],
+                    stat: { count: g.count, chars: g.chars, avg: g.avg },
+                    color: g.color,
+                    inner: inner,
+                    pos: new THREE.Vector3(0, 0, 0),
+                    delta: new THREE.Vector3(
+                        rx * (RING_SCALE - 1),
+                        RING_Y - FLOOR_TOP,
+                        rz * (RING_SCALE - 1)
+                    ),
+                    accent: built.accent || [],
+                    anchor: new THREE.Vector3(0, built.anchorY || 0.62, 0)
+                });
+
+                part.built = built;
+                part.ringPos = new THREE.Vector3(rx, FLOOR_TOP, rz);
+                dioramas.push(part);
+            });
+        })();
+
+        /* ---------- 片段灯条（每个展台背后一根竖列） ---------- */
+
+        (function buildCells() {
+            var first = dioramas[0];
+            if (!first) return;
+            var color0 = first.color;
+
+            dioramas.forEach(function (part) {
+                var g = groups.filter(function (x) { return x.key === part.key; })[0];
+                if (!g) return;
+
+                var n = g.count;
+                var spineH = 0.46;
+                var pitch = spineH / n;
+                var segH = Math.max(0.004, pitch * 0.62);
+
+                // 立柱
+                var post = new THREE.Mesh(
+                    new THREE.BoxGeometry(0.05, spineH + 0.06, 0.04),
+                    metal(0x111a23, 0.52, 0.7)
+                );
+                post.position.set(0.205, 0.10 + (spineH + 0.06) / 2, -0.115);
+                part.inner.add(post);
+
+                // 底座小灯
+                var foot = new THREE.Mesh(new THREE.BoxGeometry(0.055, 0.014, 0.045), neon(part.color, 1.0));
+                foot.position.set(0.205, 0.10, -0.115);
+                part.inner.add(foot);
+
+                var cellMats = [];
+                for (var i = 0; i < n; i++) {
+                    var m = new THREE.MeshStandardMaterial({
+                        color: new THREE.Color(part.color),
+                        emissive: new THREE.Color(part.color),
+                        emissiveIntensity: 0.32,
+                        metalness: 0.3,
+                        roughness: 0.45
+                    });
+                    var mesh = new THREE.Mesh(new THREE.BoxGeometry(0.03, segH, 0.012), m);
+                    var yy = n === 1
+                        ? 0.10 + spineH / 2
+                        : 0.10 + (i + 0.5) * pitch;
+                    mesh.position.set(0.205, yy, -0.093);
+                    mesh.userData.chunkIndex = g.members[i].i;
+                    mesh.userData.partKey = part.key;
+                    mesh.userData.noOutline = true;
+                    part.inner.add(mesh);
+                    cellMats.push({ mesh: mesh, mat: m, baseColor: m.color.clone(), chunk: g.members[i], partKey: part.key });
+                    cells.push(cellMats[cellMats.length - 1]);
+                }
+
+                part.spine = { mats: cellMats, height: spineH, post: post };
+                part.mats = collectMats(part.inner, []);
+            });
         })();
 
         /* ---------- 接触阴影 ---------- */
 
         var shadow = new THREE.Mesh(
-            new THREE.PlaneGeometry(5.4, 4.2),
+            new THREE.PlaneGeometry(7.4, 6.4),
             new THREE.MeshBasicMaterial({
-                map: shadowTexture(), transparent: true, opacity: 1,
+                map: contactTexture(), transparent: true, opacity: 0.95,
                 depthWrite: false
             })
         );
         shadow.rotation.x = -Math.PI / 2;
-        shadow.position.y = -SHELF_H / 2 - 0.048;
+        shadow.position.y = -0.30;
         shadow.renderOrder = -1;
         root.add(shadow);
 
-        /* ---------- 包围球（装配 / 拆解） ---------- */
+        /* ---------- 包围盒（装配 / 拆解） ---------- */
 
         var bounds = parts.map(function (p) {
-            var box = new THREE.Box3().setFromObject(p.inner);
-            if (box.isEmpty()) box.setFromCenterAndSize(new THREE.Vector3(), new THREE.Vector3(0.4, 0.1, 0.4));
-            var size = box.getSize(new THREE.Vector3());
-            var centerLocal = box.getCenter(new THREE.Vector3());
-            return { part: p, size: size, centerLocal: centerLocal };
+            // 每个子对象在“静止姿态”下各自的包围盒；拆解时按它自己的位移平移
+            var subs = p.subs.map(function (s) {
+                var bb = new THREE.Box3().setFromObject(s.obj);
+                if (bb.isEmpty()) {
+                    bb.setFromCenterAndSize(
+                        s.base.clone(),
+                        new THREE.Vector3(0.3, 0.2, 0.3)
+                    );
+                }
+                return { sub: s, box: bb, size: bb.getSize(new THREE.Vector3()) };
+            });
+            var whole = new THREE.Box3().setFromObject(p.inner);
+            if (whole.isEmpty()) whole.setFromCenterAndSize(new THREE.Vector3(), new THREE.Vector3(0.4, 0.1, 0.4));
+            return {
+                part: p,
+                subs: subs,
+                box: whole,
+                size: whole.getSize(new THREE.Vector3()),
+                centerLocal: whole.getCenter(new THREE.Vector3())
+            };
         });
 
-        function boundsBoxAt(e) {
-            var box = new THREE.Box3();
+        var _tmpBox = new THREE.Box3();
+        var _frameBoxes = [];
+
+        // 收集当前拆解进度下所有"真实"子包围盒。
+        // 用联合 AABB 会把不相干的宽/高组合成幽灵角（比如基座的宽度配屋顶的高度），
+        // 自动取景就会被推到很远，模型缩成一小块。
+        function collectFrameBoxes(e) {
+            _frameBoxes.length = 0;
             bounds.forEach(function (b) {
-                var p = b.part;
-                var sz = b.size.clone();
-                var cl = b.centerLocal.clone();
-                if (p.stretch) {
-                    sz.y *= (1 + e * p.stretch);
-                    cl.y *= (1 + e * p.stretch);
-                }
-                if (p.radial) {
-                    sz.x *= (1 + e * p.radial);
-                    sz.z *= (1 + e * p.radial);
-                }
-                var c = new THREE.Vector3(
-                    p.basePos.x + p.dir.x * e + cl.x,
-                    p.basePos.y + p.dir.y * e + cl.y,
-                    p.basePos.z + p.dir.z * e + cl.z
-                );
-                box.expandByPoint(new THREE.Vector3(c.x - sz.x / 2, c.y - sz.y / 2, c.z - sz.z / 2));
-                box.expandByPoint(new THREE.Vector3(c.x + sz.x / 2, c.y + sz.y / 2, c.z + sz.z / 2));
+                b.subs.forEach(function (s) {
+                    _tmpBox.copy(s.box).translate(s.sub.delta.clone().multiplyScalar(e));
+                    _frameBoxes.push(_tmpBox.clone());
+                });
             });
-            return box;
+            return _frameBoxes;
+        }
+
+        function boundsBoxAt(e) {
+            var out = new THREE.Box3();
+            collectFrameBoxes(e).forEach(function (bb) { out.union(bb); });
+            if (out.isEmpty()) out = box0Fallback();
+            return out;
+        }
+
+        // setFromObject 在极窄场景下可能为空：兜一个体面的默认盒
+        function box0Fallback() {
+            return new THREE.Box3(new THREE.Vector3(-1.9, -0.3, -1.7), new THREE.Vector3(1.9, 1.9, 1.7));
         }
 
         var box0 = boundsBoxAt(0);
         var box1 = boundsBoxAt(1);
 
-        /* ---------- 选中描边 ---------- */
+        /* ---------- 选中描边 / 光晕 ---------- */
 
         function buildOutline(p) {
             if (p.outline) return p.outline;
             var group = new THREE.Group();
             var mat = new THREE.LineBasicMaterial({
                 color: new THREE.Color(p.color),
-                transparent: true, opacity: 0.92, depthWrite: false
+                transparent: true, opacity: 0.9, depthWrite: false
             });
             p.inner.traverse(function (o) {
                 if (!o.isMesh || !o.geometry || !o.geometry.attributes.position) return;
-                if (o.geometry.attributes.position.count > 5000) return;
+                if (o.userData.noOutline) return;
+                if (o.geometry.attributes.position.count > 4000) return;
                 var eg;
-                try { eg = new THREE.EdgesGeometry(o.geometry, 32); } catch (err) { return; }
+                try { eg = new THREE.EdgesGeometry(o.geometry, 34); } catch (err) { return; }
                 if (!eg.attributes.position || eg.attributes.position.count < 2) { eg.dispose(); return; }
                 var ls = new THREE.LineSegments(eg, mat);
                 ls.position.copy(o.position);
@@ -635,7 +1355,7 @@
             var sp = new THREE.Sprite(mat);
             var b = bounds.filter(function (x) { return x.part === p; })[0];
             var size = b ? b.size : new THREE.Vector3(1, 1, 1);
-            var scale = Math.max(size.x, size.z, size.y) * 1.9;
+            var scale = Math.max(size.x, size.z, size.y) * 2.1;
             sp.scale.set(scale, scale, 1);
             sp.position.copy(b ? b.centerLocal : new THREE.Vector3());
             sp.renderOrder = 4;
@@ -660,19 +1380,20 @@
             panX: 0,
             dirty: true,
             running: true,
-            idleTime: 0
+            idleTime: 0,
+            clock: 0
         };
 
         var cam = {
-            theta: -0.18,
-            phi: 1.46,
-            radius: 4.9,
-            targetTheta: -0.18,
-            targetPhi: 1.46
+            theta: 0.62,
+            phi: 1.04,
+            radius: 6,
+            targetTheta: 0.62,
+            targetPhi: 1.04
         };
 
-        var MIN_PHI = 0.30, MAX_PHI = Math.PI - 0.34;
-        var ZOOM_MIN = 0.55, ZOOM_MAX = 1.85;
+        var MIN_PHI = 0.26, MAX_PHI = Math.PI - 0.42;
+        var ZOOM_MIN = 0.5, ZOOM_MAX = 1.9;
 
         /* ---------- 相机 ---------- */
 
@@ -683,49 +1404,62 @@
             return new THREE.Box3(min, max);
         }
 
-        var _fitCamTarget = new THREE.Vector3();
         var _fitCorner = new THREE.Vector3();
+        var _fitRel = new THREE.Vector3();
+        var _fitRight = new THREE.Vector3();
+        var _fitUp = new THREE.Vector3();
+        var _fitDir = new THREE.Vector3();
 
-        function fitsAt(box, pos, target) {
-            camera.position.copy(pos);
-            camera.lookAt(target);
-            camera.updateMatrixWorld(true);
-            // r149 的 Camera.updateMatrixWorld 不保证刷新逆矩阵，手工同步，
-            // 否则 project() 会用上一帧的相机做判断，自动取景会算飞
-            camera.matrixWorldInverse.copy(camera.matrixWorld).invert();
-            for (var i = 0; i < 8; i++) {
-                _fitCorner.set(
-                    i & 1 ? box.max.x : box.min.x,
-                    i & 2 ? box.max.y : box.min.y,
-                    i & 4 ? box.max.z : box.min.z
-                );
-                _fitCorner.project(camera);
-                if (Math.abs(_fitCorner.x) > 0.66 || Math.abs(_fitCorner.y) > 0.88) return false;
-            }
-            return true;
-        }
-
+        // 解析取景：把每个真实子包围盒的 8 个角投到相机基上，直接解出"刚好装下"的半径。
+        // 二分法依赖 project()，且 AABB 的角大量落在空白区时会把相机推得过远。
         function frameDistance() {
-            var box = currentBox();
             var target = currentTarget();
-            var dir = new THREE.Vector3(
-                Math.sin(cam.phi) * Math.sin(cam.theta),
-                Math.cos(cam.phi),
-                Math.sin(cam.phi) * Math.cos(cam.theta)
-            );
-            var lo = 1.2, hi = 48;
-            for (var i = 0; i < 22; i++) {
-                var mid = (lo + hi) / 2;
-                if (fitsAt(box, target.clone().addScaledVector(dir, mid), target)) hi = mid;
-                else lo = mid;
-            }
-            return hi;
+            var t = clamp(S.explode, 0, 1);
+            var boxes = collectFrameBoxes(t);
+
+            // 视线方向（从 target 指向相机）
+            var sp = Math.sin(cam.phi);
+            _fitDir.set(sp * Math.sin(cam.theta), Math.cos(cam.phi), sp * Math.cos(cam.theta)).normalize();
+            _fitRight.set(_fitDir.z, 0, -_fitDir.x);
+            if (_fitRight.lengthSq() < 1e-6) _fitRight.set(1, 0, 0);
+            _fitRight.normalize();
+            _fitUp.crossVectors(_fitRight, _fitDir).normalize();
+
+            // 垂直 fov 是基准，水平方向按 aspect 换算；margin 是留边。
+            // 1.0 = 刚好贴边，取 0.78 让主体占到画面约 8 成，同时给标注留位置。
+            var margin = 0.84;
+            var tanV = Math.tan(camera.fov * D2R / 2) * margin;
+            var tanH = tanV * Math.max(0.5, camera.aspect);
+
+            var need = 0;
+            boxes.forEach(function (box) {
+                for (var i = 0; i < 8; i++) {
+                    _fitCorner.set(
+                        i & 1 ? box.max.x : box.min.x,
+                        i & 2 ? box.max.y : box.min.y,
+                        i & 4 ? box.max.z : box.min.z
+                    );
+                    _fitRel.copy(_fitCorner).sub(target);
+                    // along: 该角在视线方向上的位置（正 = 比 target 更靠近相机）
+                    var along = _fitRel.dot(_fitDir);
+                    var x = Math.abs(_fitRel.dot(_fitRight));
+                    var y = Math.abs(_fitRel.dot(_fitUp));
+                    need = Math.max(need, x / tanH + along, y / tanV + along);
+                }
+            });
+            return Math.max(2.2, need);
         }
 
         function currentTarget() {
             var box = currentBox();
             var c = box.getCenter(new THREE.Vector3());
             return new THREE.Vector3(0, c.y, 0);
+        }
+
+        // 保留：调试/外部查询用
+        function sceneSize(e) {
+            var box = currentBox(e);
+            return box.getSize(new THREE.Vector3());
         }
 
         function updateCamera() {
@@ -746,10 +1480,9 @@
         /* ---------- 交互：拖拽 / 缩放 / 平移 ---------- */
 
         var ptr = { down: false, x: 0, y: 0, btn: 0, moved: 0, id: null };
-        var touches = [];
 
         function onDown(e) {
-            if (e.target.closest && e.target.closest('.se-ui, .ss-label')) return;
+            if (e.target.closest && e.target.closest('.se-ui, .se-label')) return;
             ptr.down = true;
             ptr.x = e.clientX; ptr.y = e.clientY;
             ptr.btn = e.button;
@@ -767,8 +1500,8 @@
                 ptr.moved += Math.abs(dx) + Math.abs(dy);
 
                 if (ptr.btn === 2 || e.shiftKey) {
-                    S.panX -= dx * 0.004 * (cam.radius / 5);
-                    S.panY += dy * 0.004 * (cam.radius / 5);
+                    S.panX -= dx * 0.004 * (cam.radius / 6);
+                    S.panY += dy * 0.004 * (cam.radius / 6);
                 } else {
                     cam.targetTheta -= dx * 0.0072;
                     cam.targetPhi = clamp(cam.targetPhi - dy * 0.0062, MIN_PHI, MAX_PHI);
@@ -847,20 +1580,30 @@
 
         /* ---------- 选中 ---------- */
 
+        function partByKey(k) {
+            for (var i = 0; i < parts.length; i++) if (parts[i].key === k) return parts[i];
+            return null;
+        }
+
         function setPartsDim(exceptKey) {
-            var dim = exceptKey ? 0.13 : 1;
+            var dim = exceptKey ? 0.11 : 1;
             parts.forEach(function (p) {
                 var opacity = (p.key === exceptKey) ? 1 : dim;
                 p.mats.forEach(function (rec) {
                     var m = rec.m;
-                    if (opacity < 1) {
+                    if (opacity < 1 && rec.opacity > 0.9) {
                         m.transparent = true;
                         m.opacity = opacity;
+                        m.depthWrite = false;
+                    } else if (opacity < 1) {
+                        // 本来就是半透明的（玻璃），再压一点就好
+                        m.transparent = true;
+                        m.opacity = rec.opacity * 0.5;
                         m.depthWrite = false;
                     } else {
                         m.opacity = rec.opacity;
                         m.transparent = rec.transparent;
-                        m.depthWrite = true;
+                        m.depthWrite = rec.depthWrite;
                     }
                 });
                 if (p.outline) p.outline.visible = false;
@@ -873,24 +1616,16 @@
             var out = buildOutline(sel);
             out.visible = true;
             var glow = buildGlow(sel);
-            glow.material.opacity = 0.46;
-        }
-
-        function partByKey(k) {
-            for (var i = 0; i < parts.length; i++) if (parts[i].key === k) return parts[i];
-            return null;
+            glow.material.opacity = 0.5;
         }
 
         function selectPart(key, quiet) {
-            if (key && S.selected === key) {
-                if (!quiet) { /* 再点一次保持选中 */ }
-            }
             S.selected = key;
             setPartsDim(key);
             if (key) {
-                if (S.explodeTarget < 0.55) S.explodeTarget = 0.92;
+                if (S.explodeTarget < 0.55) S.explodeTarget = 0.94;
                 var p = partByKey(key);
-                if (p) p.liftTarget = 0.03;
+                if (p) p.liftTarget = 0.035;
             }
             parts.forEach(function (p) {
                 if (p.key !== key) p.liftTarget = 0;
@@ -927,32 +1662,31 @@
             var byPart = {};
 
             cells.forEach(function (c) {
-                var idx = c.mesh.userData.chunkIndex;
+                var idx = c.chunk.i;
                 var score = map[idx];
                 if (score === undefined) {
-                    c.mat.emissiveIntensity = 0.16;
+                    c.mat.emissiveIntensity = 0.18;
                     c.mat.color.copy(c.baseColor);
                 } else {
                     var k = maxScore > 0 ? score / maxScore : 0;
-                    c.mat.emissiveIntensity = 0.55 + k * 3.1;
-                    c.mat.color.copy(c.baseColor).lerp(new THREE.Color(0xffffff), 0.18);
-                    var pk = c.mesh.userData.partKey;
-                    byPart[pk] = byPart[pk] || { n: 0, max: 0 };
-                    byPart[pk].n++;
-                    if (k > byPart[pk].max) byPart[pk].max = k;
+                    c.mat.emissiveIntensity = 0.6 + k * 3.4;
+                    c.mat.color.copy(c.baseColor).lerp(new THREE.Color(0xffffff), 0.22);
+                    byPart[c.partKey] = byPart[c.partKey] || { n: 0, max: 0 };
+                    byPart[c.partKey].n++;
+                    if (k > byPart[c.partKey].max) byPart[c.partKey].max = k;
                 }
             });
 
             parts.forEach(function (p) {
-                if (p.key === 'rail') return;
+                if (p.kind !== 'core') { p.hit = 0; p.hitCount = 0; return; }
                 var rec = byPart[p.key];
                 p.hit = rec ? rec.max : 0;
                 p.hitCount = rec ? rec.n : 0;
-                if (p.strip) {
-                    p.strip.mats.forEach(function (m) {
-                        m.emissiveIntensity = 0.08 + (rec ? rec.max * 1.15 : 0);
-                    });
-                }
+                p.accent.forEach(function (m) {
+                    if (!m || !m.emissive) return;
+                    if (!m.userData.baseEmissive) m.userData.baseEmissive = m.emissiveIntensity;
+                    m.emissiveIntensity = m.userData.baseEmissive + (rec ? rec.max * 1.4 : 0);
+                });
             });
 
             wake();
@@ -975,25 +1709,23 @@
             var p = partByKey(key);
             if (!p) return;
             selectPart(key);
-            setExplode(0.92);
+            setExplode(0.94);
         }
 
         /* ---------- 自动巡览 ---------- */
 
         function tour() {
             stopTour();
-            var order = parts.filter(function (p) {
-                return p.book !== undefined;
-            }).map(function (p) { return p.key; });
+            var order = dioramas.map(function (p) { return p.key; });
             if (!order.length) return;
             setExplode(1);
             var i = 0;
-            S.tour = global.setInterval(function () {
-                selectPart(order[i % order.length]);
-                i++;
-                if (i > order.length) { stopTour(); }
-            }, 2400);
             selectPart(order[0]);
+            S.tour = global.setInterval(function () {
+                i++;
+                if (i >= order.length) { stopTour(); return; }
+                selectPart(order[i]);
+            }, 2600);
         }
 
         function stopTour() {
@@ -1013,22 +1745,24 @@
             return labelSvg;
         }
 
+        var SHELL_ORDER = ['base', 'floor', 'walls', 'roof', 'chimney'];
+
         function labelDescriptor(p) {
-            var idx = String(p.index + 1).padStart(2, '0');
-            if (p.book) {
+            if (p.kind === 'core') {
                 return {
-                    idx: idx,
+                    badge: 'T' + String(dioramas.indexOf(p) + 1).padStart(2, '0'),
                     name: p.name,
                     meta: p.stat.count + ' 段 · ' + p.stat.chars + ' 字',
                     show: true
                 };
             }
-            var names = {
-                shelf: ['书架', '2.5 × 0.86'],
-                rail: ['顶横梁', chunks.length + ' 道刻度']
+            var idx = SHELL_ORDER.indexOf(p.key);
+            return {
+                badge: 'S' + String(idx + 1).padStart(2, '0'),
+                name: p.name,
+                meta: (p.specs[0] ? p.specs[0][1] : ''),
+                show: S.explode > 0.5
             };
-            var n = names[p.key] || ['部件', ''];
-            return { idx: idx, name: n[0], meta: n[1], show: S.explode > 0.55 };
         }
 
         function ensureLabel(p) {
@@ -1091,7 +1825,6 @@
                 list.push({ p: p, rec: rec, x: x, y: y, desc: desc });
             });
 
-            // 左右分列，按 y 排序避让
             var sides = { left: [], right: [] };
             list.forEach(function (it) {
                 sides[it.x > w / 2 ? 'right' : 'left'].push(it);
@@ -1099,38 +1832,37 @@
 
             ['left', 'right'].forEach(function (side) {
                 var arr = sides[side].sort(function (a, b) { return a.y - b.y; });
-                var gap = 46;
-                var minY = 74, maxY = h - 96;
+                var gap = 40;
+                var minY = 70, maxY = h - 92;
                 var cursor = minY;
                 arr.forEach(function (it) {
-                    var ly = clamp(Math.max(it.y - 14, cursor), minY, maxY);
+                    var ly = clamp(Math.max(it.y - 13, cursor), minY, maxY);
                     it.ly = ly;
                     cursor = ly + gap;
                 });
-                // 超出下边界则整体上推
                 var overflow = cursor - gap - maxY;
                 if (overflow > 0) {
-                    arr.forEach(function (it) { it.ly = clamp(it.ly - overflow, minY, maxY); });
+                    arr.forEach(function (it) { it.ly = clamp(it.ly - overflow * 0.6, minY, maxY); });
                 }
                 arr.forEach(function (it) {
-                    var cardW = 196;
-                    var cardX = side === 'right' ? w - cardW - 16 : 16;
+                    var cardW = 186;
+                    var cardX = side === 'right' ? w - cardW - 14 : 14;
                     var edgeX = side === 'right' ? cardX : cardX + cardW;
                     it.rec.el.style.left = cardX + 'px';
                     it.rec.el.style.top = it.ly + 'px';
                     it.rec.el.style.width = cardW + 'px';
-                    it.rec.el.querySelector('.se-label__idx').textContent = it.desc.idx;
+                    it.rec.el.querySelector('.se-label__idx').textContent = it.desc.badge;
                     it.rec.el.querySelector('.se-label__name').textContent = it.desc.name;
                     it.rec.el.querySelector('.se-label__meta').textContent = it.desc.meta;
                     it.rec.el.classList.toggle('is-on', S.selected === it.p.key);
+                    it.rec.el.classList.toggle('is-core', it.p.kind === 'core');
 
-                    // 固定折线列：所有竖段对齐成两条竖线，读起来才像技术图
-                    var midX = side === 'right' ? cardX - 26 : cardX + cardW + 26;
+                    var midX = side === 'right' ? cardX - 24 : cardX + cardW + 24;
                     it.rec.line.setAttribute('points',
                         it.x.toFixed(1) + ',' + it.y.toFixed(1) + ' ' +
                         midX.toFixed(1) + ',' + it.y.toFixed(1) + ' ' +
-                        midX.toFixed(1) + ',' + (it.ly + 13).toFixed(1) + ' ' +
-                        edgeX.toFixed(1) + ',' + (it.ly + 13).toFixed(1)
+                        midX.toFixed(1) + ',' + (it.ly + 12).toFixed(1) + ' ' +
+                        edgeX.toFixed(1) + ',' + (it.ly + 12).toFixed(1)
                     );
                     it.rec.dot.setAttribute('cx', it.x.toFixed(1));
                     it.rec.dot.setAttribute('cy', it.y.toFixed(1));
@@ -1151,9 +1883,46 @@
                 requestAnimationFrame(tick);
             }
         }
+        function applyLayout(e) {
+            parts.forEach(function (p) {
+                p.subs.forEach(function (s) {
+                    s.obj.position.copy(s.base).addScaledVector(s.delta, e);
+                    if (s.dRot) {
+                        s.obj.rotation.set(
+                            s.baseRot.x + s.dRot.x * e,
+                            s.baseRot.y + s.dRot.y * e,
+                            s.baseRot.z + s.dRot.z * e
+                        );
+                    }
+                });
+                p.group.position.set(p.basePos.x, p.basePos.y + p.lift, p.basePos.z);
+            });
+        }
+
+        function idleMotion(t) {
+            // 拆解后让机械件动起来：齿轮啮合、滚筒转、悬浮件飘
+            dioramas.forEach(function (p) {
+                var sp = p.built && p.built.spin;
+                if (!sp) return;
+                if (sp.gears) {
+                    sp.gears[0].rotation.z = t * 0.9;
+                    sp.gears[1].rotation.z = -t * 1.3;
+                }
+                if (sp.rollers) {
+                    sp.rollers.forEach(function (r) { r.rotation.y = t * 1.6; });
+                }
+                if (sp.crate) {
+                    sp.crate.position.z = Math.sin(t * 0.8) * 0.035;
+                }
+                if (sp.obj) {
+                    if (sp.axis === 'y') sp.obj.rotation.y = t * (sp.speed || 0.6);
+                    else sp.obj.rotation.x = t * (sp.speed || 0.6);
+                }
+            });
+        }
 
         function step(dt) {
-            var k = reduceMotion ? 1 : 1 - Math.exp(-dt * 6.2);
+            var k = reduceMotion ? 1 : 1 - Math.exp(-dt * 6.4);
 
             if (Math.abs(S.explode - S.explodeTarget) > 0.0004) {
                 S.explode += (S.explodeTarget - S.explode) * k;
@@ -1182,27 +1951,23 @@
                     p.lift += liftDiff * (reduceMotion ? 1 : 0.18);
                     S.dirty = true;
                 }
-                var hitLift = p.book && p.hit ? 0.022 * p.hit : 0;
-                var e = S.explode;
-                p.group.position.set(
-                    p.basePos.x + p.dir.x * e,
-                    p.basePos.y + p.dir.y * e + p.lift + hitLift,
-                    p.basePos.z + p.dir.z * e
-                );
-                if (p.rotZ) p.group.rotation.z = p.rotZ * e;
-                if (p.stretch) p.inner.scale.y = 1 + e * p.stretch;
-                if (p.radial) {
-                    var rs = 1 + e * p.radial;
-                    p.inner.scale.x = rs;
-                    p.inner.scale.z = rs;
-                }
             });
+
+            applyLayout(S.explode);
+
+            // 拆开后屋里的机械件持续动作，这时必须逐帧渲染
+            if (S.explode > 0.35 && !reduceMotion) {
+                S.clock += dt;
+                idleMotion(S.clock);
+                S.dirty = true;
+            }
 
             updateCamera();
 
             if (S.dirty) {
                 renderer.render(scene, camera);
                 updateLabels();
+                S.dirty = false;
             }
         }
 
@@ -1211,21 +1976,22 @@
             var dt = lastTime ? Math.min(0.05, (now - lastTime) / 1000) : 0.016;
             lastTime = now;
 
-            var moving =
+            step(dt);
+
+            // 是否还有必要继续画：拆解中 / 相机在动 / 自转 / 机械件在转
+            var busy =
                 Math.abs(S.explode - S.explodeTarget) > 0.0004 ||
                 Math.abs(cam.theta - cam.targetTheta) > 0.0002 ||
                 Math.abs(cam.phi - cam.targetPhi) > 0.0002 ||
                 S.spin ||
+                (S.explode > 0.35 && !reduceMotion) ||
                 parts.some(function (p) { return Math.abs(p.liftTarget - p.lift) > 0.0002; });
 
-            step(dt);
-
-            if (!moving && !S.dirty) {
+            if (!busy) {
                 S.idleTime += dt;
-                if (S.idleTime > 0.9) { S.running = false; return; }
+                if (S.idleTime > 1.0) { S.running = false; S.dirty = true; return; }
             } else {
                 S.idleTime = 0;
-                S.dirty = false;
             }
 
             requestAnimationFrame(tick);
@@ -1248,7 +2014,6 @@
         var ro = new ResizeObserver(resize);
         ro.observe(stage);
 
-        resolveSize();
         function resolveSize() {
             var w = stage.clientWidth;
             if (!w) {
@@ -1256,14 +2021,35 @@
                 return;
             }
             resize();
+            applyLayout(S.explode);
             updateCamera();
             renderer.render(scene, camera);
             updateLabels();
-            onReady({ parts: parts.map(function (p) {
-                return { key: p.key, name: p.name || p.key, index: p.index, color: p.color, stat: p.stat || null, hitCount: 0 };
-            }) });
+            onReady({ parts: listParts() });
             requestAnimationFrame(tick);
         }
+
+        function listParts() {
+            return parts.map(function (p) {
+                return {
+                    key: p.key,
+                    name: p.name,
+                    kind: p.kind,
+                    index: p.index,
+                    color: p.color,
+                    form: p.form,
+                    desc: p.desc,
+                    specs: p.specs,
+                    stat: p.stat,
+                    hitCount: p.hitCount || 0,
+                    badge: p.kind === 'core'
+                        ? 'T' + String(dioramas.indexOf(p) + 1).padStart(2, '0')
+                        : 'S' + String(SHELL_ORDER.indexOf(p.key) + 1).padStart(2, '0')
+                };
+            });
+        }
+
+        resolveSize();
 
         /* ---------- 键盘 ---------- */
 
@@ -1292,9 +2078,10 @@
             S.zoom = 1;
             S.panX = 0;
             S.panY = 0;
-            cam.targetTheta = -0.18;
-            cam.targetPhi = 1.46;
+            cam.targetTheta = 0.62;
+            cam.targetPhi = 1.04;
             S.spin = false;
+            S.clock = 0;
             wake();
         }
 
@@ -1330,14 +2117,16 @@
             selectPart: selectPart,
             selectChunk: selectChunk,
             focusChunk: function (idx) {
-                var c = cells.filter(function (x) { return x.mesh.userData.chunkIndex === idx; })[0];
+                var c = cells.filter(function (x) { return x.chunk.i === idx; })[0];
                 if (c) {
-                    selectPart(c.mesh.userData.partKey, true);
+                    selectPart(c.partKey, true);
                     selectChunk(idx);
                 }
             },
+            listParts: listParts,
             setExplode: setExplode,
             toggleExplode: toggleExplode,
+            focusPart: focusPart,
             tour: tour,
             stopTour: stopTour,
             setLabels: setLabels,
@@ -1349,21 +2138,18 @@
             dispose: dispose,
             state: S,
             parts: parts,
+            dioramas: dioramas,
             _dbg: function () {
                 var box = currentBox();
                 var size = box.getSize(new THREE.Vector3());
-                var ndc = [];
-                camera.updateMatrixWorld(true);
-                camera.matrixWorldInverse.copy(camera.matrixWorld).invert();
-                for (var i = 0; i < 8; i++) {
-                    var v = new THREE.Vector3(
-                        i & 1 ? box.max.x : box.min.x,
-                        i & 2 ? box.max.y : box.min.y,
-                        i & 4 ? box.max.z : box.min.z
-                    ).project(camera);
-                    ndc.push([+v.x.toFixed(3), +v.y.toFixed(3)]);
-                }
-                return { fov: camera.fov, pos: camera.position.toArray().map(function(n){return +n.toFixed(2);}), camY: +camera.position.y.toFixed(2), radius: +cam.radius.toFixed(2), size: [+size.x.toFixed(2), +size.y.toFixed(2), +size.z.toFixed(2)], ndc: ndc, aspect: +camera.aspect.toFixed(3) };
+                return {
+                    fov: camera.fov,
+                    pos: camera.position.toArray().map(function (n) { return +n.toFixed(2); }),
+                    radius: +cam.radius.toFixed(2),
+                    explode: +S.explode.toFixed(3),
+                    size: [+size.x.toFixed(2), +size.y.toFixed(2), +size.z.toFixed(2)],
+                    aspect: +camera.aspect.toFixed(3)
+                };
             }
         };
     }
