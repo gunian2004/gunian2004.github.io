@@ -452,7 +452,7 @@ if (!motionPreference.matches && 'IntersectionObserver' in window) {
 const copyGithubButton = document.getElementById('copyGithub');
 const contactCopyStatus = document.getElementById('contactCopyStatus');
 if (copyGithubButton && contactCopyStatus) {
-    const githubAddress = 'https://github.com/gunian2004';
+    const githubAddress = 'https://github.com/gunian2022';
     let copying = false;
     copyGithubButton.hidden = false;
     copyGithubButton.addEventListener('click', async () => {

@@ -141,7 +141,7 @@
 | 移动端菜单 | ☰ | `#navToggle` | 展开 / 收起导航 | 本页 |
 | 首屏主 CTA | 探索项目案例 ↗ | `.btn.btn-primary` | 滚动 | `#projects` |
 | 首屏次 CTA | 联系我 ↓ | `.btn.btn-ghost` | 滚动 | `#contact` |
-| 首屏社交 | GitHub | `.hero-social` | 新窗口打开 | `github.com/gunian2004` |
+| 首屏社交 | GitHub | `.hero-social` | 新窗口打开 | `github.com/gunian2022` |
 | 项目筛选（隐藏） | 全部 / AI 应用 / 业务系统 / 自动化 | `.project-filter` | 按分类过滤卡片 | 默认 `hidden`，暂未启用 |
 | 项目展开 | 展开案例细节 / 收起细节 | `.project-expand-btn` | 展开 / 收起案例三段 | 本页 |
 | 项目截图 | 图片封面（⤢） | `.project-image-trigger` | 打开大图对话框 | `#erpImageDialog` |

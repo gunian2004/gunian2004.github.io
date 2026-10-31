@@ -2,9 +2,9 @@
 
 <div align="center">
 
-![Visitors](https://komarev.com/ghpvc/?username=gunian2004&style=flat-square&color=00d4ff)
-![Stars](https://img.shields.io/github/stars/gunian2004?style=flat-square&color=ff00aa)
-![Forks](https://img.shields.io/github/forks/gunian2004?style=flat-square&color=7b2cbf)
+![Visitors](https://komarev.com/ghpvc/?username=gunian2022&style=flat-square&color=00d4ff)
+![Stars](https://img.shields.io/github/stars/gunian2022?style=flat-square&color=ff00aa)
+![Forks](https://img.shields.io/github/forks/gunian2022?style=flat-square&color=7b2cbf)
 
 <p align="center">
   <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=600&size=30&color=00D4FF&center=true&vCenter=true&width=500&lines=AI+Product+Engineer;Software+Engineer;Automation+Expert" alt="Typing SVG" />
@@ -97,8 +97,8 @@
 
 <div align="center">
 
-[![GitHub](https://img.shields.io/badge/-GitHub-181717?style=for-the-badge&logo=github)](https://github.com/gunian2004)
-[![Email](https://img.shields.io/badge/-Email-D14836?style=for-the-badge&logo=gmail)](mailto:gunian2004@example.com)
+[![GitHub](https://img.shields.io/badge/-GitHub-181717?style=for-the-badge&logo=github)](https://github.com/gunian2022)
+[![Email](https://img.shields.io/badge/-Email-D14836?style=for-the-badge&logo=gmail)](mailto:gunian2022@example.com)
 [![掘金](https://img.shields.io/badge/-掘金-007AFF?style=for-the-badge)](https://juejin.cn)
 
 </div>
